@@ -8,7 +8,7 @@
         <v-list-item-content class="text-center" style="color: white;">
           <img :src="logo" />
           <v-list-item-title class="headline">Inicio de Sesión</v-list-item-title>
-          <v-list-item-subtitle style="color: white;">Sistema MRM</v-list-item-subtitle>
+          <v-list-item-subtitle style="color: white;">Sistema</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-card class="elevation-12">
