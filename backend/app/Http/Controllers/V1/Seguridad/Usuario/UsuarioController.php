@@ -271,7 +271,7 @@ class UsuarioController extends ApiController
             
             return $this->successResponse('Registro actualizado.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error en el controlador', 423);
+            return $this->errorResponse($e->getMessage(), 423);
         }
     }
 
