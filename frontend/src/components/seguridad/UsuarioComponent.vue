@@ -218,6 +218,7 @@
                           v-validate="'required'"
                           data-vv-scope="crear_usuario"
                           data-vv-name="número de teléfono"
+                          :no-flags="true"
                           required
                         />
                         <FormError
