@@ -97,7 +97,7 @@ Vue.use(Cropper, {
 });
 
 import VuePhoneNumberInput from 'vue-phone-number-input';
-import 'vue-phone-number-input/dist/vue-phone-number-input.css';
+import '../static/vue-phone-number-input.css';
 Vue.component('vue-phone-number-input', VuePhoneNumberInput);
 
 import VueNumberInput from '@chenfengyuan/vue-number-input';
