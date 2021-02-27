@@ -44,15 +44,15 @@ return [
 
         'user' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL') . '/storage/pictures_users',
+            'root' => storage_path('app/public/pictures_users'),
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
         'room' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL') . '/storage/pictures_rooms',
+            'root' => storage_path('app/public/pictures_rooms'),
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 

@@ -33,8 +33,8 @@ import pictureRoomService from '../services/principal/room/PictureRoomService'
 
 
 // Para desarrollo
-let baseUrl = 'http://64.225.43.65/'
-//let baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
+//let baseUrl = 'http://64.225.43.65/'
+let baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
 let token_data = $cookies.get('token_data')
 
 // Axios Configuration
