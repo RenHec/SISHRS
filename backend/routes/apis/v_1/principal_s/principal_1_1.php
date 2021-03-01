@@ -31,3 +31,6 @@ Route::resource('picture_room', 'Room\PictureRoomController')->only('store', 'sh
 Route::name('picture_room.view')->get('picture_room/view/{picture_room}', 'Room\PictureRoomController@view');
 Route::name('picture_room.up')->get('picture_room/up/{picture_room}', 'Room\PictureRoomController@up');
 Route::name('picture_room.down')->get('picture_room/down/{picture_room}', 'Room\PictureRoomController@down');
+
+//rutas para OfertRoomController
+Route::resource('ofert_room', 'Room\OfertRoomController')->except('create', 'show', 'edit');

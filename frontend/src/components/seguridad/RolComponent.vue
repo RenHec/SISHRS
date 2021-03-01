@@ -316,7 +316,6 @@ export default {
             this.loading = false;
             return;
           }
-          console.log(r.data.data);
           this.desserts = r.data.data;
           this.close();
           this.loading = false;

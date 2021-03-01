@@ -15,7 +15,7 @@ export default {
     var token_data = $cookies.get('token_data')
     this.data_refresh_token.refresh_token = token_data.refresh_token
     this.data_refresh_token.client_id = store.state.client_id,
-      this.data_refresh_token.client_secret = store.state.client_secret
+    this.data_refresh_token.client_secret = store.state.client_secret
 
     return this.data_refresh_token
   },
@@ -40,7 +40,6 @@ export default {
   },
 
   getMenus(data) {
-    console.log(data)
     let self = this
     self.loading = true
     store.state.services.userRolService
@@ -82,8 +81,6 @@ export default {
         object.childrens.length > 0 ? menu.push(object) : null
       }
     })
-
-    console.log(menu)
 
     store.dispatch('setMenu', {
       items: menu,

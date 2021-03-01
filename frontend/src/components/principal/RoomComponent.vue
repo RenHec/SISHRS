@@ -114,10 +114,10 @@
                   @input="form.price = formatear_numero($event)"
                   data-vv-name="precio de la habitación"
                   v-validate="'required'"
-                  data-vv-scope="crear_vehiculo"
+                  data-vv-scope="create"
                 />
                 <FormError
-                  :attribute_name="'crear_vehiculo.precio de la habitación'"
+                  :attribute_name="'create.precio de la habitación'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -195,7 +195,17 @@
               </v-col>
               <v-col cols="12" md="12" class="text-center">
                 <h3>Descripción de la habitación</h3>
-                <quill-editor class="editor" v-model="form.description" />
+                <quill-editor
+                  class="editor"
+                  v-validate="'required|min:50'"
+                  data-vv-scope="create"
+                  data-vv-name="descripción"
+                  v-model="form.description"
+                />
+                <FormError
+                  :attribute_name="'create.descripción'"
+                  :errors_form="errors"
+                ></FormError>
               </v-col>
             </v-row>
           </v-container>
@@ -238,26 +248,28 @@
           </v-toolbar>
         </template>
         <template v-slot:item.description="{ item }">
-        <br>
+          <br />
           <v-card color="#385F73" dark>
-            <v-card-title class="headline"> Información de la Habitación </v-card-title>
-            <hr>
+            <v-card-title class="headline">
+              Información de la Habitación
+            </v-card-title>
+            <hr />
             <v-card-subtitle>
-                <ul>
-                    <li>Cantidad de Personas: {{ item.amount_people }}</li>
-                    <li>
-                    Tipo de Cama: {{ item.amount_bed }} {{ item.type_bed.name }}
-                    </li>
-                    <li>Habitación: {{ item.type_room.name }}</li>
-                </ul>
-                <p v-html="item.description"></p>
+              <ul>
+                <li>Cantidad de Personas: {{ item.amount_people }}</li>
+                <li>
+                  Tipo de Cama: {{ item.amount_bed }} {{ item.type_bed.name }}
+                </li>
+                <li>Habitación: {{ item.type_room.name }}</li>
+              </ul>
+              <p v-html="item.description"></p>
             </v-card-subtitle>
 
             <v-card-actions>
               <h1>Precio {{ item.coin.symbol }} {{ item.price }}</h1>
             </v-card-actions>
           </v-card>
-        <br>
+          <br />
         </template>
         <template v-slot:item.actions="{ item }">
           <v-btn

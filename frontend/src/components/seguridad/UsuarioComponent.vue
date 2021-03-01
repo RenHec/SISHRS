@@ -551,6 +551,11 @@ export default {
       temp: null,
       headers: [
         {
+          text: "CUI",
+          align: "start",
+          value: "cui",
+        },
+        {
           text: "Nombre",
           align: "start",
           value: "name",

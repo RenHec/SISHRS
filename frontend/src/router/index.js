@@ -24,6 +24,7 @@ import PictureRoom from '@/components/principal/PictureRoomComponent'
 import Room from '@/components/principal/RoomComponent'
 import TypeBed from '@/components/principal/TypeBedComponent'
 import TypeRoom from '@/components/principal/TypeRoomComponent'
+import Ofert from '@/components/principal/OfertComponent'
 
 Vue.use(Router)
 
@@ -121,6 +122,11 @@ const routes = [{
     path: '/type_room',
     name: 'TypeRoom',
     component: TypeRoom,
+    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+  }, {
+    path: '/oferts',
+    name: 'Ofert',
+    component: Ofert,
     beforeEnter: multiguard([isLoggedIn, permissionsValidations])
   },
 ]

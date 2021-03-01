@@ -284,9 +284,9 @@
             text
             icon
             color="info lighten-2"
-            @click="mapear_roles(item)"
+            @click="mapear_telefonos(item)"
           >
-            <v-icon class="material-icons">library_books</v-icon>
+            <v-icon class="material-icons">mdi-phone</v-icon>
           </v-btn>
         </template>
         <template v-slot:no-data>
@@ -295,6 +295,89 @@
         </template>
       </v-data-table>
     </v-col>
+
+    <v-dialog
+      v-model="dialog"
+      persistent
+      color="primary"
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-overlay :value="loading">
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
+        </v-overlay>
+        <v-card-title>
+          <span class="headline">{{ title }}</span>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container>
+            <v-row class="text-center">
+              <v-col cols="12" md="4">
+                <vue-phone-number-input
+                  v-model="number"
+                  default-country-code="GT"
+                  size="lg"
+                  :dark="true"
+                  :translations="translations"
+                  show-code-on-list
+                  @update="validar_numero($event)"
+                  :no-flags="true"
+                  required
+                />
+              </v-col>
+              <v-col cols="12" md="2">
+                <v-btn
+                  v-if="esconder_boton"
+                  color="blue darken-1"
+                  @click="store_phone(form_telefono)"
+                  >Guardar</v-btn
+                >
+              </v-col>
+
+              <v-col cols="12">
+                <v-simple-table dark>
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-center">País</th>
+                        <th class="text-center">Código de Área</th>
+                        <th class="text-center">Número de Teléfono</th>
+                        <th class="text-center">Link Llamada</th>
+                        <th class="text-center">Opción</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="telefonos_mostrar.length > 0">
+                      <tr
+                        v-for="(item, index) in telefonos_mostrar"
+                        :key="index"
+                      >
+                        <td class="text-center">{{ item.country }}</td>
+                        <td class="text-center">{{ item.area_code }}</td>
+                        <td class="text-center">{{ item.number }}</td>
+                        <td class="text-center">{{ item.url }}</td>
+                        <td class="text-center">
+                          <v-btn color="info" small @click="destroy_phone(item)"
+                            >Eliminar</v-btn
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" @click="cerrar_dialog"
+            >Cerrar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
@@ -314,6 +397,7 @@ export default {
       esconder_boton: false,
       number: null,
       search: "",
+      title: "",
       headers: [
         {
           text: "NIT",
@@ -356,6 +440,7 @@ export default {
       },
       desserts: [],
       municipios: [],
+      telefonos: [],
       form: {
         id: 0,
         nit: null,
@@ -369,6 +454,7 @@ export default {
         phones: [],
       },
       form_telefono: {
+        id: 0,
         number: null,
         area_code: null,
         country: null,
@@ -380,11 +466,15 @@ export default {
         phoneNumberLabel: "Número de teléfono",
         example: "Ejemplo :",
       },
+      temporal: null,
     };
   },
   computed: {
     formTitle() {
       return !this.editedIndex ? "Agregar Cliente" : "Editar Cliente";
+    },
+    telefonos_mostrar() {
+      return this.telefonos;
     },
   },
 
@@ -597,7 +687,6 @@ export default {
     },
 
     agregar_telefono(scope) {
-      console.log(scope);
       if (!this.esconder_boton) {
         this.$toastr.info("El número de teléfono no es válido", "Teléfono");
       }
@@ -637,6 +726,126 @@ export default {
         })
         .catch((r) => {});
     },
+
+    mapear_telefonos(item) {
+      this.loading = true;
+      this.title = "Administrar números de teléfono de " + item.full_name;
+
+      this.$store.state.services.clientPhoneService
+        .show(item)
+        .then((r) => {
+          if (r.response) {
+            if (r.response.data.code === 423) {
+              this.$toastr.error(r.response.data.error, "Mensaje");
+            } else {
+              for (let value of Object.values(r.response.data.error)) {
+                this.$toastr.error(value, "Mensaje");
+              }
+            }
+            this.loading = false;
+            return;
+          }
+
+          this.telefonos = r.data.data.phones;
+          this.form_telefono.id = item.id;
+          this.esconder_boton = false;
+          this.number = null;
+          this.dialog = true;
+          this.temporal = item;
+          this.loading = false;
+        })
+        .catch((r) => {
+          this.loading = false;
+          this.dialog = false;
+        });
+    },
+
+    store_phone(data) {
+      this.$swal({
+        title: "Agregar Número de Teléfono",
+        text: "¿Está seguro de realizar esta acción?",
+        type: "success",
+        showCancelButton: true,
+      }).then((result) => {
+        if (result.value) {
+          this.loading = true;
+          this.$store.state.services.clientPhoneService
+            .update(data)
+            .then((r) => {
+              this.loading = false;
+
+              if (r.response) {
+                if (r.response.data.code === 404) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else if (r.response.data.code === 423) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else {
+                  for (let value of Object.values(r.response.data)) {
+                    this.$toastr.error(value, "Mensaje");
+                  }
+                }
+                return;
+              }
+
+              this.$toastr.success(r.data, "Mensaje");
+              this.mapear_telefonos(this.temporal);
+            })
+            .catch((r) => {
+              this.loading = false;
+            });
+        } else {
+          this.dialog = false;
+        }
+      });
+    },
+
+    destroy_phone(data) {
+      this.$swal({
+        title: "Eliminar Número de Teléfono",
+        text: "¿Está seguro de realizar esta acción?",
+        type: "error",
+        showCancelButton: true,
+      }).then((result) => {
+        if (result.value) {
+          this.loading = true;
+          this.$store.state.services.clientPhoneService
+            .destroy(data)
+            .then((r) => {
+              this.loading = false;
+
+              if (r.response) {
+                if (r.response.data.code === 404) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else if (r.response.data.code === 423) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else {
+                  for (let value of Object.values(r.response.data)) {
+                    this.$toastr.error(value, "Mensaje");
+                  }
+                }
+                return;
+              }
+
+              this.$toastr.success(r.data, "Mensaje");
+              this.mapear_telefonos(this.temporal);
+            })
+            .catch((r) => {
+              this.loading = false;
+            });
+        } else {
+          this.dialog = false;
+        }
+      });
+    },
+
+    cerrar_dialog() {
+      this.dialog = false;
+      this.initialize();
+    }
   },
 };
 </script>

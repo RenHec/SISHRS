@@ -55,7 +55,7 @@ class RoomController extends ApiController
      */
     public function index()
     {
-        $data = Room::with('type_bed', 'type_room', 'coin')->get();;
+        $data = Room::with('type_bed', 'type_room', 'coin')->get();
         return $this->showAll($data);
     }
 
@@ -102,6 +102,7 @@ class RoomController extends ApiController
             DB::beginTransaction();
 
             $data = $request->all();
+            $data['price'] = floatval($request->price);
             $data['type_bed_id'] = $request->type_bed_id['id'];
             $data['type_room_id'] = $request->type_room_id['id'];
             $data['coin_id'] = $request->coin_id['id'];
@@ -195,7 +196,7 @@ class RoomController extends ApiController
             $room->name = $request->name;
             $room->amount_people = $request->amount_people;
             $room->amount_bed = $request->amount_bed;
-            $room->price = $request->price;
+            $room->price = floatval($request->price);
             $room->description = $request->description;
             $room->type_bed_id = $request->type_bed_id['id'];
             $room->type_room_id = $request->type_room_id['id'];
