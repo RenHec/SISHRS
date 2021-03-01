@@ -52,7 +52,7 @@ module.exports = {
     // Template for index.html
     index: path.resolve('bundle/index.html'),
     // Paths
-    assetsRoot: path.resolve('bundle/'),
+    assetsRoot: path.resolve('bundle/bundle/'),
 
     // Template for index.html
     /*index: path.resolve('../../../xampp/htdocs/spa-vue/index.html'),
