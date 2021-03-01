@@ -78,7 +78,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('bundle/fonts/[name].[ext]')
+          name: utils.assetsPath('bundle/css/bundle/fonts/[name].[ext]')
         }
       }
     ]
