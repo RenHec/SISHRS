@@ -88,7 +88,6 @@ class Usuario extends Authenticatable
      */
     protected $appends = ['full_name', 'picture'];
 
-
     /**
      * Search user passport.
      *

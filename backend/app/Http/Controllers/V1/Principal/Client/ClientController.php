@@ -54,7 +54,7 @@ class ClientController extends ApiController
      */
     public function index()
     {
-        $data = Client::with('municipality')->get();;
+        $data = Client::with('municipality', 'phones')->get();;
         return $this->showAll($data);
     }
 
@@ -228,8 +228,6 @@ class ClientController extends ApiController
         $this->validate($request, $this->rules($client->id), $this->messages());
 
         try {
-            $cambio = false;
-
             $client->nit = $request->nit;
             $client->first_name = $request->first_name;
             $client->second_name = $request->second_name;
@@ -240,9 +238,12 @@ class ClientController extends ApiController
             $client->municipality_id = $request->municipality_id['id'];
             $client->departament_id = Municipio::find($request->municipality_id['id'])->departament_id;
 
-            !$client->isDirty() ? $cambio = true : $client->save();
+            if(!$client->isDirty())
+                return $this->errorResponse('No hay datos para actualizar', 423);
+            
+            $client->save();
 
-            return $cambio ? $this->successResponse('Registro actualizado.') : $this->errorResponse('No hay datos para actualizar', 423);
+            return $this->successResponse('Registro actualizado.');
         } catch (\Exception $e) {
             return $this->errorResponse('Error en el controlador', 423);
         }
@@ -323,7 +324,7 @@ class ClientController extends ApiController
             'phones.*.country' => 'required|max:75',
             'phones.*.url' => 'required|max:100'
         ] : [
-            'nit' => is_null($id) ? 'required|numeric|digits_between:5,15|unique:clients,nit' : "required|numeric|digits_between:13,15|unique:clients,nit,{$id}",
+            'nit' => is_null($id) ? 'required|numeric|digits_between:5,15|unique:clients,nit' : "required|numeric|digits_between:5,15|unique:clients,nit,{$id}",
             'first_name' => 'required|max:50',
             'second_name' => 'nullable|max:50',
             'surname' => 'required|max:50',

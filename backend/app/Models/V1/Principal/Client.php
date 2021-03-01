@@ -2,8 +2,9 @@
 
 namespace App\Models\V1\Principal;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\V1\Catalogo\Municipio;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Client extends Model
 {
@@ -49,6 +50,13 @@ class Client extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+    
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['full_name'];
 
     /**
      * Get the clients full name.
