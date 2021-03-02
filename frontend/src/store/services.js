@@ -30,6 +30,9 @@ import clientPhoneService from '../services/principal/client/ClientPhoneService'
 import roomService from '../services/principal/room/RoomService'
 import pictureRoomService from '../services/principal/room/PictureRoomService'
 import ofertRoomService from '../services/principal/room/OfertRoomService'
+import reservationService from '../services/principal/reservation/ReservationService'
+import reservationDetailService from '../services/principal/reservation/ReservationDetailService'
+import reservationServiceService from '../services/principal/reservation/ReservationServiceService'
 /* :::::::::::::::::::::::::::::::::::: FIN DE LOS IMPORT DE PRINCIPAL ::::::::::::::::::::::::::::::::::::: */
 
 
@@ -109,5 +112,8 @@ export default {
   clientPhoneService: new clientPhoneService(Axios, baseUrl),
   roomService: new roomService(Axios, baseUrl),
   pictureRoomService: new pictureRoomService(Axios, baseUrl),
-  ofertRoomService: new ofertRoomService(Axios, baseUrl)
+  ofertRoomService: new ofertRoomService(Axios, baseUrl),
+  reservationService: new reservationService(Axios, baseUrl),
+  reservationDetailService: new reservationDetailService(Axios, baseUrl),
+  reservationServiceService: new reservationServiceService(Axios, baseUrl)
 }

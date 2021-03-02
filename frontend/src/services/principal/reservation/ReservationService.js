@@ -1,0 +1,51 @@
+class ReservationService {
+  axios
+  baseUrl
+
+  constructor(axios, baseUrl) {
+    this.axios = axios
+    this.baseUrl = baseUrl + 'service/rest/v1/principal/reservation'
+  }
+
+  index() {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}`);
+  }
+
+  pendiente() {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}_pendiente`);
+  }
+
+  promocion(item) {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}_promocion/${item.id}`);
+  }
+
+  calendario() {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}_calendario`);
+  }
+
+  buscar_habitaciones(inicio, fin) {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}_buscar_habitaciones/${inicio}/${fin}`);
+  }
+
+  store(data) {
+    let self = this
+    return self.axios.post(`${self.baseUrl}`, data)
+  }
+
+  update(data) {
+    let self = this;
+    return self.axios.put(`${self.baseUrl}/${data.id}`, data);
+  }
+
+  destroy(data) {
+    let self = this;
+    return self.axios.delete(`${self.baseUrl}/${data.id}`);
+  }
+}
+
+export default ReservationService

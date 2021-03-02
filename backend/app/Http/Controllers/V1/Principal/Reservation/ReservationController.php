@@ -2,85 +2,231 @@
 
 namespace App\Http\Controllers\V1\Principal\Reservation;
 
-use App\Http\Controllers\Controller;
-use App\Models\V1\Principal\Reservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use App\Models\V1\Principal\Room;
+use App\Models\V1\Catalogo\Status;
+use Illuminate\Support\Facades\DB;
+use App\Models\V1\Principal\Client;
+use App\Models\V1\Catalogo\Movement;
+use Illuminate\Support\Facades\Auth;
+use App\Models\V1\Principal\OfertRoom;
+use App\Http\Controllers\ApiController;
+use App\Models\V1\Principal\PictureRoom;
+use App\Models\V1\Principal\Reservation;
+use App\Models\V1\Principal\ReservationOfert;
+use App\Models\V1\Principal\ReservationDetail;
+use App\Models\V1\Principal\BinnacleReservation;
 
-class ReservationController extends Controller
+class ReservationController extends ApiController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function index()
     {
-        //
+        $data = Reservation::with('client.phones', 'user', 'status')->get();
+        return $this->showAll($data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function pendiente()
     {
-        //
+        $data = DB::table('reservations')
+            ->join('clients', 'reservations.client_id', 'clients.id')
+            ->join('coins', 'reservations.coin_id', 'coins.id')
+            ->select(
+                'reservations.id AS id',
+                DB::RAW('CONCAT(reservations.code," | ",clients.first_name," ",clients.surname) AS name'),
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total,2)) AS total')
+            )
+            ->where('reservations.status_id', Status::PENDIENTE)
+            ->get();
+
+        return $this->showAll($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    public function promocion(Room $room)
+    {
+        $data = DB::table('oferts_rooms')
+            ->join('coins', 'oferts_rooms.coin_id', 'coins.id')
+            ->select(
+                'oferts_rooms.id AS id',
+                'oferts_rooms.price AS sf_price',
+                DB::RAW('CONCAT(oferts_rooms.accommodation," noches por: ",coins.symbol," ",FORMAT(oferts_rooms.price,2)) AS name')
+            )
+            ->where('oferts_rooms.room_id', $room->id)
+            ->where('active', true)
+            ->get();
+
+        return $this->showAll($data);
+    }
+
+    public function calendario()
+    {
+        $data = Reservation::with('client.phones')->whereIn('status_id', [Status::CONFIRMADO, Status::EN_PROCESO])->get();
+        return $this->showAll($data);
+    }
+
+    public function buscar_habitaciones($inicio, $fin)
+    {
+        $data = DB::table('rooms')
+            ->join('type_beds', 'rooms.type_bed_id', 'type_beds.id')
+            ->join('type_rooms', 'rooms.type_room_id', 'type_rooms.id')
+            ->join('coins', 'rooms.coin_id', 'coins.id')
+            ->select(
+                'rooms.id AS id',
+                DB::RAW('CONCAT(rooms.number," - ",rooms.name) AS name'),
+                'rooms.amount_people AS amount_people',
+                'type_rooms.name AS type_room',
+                DB::RAW('CONCAT(rooms.amount_bed," ",type_beds.name) AS type_bed'),
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(rooms.price,2)) AS price'),
+                'rooms.price AS sf_price',
+                'rooms.description AS description',
+                'coins.id AS coin_id'
+            )
+            ->whereNotExists(function ($query) use ($inicio, $fin) {
+                $query->select(DB::raw(1))
+                    ->from('reservations')
+                    ->join('reservations_details', 'reservations_details.reservation_id', 'reservations.id')
+                    ->whereIn('reservations.status_id', [Status::PENDIENTE, Status::EN_PROCESO, Status::CONFIRMADO])
+                    ->whereBetween(DB::RAW('DATE_FORMAT(reservations.departure_date, "%Y-%m-%d")'), [$inicio, $fin])
+                    ->whereRaw('reservations_details.room_id = rooms.id');
+            })
+            ->whereNull('rooms.deleted_at')
+            ->get();
+
+        $array = array();
+
+        foreach ($data as $value) {
+            $photo = PictureRoom::where('room_id', $value->id)->orderBy('position', 'ASC')->first();
+
+            $info['id'] = $value->id;
+            $info['name'] = $value->name;
+            $info['amount_people'] = $value->amount_people;
+            $info['type_room'] = $value->type_room;
+            $info['type_bed'] = $value->type_bed;
+            $info['price'] = $value->price;
+            $info['sf_price'] = $value->sf_price;
+            $info['description'] = $value->description;
+            $info['coin_id'] = $value->coin_id;
+            $info['photo'] = is_null($photo) ? null : $photo->picture;
+            $info['esconder'] = false;
+
+            array_push($array, $info);
+        }
+
+        return $this->successResponse($array);
+    }
+
     public function store(Request $request)
     {
-        //
+        //$this->validate($request, $this->rules(), $this->messages());
+
+        try {
+            DB::beginTransaction();
+            $start = Carbon::createFromFormat('Y-m-d', $request->arrival_date);
+            $end = Carbon::createFromFormat('Y-m-d', $request->departure_date);
+
+            $generar = Reservation::whereYear('created_at', date('Y'))->count();
+            $generar += 1;
+
+            $data = $request->all();
+            $data['code'] = $this->generadorCodigo($generar);
+            $data['total'] = 0;
+            $data['client_id'] = $request->client_id['id'];
+            $data['user_id'] = Auth::user()->id;
+            $data['status_id'] = Status::CONFIRMADO;
+            $data['coin_id'] = $request->coin_id;
+            $data['accommodation'] = $start->diffInDays($end);
+            $data['arrival_date'] = date('Y-m-d h:i:s', strtotime($request->arrival_date));
+            $data['departure_date'] = date('Y-m-d h:i:s', strtotime($request->departure_date));
+
+            $reservation = Reservation::create($data);
+
+            foreach ($request->details as $value) {
+                $detail = ReservationDetail::create(
+                    [
+                        'price' => intval($reservation->accommodation) * floatval($value['price']),
+                        'ofert' => is_null($value['ofert']) ? false : true,
+                        'reservation_id' => $reservation->id,
+                        'room_id' => $value['room_id'],
+                        'coin_id' => $reservation->coin_id
+                    ]
+                );
+
+                if (!is_null($value['ofert'])) {
+                    ReservationOfert::create(
+                        [
+                            'reservation_id' => $reservation->id,
+                            'reservation_detail_id' => $detail->id,
+                            'ofert_room_id' => $value['ofert']
+                        ]
+                    );
+                }
+
+                $reservation->total += $detail->price;
+            }
+
+            if ($reservation->total > 0)
+                $reservation->save();
+
+            BinnacleReservation::create(
+                [
+                    'start' => date('Y-m-d', strtotime($reservation->arrival_date)),
+                    'end' => date('Y-m-d', strtotime($reservation->departure_date)),
+                    'days' => 60,
+                    'reservation_id' => $reservation->id,
+                    'movement_id' => Movement::PROGRAMADA,
+                    'user_id' => Auth::user()->id
+                ]
+            );
+
+            DB::commit();
+
+            return $this->successResponse('Registro agregado.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage(), 423);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\V1\Principal\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Reservation $reservation)
+    public function show(Client $reservation)
     {
-        //
+        $data = Reservation::with('user', 'status', 'detail.room', 'service', 'binnacle')->where('client_id', $reservation->id)->get();
+        return $this->showAll($data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\V1\Principal\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Reservation $reservation)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\V1\Principal\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Reservation $reservation)
     {
-        //
+        //$this->validate($request, $this->rules($reservation->id), $this->messages());
+
+        try {
+            $reservation->nit = $request->nit;
+            $reservation->name = $request->name;
+            $reservation->ubication = $request->ubication;
+
+            if (!$reservation->isDirty())
+                return $this->errorResponse('No hay datos para actualizar', 423);
+
+            $reservation->save();
+
+            return $this->successResponse('Registro agregado.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error en el controlador', 423);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\V1\Principal\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Reservation $reservation)
     {
-        //
+        try {
+            $reservation->status_id = Status::ANULADO;
+            $reservation->save();
+
+            return $this->successResponse('Registro anulado.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error en el controlador', 423);
+        }
     }
 }

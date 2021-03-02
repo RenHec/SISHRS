@@ -2,41 +2,59 @@
 
 namespace App\Http\Controllers\V1\Principal\Reservation;
 
-use App\Http\Controllers\Controller;
-use App\Models\V1\Principal\ReservationDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ApiController;
+use App\Models\V1\Principal\Reservation;
+use App\Models\V1\Principal\ReservationOfert;
+use App\Models\V1\Principal\ReservationDetail;
 
-class ReservationDetailController extends Controller
+class ReservationDetailController extends ApiController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function __construct()
     {
-        //
+        parent::__construct();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function store(Request $request, Reservation $reservationdetail)
     {
-        //
-    }
+        //$this->validate($request, $this->rules(), $this->messages());
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->details as $value) {
+                $detail = ReservationDetail::create(
+                    [
+                        'price' => floatval($value['price']),
+                        'ofert' => is_null($value['ofert']) ? false : true,
+                        'reservation_id' => $reservationdetail->id,
+                        'room_id' => $value['room_id'],
+                        'coin_id' => $reservationdetail->coin_id
+                    ]
+                );
+
+                if (!is_null($value['ofert'])) {
+                    ReservationOfert::create(
+                        [
+                            'reservation_id' => $reservationdetail->id,
+                            'reservation_detail_id' => $detail->id,
+                            'ofert_room_id' => $value['ofert']
+                        ]
+                    );
+                }
+
+                $reservationdetail->total += $detail->price;
+                $reservationdetail->save();
+            }
+
+            DB::commit();
+
+            return $this->successResponse('Registro agregado.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('Error en el controlador', 423);
+        }
     }
 
     /**
@@ -45,32 +63,10 @@ class ReservationDetailController extends Controller
      * @param  \App\Models\V1\Principal\ReservationDetail  $reservationDetail
      * @return \Illuminate\Http\Response
      */
-    public function show(ReservationDetail $reservationDetail)
+    public function show(Reservation $reservationdetail)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\V1\Principal\ReservationDetail  $reservationDetail
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ReservationDetail $reservationDetail)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\V1\Principal\ReservationDetail  $reservationDetail
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, ReservationDetail $reservationDetail)
-    {
-        //
+        $reservationdetail  = ReservationDetail::with('room')->where('reservation_id', $reservationdetail->id)->orderBy('id', 'ASC')->get();
+        return $this->showAll($reservationdetail);
     }
 
     /**
@@ -79,8 +75,23 @@ class ReservationDetailController extends Controller
      * @param  \App\Models\V1\Principal\ReservationDetail  $reservationDetail
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ReservationDetail $reservationDetail)
+    public function destroy(ReservationDetail $reservationdetail)
     {
-        //
+        try {
+
+            DB::beginTransaction();
+            $reservation = Reservation::find($reservationdetail->reservation_id);
+            $reservation->total -= $reservationdetail->price;
+            $reservation->save();
+
+            ReservationOfert::where('reservation_detail_id', $reservationdetail->id)->forceDelete();
+            $reservationdetail->forceDelete();
+            DB::commit();
+
+            return $this->successResponse('Registro anulado.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('Error en el controlador', 423);
+        }
     }
 }

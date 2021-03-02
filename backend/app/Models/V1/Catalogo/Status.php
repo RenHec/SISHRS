@@ -14,6 +14,7 @@ class Status extends Model
     const DESOCUPADO = 3;
     const ANULADO = 4;
     const CANCELACION = 5;
+    const CONFIRMADO = 6;
 
     /**
      * The table associated with the model.

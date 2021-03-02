@@ -45,10 +45,10 @@ class Reservation extends Model
      * @var array
      */
     protected $casts = [
-        'created_at' => 'datetime:d/m/Y h:i:s a',
-        'updated_at' => 'datetime:d/m/Y h:i:s a',
-        'arrival_date' => 'datetime:d/m/Y h:i:s a',
-        'departure_date' => 'datetime:d/m/Y h:i:s a'
+        'created_at' => 'datetime:Y-m-d h:i:s a',
+        'updated_at' => 'datetime:Y-m-d h:i:s a',
+        'arrival_date' => 'date:Y-m-d',
+        'departure_date' => 'date:Y-m-d'
     ];
 
     /**
@@ -57,6 +57,25 @@ class Reservation extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['monto'];
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getMontoAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format($this->total, 2, '.', ',');
+    }
+
 
     /**
      * Get the client associated with the reservations.

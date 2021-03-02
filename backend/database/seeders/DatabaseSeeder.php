@@ -45,6 +45,9 @@ class DatabaseSeeder extends Seeder
         $insert = new Status();
         $insert->name = 'cancelación';
         $insert->save();
+        $insert = new Status();
+        $insert->name = 'confirmado';
+        $insert->save();
 
         $insert = new TypeBed();
         $insert->name = 'Litera';

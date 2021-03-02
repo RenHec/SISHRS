@@ -371,11 +371,13 @@
 
 <script>
 import FormError from "../shared/FormError";
+import moment  from 'moment';
 
 export default {
   name: "TypeRoom",
   components: {
     FormError,
+    moment 
   },
   data() {
     return {
@@ -530,6 +532,18 @@ export default {
     validar_formulario(scope) {
       if (!this.form.start_date || !this.form.end_date) {
         this.$toastr.info("El rango de fecha es inválido", "Fecha");
+        return
+      }
+
+      if (
+        moment(new Date(this.form.start_date)).format("YYYY-MM-DD") >
+        moment(new Date(this.form.end_date)).format("YYYY-MM-DD")
+      ) {
+        let inicio = this.form.end_date;
+        let fin = this.form.start_date;
+
+        this.form.start_date = inicio;
+        this.form.end_date = fin;
       }
 
       this.$validator.validateAll(scope).then((result) => {

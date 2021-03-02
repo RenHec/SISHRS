@@ -2,85 +2,68 @@
 
 namespace App\Http\Controllers\V1\Principal\Reservation;
 
-use App\Http\Controllers\Controller;
-use App\Models\V1\Principal\ReservationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ApiController;
+use App\Models\V1\Principal\Reservation;
+use App\Models\V1\Principal\ReservationService;
 
-class ReservationServiceController extends Controller
+class ReservationServiceController extends ApiController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function __construct()
     {
-        //
+        parent::__construct();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function update(Request $request, Reservation $reservationservice)
     {
-        //
+        //$this->validate($request, $this->rules(), $this->messages());
+
+        try {
+            DB::beginTransaction();
+
+            $service = ReservationService::create([
+                'price' => floatval($request->price),
+                'description' => $request->description,
+                'reservation_id' => $reservationservice->id,
+                'coin_id' => $reservationservice->coin_id
+            ]);
+
+            $reservationservice->total += $service->price;
+            $reservationservice->save();
+
+            DB::commit();
+
+            return $this->successResponse('Registro agregado.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('Error en el controlador', 423);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function show(Reservation $reservationservice)
     {
-        //
+        $reservationservice  = ReservationService::with('room')->where('reservation_id', $reservationservice->id)->orderBy('id', 'ASC')->get();
+        return $this->showAll($reservationservice);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\V1\Principal\ReservationService  $reservationService
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ReservationService $reservationService)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\V1\Principal\ReservationService  $reservationService
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ReservationService $reservationService)
+    public function destroy(ReservationService $reservationservice)
     {
-        //
-    }
+        try {
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\V1\Principal\ReservationService  $reservationService
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, ReservationService $reservationService)
-    {
-        //
-    }
+            DB::beginTransaction();
+            $reservation = Reservation::find($reservationservice->reservation_id);
+            $reservation->total -= $reservationservice->price;
+            $reservation->save();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\V1\Principal\ReservationService  $reservationService
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(ReservationService $reservationService)
-    {
-        //
+            $reservationservice->forceDelete();
+            DB::commit();
+
+            return $this->successResponse('Registro anulado.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('Error en el controlador', 423);
+        }
     }
 }

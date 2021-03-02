@@ -104,4 +104,11 @@ trait ApiResponser
 
 		return $message;
 	}
+
+	protected function generadorCodigo($id)
+	{
+		$año = date('Y');
+		$codigo = str_pad(strval($id), 5, "0", STR_PAD_LEFT);
+		return "{$codigo}-{$año}";
+	}
 }

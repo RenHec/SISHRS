@@ -126,7 +126,7 @@ class BinnacleReservationController extends ApiController
 
             $binnacle_reservation->arrival_date = date('Y-m-d h:i:s', strtotime($request->arrival_date));
             $binnacle_reservation->departure_date = date('Y-m-d h:i:s', strtotime($request->departure_date));
-            $binnacle_reservation->accommodation = $end->diffInDays($start);
+            $binnacle_reservation->accommodation = $start->diffInDays($end);
             $binnacle_reservation->save();
 
             $ultimo_movimiento = BinnacleReservation::where('reservation_id', $binnacle_reservation->id)->get()->last();
@@ -136,7 +136,7 @@ class BinnacleReservationController extends ApiController
             BinnacleReservation::create(
                 [
                     'start' => date('Y-m-d', strtotime($request->arrival_date)),
-                    'end' => date('Y-m-d', strtotime($request->arrival_date)),
+                    'end' => date('Y-m-d', strtotime($request->departure_date)),
                     'days' => $ultimo_movimiento->days,
                     'reservation_id' => $binnacle_reservation->id,
                     'movement_id' => Movement::REUBICADA,
@@ -237,8 +237,8 @@ class BinnacleReservationController extends ApiController
     public function rules()
     {
         $validar = [
-            'arrival_date' => 'required|date_format:d-m-Y h:i:s',
-            'departure_date' => 'required|date_format:d-m-Y h:i:s|after:arrival_date'
+            'arrival_date' => 'required|date_format:Y-m-d',
+            'departure_date' => 'required|date_format:Y-m-d|after:arrival_date'
         ];
 
         return $validar;

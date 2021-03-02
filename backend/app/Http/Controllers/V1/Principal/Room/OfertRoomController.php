@@ -257,7 +257,7 @@ class OfertRoomController extends ApiController
             'price' => 'required|between:1,9999999',
             'observation' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
-            'end_date' => 'required|date_format:Y-m-d',
+            'end_date' => 'required|date_format:Y-m-d|after:start_date',
             'active' => 'required',
             'coin_id.id' => 'required|integer|exists:coins,id',
 
@@ -267,7 +267,7 @@ class OfertRoomController extends ApiController
             'price' => 'required|between:1,9999999',
             'observation' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
-            'end_date' => 'required|date_format:Y-m-d',
+            'end_date' => 'required|date_format:Y-m-d|after:start_date',
             'active' => 'required',
             'coin_id.id' => 'required|integer|exists:coins,id',
             'room_id.id' => 'required|integer|exists:rooms,id'
@@ -293,6 +293,7 @@ class OfertRoomController extends ApiController
 
             'end_date.required' => 'La fecha de finalización de la oferta es obligatoria.',
             'end_date.date_format' => 'La fecha de finalización de la oferta no tiene formato correcto.',
+            'end_date.after' => 'La fecha de finalización debe ser mayor a :attribute.',
 
             'active.required' => 'Es necesario que indique si la oferta será publicada.',
 

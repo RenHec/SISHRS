@@ -34,3 +34,16 @@ Route::name('picture_room.down')->get('picture_room/down/{picture_room}', 'Room\
 
 //rutas para OfertRoomController
 Route::resource('ofert_room', 'Room\OfertRoomController')->except('create', 'show', 'edit');
+
+//rutas para ReservationController
+Route::resource('reservation', 'Reservation\ReservationController')->except('create', 'edit');
+Route::name('reservation.pendiente')->get('reservation_pendiente', 'Reservation\ReservationController@pendiente');
+Route::name('reservation.promocion')->get('reservation_promocion/{room}', 'Reservation\ReservationController@promocion');
+Route::name('reservation.calendario')->get('reservation_calendario', 'Reservation\ReservationController@calendario');
+Route::name('reservation.buscar_habitaciones')->get('reservation_buscar_habitaciones/{inicio}/{fin}', 'Reservation\ReservationController@buscar_habitaciones');
+
+//rutas para ReservationDetailController
+Route::resource('reservation_detail', 'Reservation\ReservationDetailController')->only('show', 'update', 'destroy');
+
+//rutas para ReservationServiceController
+Route::resource('reservation_service', 'Reservation\ReservationServiceController')->only('show', 'update', 'destroy');

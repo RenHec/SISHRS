@@ -25,13 +25,14 @@ import Room from '@/components/principal/RoomComponent'
 import TypeBed from '@/components/principal/TypeBedComponent'
 import TypeRoom from '@/components/principal/TypeRoomComponent'
 import Ofert from '@/components/principal/OfertComponent'
+import Reservation from '@/components/principal/ReservationComponent'
 
 Vue.use(Router)
 
 //validar authenticacion
 const isLoggedIn = (to, from, next) => {
   var user = store.state.usuario
-  if (!_.isEmpty(user)) {}
+  if (!_.isEmpty(user)) { }
   return store.state.is_login ? next() : next('/login')
 }
 
@@ -47,88 +48,93 @@ const permissionsValidations = (to, from, next) => {
 }
 
 const routes = [{
-    path: '/',
-    name: 'Default',
-    component: Default,
-    beforeEnter: multiguard([isLoggedIn])
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login,
-    beforeEnter: multiguard([isLoggedOut])
-  },
-  //Seguridad
-  {
-    path: '/rol',
-    name: 'Rol',
-    component: Rol,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/user',
-    name: 'Usuario',
-    component: Usuario,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  },
-  //Catalogo General
-  {
-    path: '/status',
-    name: 'Status',
-    component: Status,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/clients',
-    name: 'Client',
-    component: Client,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/coin',
-    name: 'Coin',
-    component: Coin,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/movement',
-    name: 'Movement',
-    component: Movement,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/municipality',
-    name: 'Municipality',
-    component: Municipality,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/departament',
-    name: 'Departament',
-    component: Departament,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  },
-  //Principal
-  {
-    path: '/pictures_rooms',
-    name: 'PictureRoom',
-    component: PictureRoom,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/rooms',
-    name: 'Room',
-    component: Room,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/type_bead',
-    name: 'TypeBed',
-    component: TypeBed,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/type_room',
-    name: 'TypeRoom',
-    component: TypeRoom,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  }, {
-    path: '/oferts',
-    name: 'Ofert',
-    component: Ofert,
-    beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-  },
+  path: '/',
+  name: 'Default',
+  component: Default,
+  beforeEnter: multiguard([isLoggedIn])
+},
+{
+  path: '/login',
+  name: 'Login',
+  component: Login,
+  beforeEnter: multiguard([isLoggedOut])
+},
+//Seguridad
+{
+  path: '/rol',
+  name: 'Rol',
+  component: Rol,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/user',
+  name: 'Usuario',
+  component: Usuario,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+},
+//Catalogo General
+{
+  path: '/status',
+  name: 'Status',
+  component: Status,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/clients',
+  name: 'Client',
+  component: Client,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/coin',
+  name: 'Coin',
+  component: Coin,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/movement',
+  name: 'Movement',
+  component: Movement,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/municipality',
+  name: 'Municipality',
+  component: Municipality,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/departament',
+  name: 'Departament',
+  component: Departament,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+},
+//Principal
+{
+  path: '/pictures_rooms',
+  name: 'PictureRoom',
+  component: PictureRoom,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/rooms',
+  name: 'Room',
+  component: Room,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/type_bead',
+  name: 'TypeBed',
+  component: TypeBed,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/type_room',
+  name: 'TypeRoom',
+  component: TypeRoom,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/oferts',
+  name: 'Ofert',
+  component: Ofert,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/reservations',
+  name: 'Reservation',
+  component: Reservation,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+},
 ]
 
 export default new Router({

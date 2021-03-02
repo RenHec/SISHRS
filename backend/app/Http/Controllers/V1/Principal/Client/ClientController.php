@@ -54,7 +54,7 @@ class ClientController extends ApiController
      */
     public function index()
     {
-        $data = Client::with('municipality', 'phones')->get();;
+        $data = Client::with('municipality', 'phones')->get();
         return $this->showAll($data);
     }
 
