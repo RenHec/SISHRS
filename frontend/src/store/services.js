@@ -21,6 +21,9 @@ import movementService from '../services/catalogo/movement/MovementService'
 import statusService from '../services/catalogo/status/StatusService'
 import typeBedService from '../services/catalogo/typebed/TypeBedService'
 import typeRoomService from '../services/catalogo/typeroom/TypeRoomService'
+import typeChargeService from '../services/catalogo/typecharge/TypeChargeService'
+import typeMessageService from '../services/catalogo/typemessage/TypeMessageService'
+import typeServiceService from '../services/catalogo/typeservice/TypeServiceService'
 /* :::::::::::::::::::::::::::::::::::: FIN DE LOS IMPORT DE CATALOGO ::::::::::::::::::::::::::::::::::::: */
 
 /* ::::::::::::::::::::::::::::::::::::::::::::: PRINCIPAL :::::::::::::::::::::::::::::::::::::::::::::::: */
@@ -106,6 +109,9 @@ export default {
   statusService: new statusService(Axios, baseUrl),
   typeBedService: new typeBedService(Axios, baseUrl),
   typeRoomService: new typeRoomService(Axios, baseUrl),
+  typeChargeService: new typeChargeService(Axios, baseUrl),
+  typeMessageService: new typeMessageService(Axios, baseUrl),
+  typeServiceService: new typeServiceService(Axios, baseUrl),
 //Principal
   binnacleReservationService: new binnacleReservationService(Axios, baseUrl),
   clientService: new clientService(Axios, baseUrl),

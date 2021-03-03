@@ -3,6 +3,7 @@
 namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Coin;
+use App\Models\V1\Catalogo\TypeCharge;
 use App\Models\V1\Principal\Room;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,7 +32,8 @@ class OfertRoom extends Model
         'end_date',
         'active',
         'room_id',
-        'coin_id'
+        'coin_id',
+        'type_charge_id'
     ];
 
     /**
@@ -72,5 +74,15 @@ class OfertRoom extends Model
     public function coin()
     {
         return $this->belongsTo(Coin::class, 'coin_id', 'id');
+    }
+
+    /**
+     * Get the type_change associated with the oferts_rooms.
+     *
+     * @return object
+     */
+    public function type_change()
+    {
+        return $this->belongsTo(TypeCharge::class, 'type_charge_id', 'id');
     }
 }

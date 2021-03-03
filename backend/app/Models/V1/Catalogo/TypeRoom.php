@@ -22,7 +22,8 @@ class TypeRoom extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
+        'type_service_id'
     ];
 
     /**
@@ -41,4 +42,32 @@ class TypeRoom extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['full_name'];
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        $service = TypeService::find($this->type_service_id)->name;
+        return str_replace('  ', ' ', "{$service}, {$this->name}");
+    }
+
+    /**
+     * Get the type service associated with the municipality.
+     *
+     * @return object
+     */
+    public function type_service()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
+    }
 }

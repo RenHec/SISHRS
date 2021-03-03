@@ -27,7 +27,9 @@ class ReservationDetail extends Model
         'ofert',
         'reservation_id',
         'room_id',
-        'coin_id'
+        'coin_id',
+        'sub',
+        'room_price_id'
     ];
 
     /**

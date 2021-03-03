@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-col cols="12" md="4">
+    <v-col cols="12" md="8">
       <v-card>
         <v-overlay :value="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -16,7 +16,28 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="12">
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="form.type_service_id"
+                  :items="tipo_servicios"
+                  chips
+                  label="Seleccionar tipo de servicio"
+                  outlined
+                  :clearable="true"
+                  :deletable-chips="true"
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                  data-vv-name="tipo de servicio"
+                ></v-autocomplete>
+                <FormError
+                  :attribute_name="'create.tipo de servicio'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="8">
                 <v-text-field
                   counter
                   outlined
@@ -120,6 +141,11 @@ export default {
       search: "",
       headers: [
         {
+          text: "Servicio",
+          align: "start",
+          value: "type_service.name",
+        },
+        {
           text: "Nombre",
           align: "start",
           value: "name",
@@ -134,9 +160,11 @@ export default {
         nextIcon: "mdi-plus",
       },
       desserts: [],
+      tipo_servicios: [],
       form: {
         id: 0,
         name: null,
+        type_service_id: null
       },
     };
   },
@@ -154,6 +182,7 @@ export default {
 
   created() {
     this.initialize();
+    this.getTipoServicio();
   },
 
   methods: {
@@ -197,6 +226,7 @@ export default {
     mapear(item) {
       this.form.id = item.id;
       this.form.name = item.name;
+      this.form.type_service_id = item.type_service;
 
       this.editedIndex = true;
       this.dialog = true;
@@ -337,6 +367,15 @@ export default {
           this.close();
         }
       });
+    },
+
+    getTipoServicio() {
+      this.$store.state.services.typeServiceService
+        .index()
+        .then((r) => {
+          this.tipo_servicios = r.data.data;
+        })
+        .catch((r) => {});
     },
   },
 };

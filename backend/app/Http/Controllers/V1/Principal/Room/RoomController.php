@@ -10,6 +10,8 @@ use Intervention\Image\Facades\Image;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Storage;
 use App\Models\V1\Principal\PictureRoom;
+use App\Models\V1\Principal\RoomMassage;
+use App\Models\V1\Principal\RoomPrice;
 
 class RoomController extends ApiController
 {
@@ -55,7 +57,7 @@ class RoomController extends ApiController
      */
     public function index()
     {
-        $data = Room::with('type_bed', 'type_room', 'coin')->get();
+        $data = Room::with('type_bed', 'type_room', 'coin', 'type_service')->get();
         return $this->showAll($data);
     }
 
@@ -102,10 +104,11 @@ class RoomController extends ApiController
             DB::beginTransaction();
 
             $data = $request->all();
-            $data['price'] = floatval($request->price);
+            $data['price'] = 0;
             $data['type_bed_id'] = $request->type_bed_id['id'];
             $data['type_room_id'] = $request->type_room_id['id'];
             $data['coin_id'] = $request->coin_id['id'];
+            $data['type_service_id'] = $request->type_room_id['type_service_id'];
 
             $room = Room::create($data);
 
@@ -133,12 +136,36 @@ class RoomController extends ApiController
                 }
             }
 
+            foreach ($request->prices as $value) {
+                $insert = RoomPrice::create(
+                    [
+                        'price' => floatval($value['price']),
+                        'default' => $value['default'],
+                        'type_charge_id' => $value['type_charge_id'],
+                        'room_id' => $room->id
+                    ]
+                );
+
+                $room->price = $insert->default ? $insert->price : 0;
+            }
+
+            foreach ($request->massages as $value) {
+                RoomMassage::create(
+                    [
+                        'type_massage_id' => $value['id'],
+                        'room_id' => $room->id
+                    ]
+                );
+            }
+
+            $room->save();
+
             DB::commit();
 
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->errorResponse('Error en el controlador', 423);
+            return $this->errorResponse($e->getMessage(), 423);
         }
     }
 
@@ -280,7 +307,6 @@ class RoomController extends ApiController
             'name' => 'required|max:100',
             'amount_people' => 'required|between:1,99',
             'amount_bed' => 'required|between:1,99',
-            'price' => 'required|between:1,9999999',
             'description' => 'required',
             'type_bed_id.id' => 'required|integer|exists:type_beds,id',
             'type_room_id.id' => 'required|integer|exists:type_rooms,id',

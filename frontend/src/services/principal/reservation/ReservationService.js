@@ -27,9 +27,9 @@ class ReservationService {
     return self.axios.get(`${self.baseUrl}_calendario`);
   }
 
-  buscar_habitaciones(inicio, fin) {
+  buscar_habitaciones(data) {
     let self = this;
-    return self.axios.get(`${self.baseUrl}_buscar_habitaciones/${inicio}/${fin}`);
+    return self.axios.post(`${self.baseUrl}_buscar_habitaciones`, data);
   }
 
   store(data) {

@@ -5,6 +5,7 @@ namespace App\Models\V1\Principal;
 use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\TypeBed;
 use App\Models\V1\Catalogo\TypeRoom;
+use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -34,7 +35,9 @@ class Room extends Model
         'description',
         'type_bed_id',
         'type_room_id',
-        'coin_id'
+        'coin_id',
+        'pets',
+        'type_service_id'
     ];
 
     /**
@@ -86,6 +89,16 @@ class Room extends Model
     }
 
     /**
+     * Get the type_service associated with the rooms.
+     *
+     * @return object
+     */
+    public function type_service()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
+    }
+
+    /**
      * Get the pictures associated with the rooms.
      *
      * @return array
@@ -103,5 +116,25 @@ class Room extends Model
     public function oferts()
     {
         return $this->hasMany(OfertRoom::class, 'room_id', 'id');
+    }
+
+    /**
+     * Get the massages associated with the rooms.
+     *
+     * @return array
+     */
+    public function massages()
+    {
+        return $this->hasMany(RoomMassage::class, 'room_id', 'id');
+    }
+
+    /**
+     * Get the prices associated with the rooms.
+     *
+     * @return array
+     */
+    public function prices()
+    {
+        return $this->hasMany(RoomPrice::class, 'room_id', 'id');
     }
 }

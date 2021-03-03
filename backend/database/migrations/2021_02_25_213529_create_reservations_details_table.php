@@ -16,9 +16,11 @@ class CreateReservationsDetailsTable extends Migration
         Schema::create('reservations_details', function (Blueprint $table) {
             $table->id();
             $table->decimal('price', 11, 2);
+            $table->decimal('sub', 11, 2);
             $table->boolean('ofert')->default(false);
             $table->foreignId('reservation_id')->constrained('reservations');
             $table->foreignId('room_id')->constrained('rooms');
+            $table->foreignId('room_price_id')->constrained('rooms_prices');
             $table->foreignId('coin_id')->constrained('coins');
             $table->timestamps();
         });

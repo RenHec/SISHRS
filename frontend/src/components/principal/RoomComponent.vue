@@ -83,44 +83,7 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-autocomplete
-                  v-model="form.coin_id"
-                  :items="monedas"
-                  chips
-                  label="Seleccionar moneda"
-                  outlined
-                  :clearable="true"
-                  :deletable-chips="true"
-                  item-text="name"
-                  item-value="id"
-                  return-object
-                  v-validate="'required'"
-                  data-vv-scope="create"
-                  data-vv-name="moneda"
-                ></v-autocomplete>
-                <FormError
-                  :attribute_name="'create.moneda'"
-                  :errors_form="errors"
-                ></FormError>
-              </v-col>
-              <v-col cols="12" md="3" class="text-center">
-                <label>Precio de costo</label>
-                <input
-                  dark
-                  placeholder="Precio de la habitación"
-                  class="nuevo-input"
-                  v-model="form.price"
-                  @input="form.price = formatear_numero($event)"
-                  data-vv-name="precio de la habitación"
-                  v-validate="'required'"
-                  data-vv-scope="create"
-                />
-                <FormError
-                  :attribute_name="'create.precio de la habitación'"
-                  :errors_form="errors"
-                ></FormError>
-              </v-col>
+              <v-col cols="12" md="6" class="text-center"> </v-col>
               <v-col cols="12" md="3">
                 <v-autocomplete
                   v-model="form.type_bed_id"
@@ -151,7 +114,7 @@
                   outlined
                   :clearable="true"
                   :deletable-chips="true"
-                  item-text="name"
+                  item-text="full_name"
                   item-value="id"
                   return-object
                   v-validate="'required'"
@@ -163,7 +126,31 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="6" v-if="!editedIndex">
+              <v-col cols="12" md="6">
+                <v-autocomplete
+                  v-model="form.massages"
+                  :items="masajes"
+                  v-if="mostrar_masaje"
+                  chips
+                  label="Seleccionar masajes"
+                  outlined
+                  :clearable="true"
+                  :deletable-chips="true"
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                  multiple
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                  data-vv-name="masajes"
+                ></v-autocomplete>
+                <FormError
+                  :attribute_name="'create.masajes'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+
+              <v-col cols="12" md="12" v-if="!editedIndex">
                 <v-file-input
                   v-model="masiva_image"
                   color="deep-purple accent-4"
@@ -193,6 +180,136 @@
                   </template>
                 </v-file-input>
               </v-col>
+
+              <v-col cols="12" md="2" class="text-rigth">
+                <v-switch
+                  v-model="form.pets"
+                  :label="`Se aceptan mascotas: ${form.pets ? 'SI' : 'NO'}`"
+                  data-vv-name="mascota"
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                ></v-switch>
+                <FormError
+                  :attribute_name="'create.mascota'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-autocomplete
+                  v-model="form.coin_id"
+                  :items="monedas"
+                  chips
+                  label="Seleccionar moneda"
+                  outlined
+                  :clearable="true"
+                  :deletable-chips="true"
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                  data-vv-name="moneda"
+                ></v-autocomplete>
+                <FormError
+                  :attribute_name="'create.moneda'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+
+              <v-col cols="12" md="7"></v-col>
+
+              <v-row v-if="!editedIndex">
+                <v-col cols="12" md="2">
+                  <v-autocomplete
+                    v-model="type_charge_id"
+                    :items="precios"
+                    chips
+                    label="Seleccionar tipo de cobro"
+                    outlined
+                    :clearable="true"
+                    :deletable-chips="true"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    v-validate="'required'"
+                    data-vv-scope="agregar_precio"
+                    data-vv-name="tipo de cobro"
+                  ></v-autocomplete>
+                  <FormError
+                    :attribute_name="'agregar_precio.tipo de cobro'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="2" class="text-center">
+                  <label>Precio de costo</label>
+                  <input
+                    dark
+                    placeholder="Precio de la habitación"
+                    class="nuevo-input"
+                    v-model="price.price"
+                    @input="price.price = formatear_numero($event)"
+                    data-vv-name="precio de la habitación"
+                    v-validate="'required'"
+                    data-vv-scope="agregar_precio"
+                  />
+                  <FormError
+                    :attribute_name="'agregar_precio.precio de la habitación'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="2" class="text-rigth">
+                  <v-switch
+                    v-model="price.default"
+                    :label="`Colocar por defecto: ${
+                      price.default ? 'SI' : 'NO'
+                    }`"
+                    data-vv-name="por defecto"
+                    v-validate="'required'"
+                    data-vv-scope="agregar_precio"
+                  ></v-switch>
+                  <FormError
+                    :attribute_name="'agregar_precio.por defecto'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="1">
+                  <v-btn
+                    color="blue darken-1"
+                    @click="agregar_precio('agregar_precio')"
+                    >Guardar</v-btn
+                  >
+                </v-col>
+                <v-col cols="12" md="5">
+                  <v-simple-table dark>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-center">Tipo de Cobro</th>
+                          <th class="text-center">Precio</th>
+                          <th class="text-center">Por Defecto</th>
+                        </tr>
+                      </thead>
+                      <tbody v-if="form.prices.length > 0">
+                        <tr v-for="(item, index) in form.prices" :key="index">
+                          <td class="text-center">
+                            {{ item.type_charge.name }}
+                          </td>
+                          <td class="text-center">{{ item.price }}</td>
+                          <td class="text-center">
+                            {{ item.default ? "SI" : "NO" }}
+                          </td>
+                          <td class="text-center">
+                            <v-btn color="error" @click="quitar_price(item)"
+                              >Eliminar</v-btn
+                            >
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+
               <v-col cols="12" md="12" class="text-center">
                 <h3>Descripción de la habitación</h3>
                 <quill-editor
@@ -236,7 +353,7 @@
       >
         <template v-slot:top>
           <v-toolbar flat color="success">
-            <v-toolbar-title>Tipos de Habitación</v-toolbar-title>
+            <v-toolbar-title>Habitaciones</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-text-field
               v-model="search"
@@ -251,7 +368,7 @@
           <br />
           <v-card color="#385F73" dark>
             <v-card-title class="headline">
-              Información de la Habitación
+              {{ item.number+" "+item.name }}
             </v-card-title>
             <hr />
             <v-card-subtitle>
@@ -272,6 +389,21 @@
           <br />
         </template>
         <template v-slot:item.actions="{ item }">
+          <v-btn
+            v-if="item.type_service_id == 2"
+            class="ma-2"
+            color="primary lighten-2"
+            small
+          >
+            Masajes
+          </v-btn>
+          <v-btn
+            class="ma-2"
+            color="default lighten-2"
+            small
+          >
+            Precios
+          </v-btn>
           <v-btn
             class="ma-2"
             text
@@ -315,7 +447,7 @@
 import FormError from "../shared/FormError";
 
 export default {
-  name: "TypeRoom",
+  name: "Room",
   components: {
     FormError,
   },
@@ -330,6 +462,11 @@ export default {
           text: "Número de habitación",
           align: "start",
           value: "number",
+        },
+        {
+          text: "Servicio",
+          align: "start",
+          value: "type_service.name",
         },
         {
           text: "Nombre",
@@ -355,6 +492,8 @@ export default {
       camas: [],
       habitaciones: [],
       masiva_image: [],
+      precios: [],
+      masajes: [],
       form: {
         id: 0,
         number: null,
@@ -367,12 +506,29 @@ export default {
         type_room_id: null,
         coin_id: null,
         pictures: [],
+        pets: false,
+        prices: [],
+        massages: [],
+      },
+      type_charge_id: null,
+      price: {
+        price: null,
+        default: false,
+        type_charge_id: null,
       },
     };
   },
   computed: {
     formTitle() {
       return !this.editedIndex ? "Agregar Habitación" : "Editar Habitación";
+    },
+    mostrar_masaje() {
+      this.form.massages = [];
+      return this.form.type_room_id
+        ? this.form.type_room_id.type_service_id == 2
+          ? true
+          : false
+        : false;
     },
   },
 
@@ -387,6 +543,8 @@ export default {
     this.getMoneda();
     this.getCama();
     this.getHabitacion();
+    this.getPrecio();
+    this.getMasaje();
   },
 
   methods: {
@@ -419,6 +577,8 @@ export default {
       this.form.type_room_id = null;
       this.form.coin_id = null;
       this.form.pictures = [];
+      this.form.prices = [];
+      this.form.pets = false;
 
       this.$validator.reset();
       this.$validator.reset();
@@ -462,7 +622,9 @@ export default {
       this.form.type_bed_id = item.type_bed_id;
       this.form.type_room_id = item.type_room_id;
       this.form.coin_id = item.coin_id;
+      this.form.pets = item.pets;
       this.form.pictures = [];
+      this.form.prices = [];
       this.masiva_image = [];
 
       this.editedIndex = true;
@@ -475,6 +637,11 @@ export default {
     },
 
     validar_formulario(scope) {
+      if (this.form.prices.length == 0) {
+        this.$toastr.warning("Debe de agregar al menos un precio.", "Mensaje");
+        return 0;
+      }
+
       this.$validator.validateAll(scope).then((result) => {
         if (result)
           this.editedIndex ? this.update(this.form) : this.store(this.form);
@@ -641,6 +808,54 @@ export default {
           this.habitaciones = r.data.data;
         })
         .catch((r) => {});
+    },
+
+    getPrecio() {
+      this.$store.state.services.typeChargeService
+        .index()
+        .then((r) => {
+          this.precios = r.data.data;
+        })
+        .catch((r) => {});
+    },
+
+    getMasaje() {
+      this.$store.state.services.typeMessageService
+        .index()
+        .then((r) => {
+          this.masajes = r.data.data;
+        })
+        .catch((r) => {});
+    },
+
+    agregar_precio(scope) {
+      this.$validator.validateAll(scope).then((result) => {
+        if (result) {
+          let objeto = new Object();
+          objeto.price = this.price.price;
+          objeto.default = this.price.default;
+          objeto.type_charge_id = this.type_charge_id.id;
+          objeto.type_charge = this.type_charge_id;
+
+          this.form.prices.push(objeto);
+          this.precios.splice(this.precios.indexOf(this.type_charge_id), 1);
+
+          this.price.price = null;
+          this.price.default = false;
+          this.price.type_charge_id = null;
+          this.type_charge_id = null;
+
+          this.$toastr.info("Precio agregado", "Precio");
+
+          this.$validator.reset();
+          this.$validator.reset();
+        }
+      });
+    },
+
+    quitar_price(index) {
+      this.form.prices.splice(this.form.prices.indexOf(index), 1);
+      this.precios.push(index.type_charge);
     },
   },
 };

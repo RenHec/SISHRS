@@ -22,6 +22,7 @@ class CreateOfertsRoomsTable extends Migration
             $table->dateTime('end_date');
             $table->boolean('active');
             $table->foreignId('room_id')->constrained('rooms');
+            $table->foreignId('type_charge_id')->constrained('type_charge');
             $table->foreignId('coin_id')->constrained('coins');
             $table->timestamps();
         });

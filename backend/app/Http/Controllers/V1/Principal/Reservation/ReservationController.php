@@ -69,15 +69,26 @@ class ReservationController extends ApiController
         return $this->showAll($data);
     }
 
-    public function buscar_habitaciones($inicio, $fin)
+    public function buscar_habitaciones(Request $request)
     {
+        $servicios = $request->servicios == 'null' || is_null($request->servicios) ? array() : $request->servicios;
+        $inicio = $request->inicio == 'null' || is_null($request->inicio) ? array() : $request->inicio;
+        $fin = $request->fin == 'null' || is_null($request->fin) ? array() : $request->fin;
+
+        $array_servicios = array();
+
+        foreach ($servicios as $value) {
+            array_push($array_servicios, $value['id']);
+        }
+
         $data = DB::table('rooms')
             ->join('type_beds', 'rooms.type_bed_id', 'type_beds.id')
             ->join('type_rooms', 'rooms.type_room_id', 'type_rooms.id')
             ->join('coins', 'rooms.coin_id', 'coins.id')
+            ->join('type_services', 'rooms.type_service_id', 'type_services.id')
             ->select(
                 'rooms.id AS id',
-                DB::RAW('CONCAT(rooms.number," - ",rooms.name) AS name'),
+                DB::RAW('CONCAT(rooms.number," ",type_services.name," - ",rooms.name) AS name'),
                 'rooms.amount_people AS amount_people',
                 'type_rooms.name AS type_room',
                 DB::RAW('CONCAT(rooms.amount_bed," ",type_beds.name) AS type_bed'),
@@ -93,6 +104,9 @@ class ReservationController extends ApiController
                     ->whereIn('reservations.status_id', [Status::PENDIENTE, Status::EN_PROCESO, Status::CONFIRMADO])
                     ->whereBetween(DB::RAW('DATE_FORMAT(reservations.departure_date, "%Y-%m-%d")'), [$inicio, $fin])
                     ->whereRaw('reservations_details.room_id = rooms.id');
+            })
+            ->when(count($array_servicios) != 0, function($query) use ($array_servicios) {
+                $query->whereIn('rooms.type_service_id', $array_servicios);
             })
             ->whereNull('rooms.deleted_at')
             ->get();

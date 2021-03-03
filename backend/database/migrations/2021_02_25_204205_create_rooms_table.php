@@ -21,6 +21,8 @@ class CreateRoomsTable extends Migration
             $table->smallInteger('amount_bed');
             $table->decimal('price', 11, 2);
             $table->longText('description');
+            $table->boolean('pets')->default(false);
+            $table->foreignId('type_service_id')->constrained('type_services');
             $table->foreignId('type_bed_id')->constrained('type_beds');
             $table->foreignId('type_room_id')->constrained('type_rooms');
             $table->foreignId('coin_id')->constrained('coins');

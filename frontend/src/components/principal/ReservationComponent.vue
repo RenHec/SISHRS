@@ -17,7 +17,23 @@
           <v-container>
             <v-row>
               <v-col cols="12" :md="!bloquear ? '2' : '3'"></v-col>
+
               <v-col cols="12" md="3">
+                <v-autocomplete
+                  v-model="servicios"
+                  :items="listar_servicios"
+                  chips
+                  label="Seleccionar servicios"
+                  outlined
+                  :clearable="true"
+                  :deletable-chips="true"
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                  multiple
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="2">
                 <v-menu
                   ref="menu_inicio"
                   v-model="menu_inicio"
@@ -39,9 +55,6 @@
                       @input="formatear_fecha_inicio"
                       v-on="on"
                       :disabled="bloquear"
-                      data-vv-name="fecha de inicio"
-                      v-validate="'required'"
-                      data-vv-scope="consultar_excel"
                     ></v-text-field>
                   </template>
                   <v-date-picker
@@ -54,7 +67,7 @@
                 </v-menu>
               </v-col>
 
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-menu
                   ref="menu_fin"
                   v-model="menu_fin"
@@ -76,9 +89,6 @@
                       @input="formatear_fecha_fin"
                       v-on="on"
                       :disabled="bloquear"
-                      data-vv-name="fecha de fin"
-                      v-validate="'required'"
-                      data-vv-scope="consultar_excel"
                     ></v-text-field>
                   </template>
                   <v-date-picker
@@ -90,7 +100,7 @@
                   ></v-date-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="12" md="2" v-if="!bloquear">
+              <v-col cols="12" md="1" v-if="!bloquear">
                 <v-btn
                   color="warning darken-1"
                   x-large
@@ -178,12 +188,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="limpiar">Cancelar</v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="agregar"
-            >Guardar</v-btn
-          >
+          <v-btn color="blue darken-1" text @click="agregar">Guardar</v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -274,7 +279,9 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" @click="dialog_cliente = false">Cancelar</v-btn>
+          <v-btn color="blue darken-1" @click="dialog_cliente = false"
+            >Cancelar</v-btn
+          >
           <v-btn color="blue darken-1" @click="guardar_reservacion('reservar')"
             >Aplicar</v-btn
           >
@@ -318,6 +325,8 @@ export default {
       habitaciones: [],
       items: [],
       clientes: [],
+      servicios: [],
+      listar_servicios: [],
       form: {
         id: 0,
         nit: null,
@@ -337,7 +346,9 @@ export default {
     },
   },
 
-  created() {},
+  created() {
+    this.getServicios();
+  },
 
   methods: {
     //formato de fecha
@@ -392,16 +403,21 @@ export default {
 
       this.dialog = false;
       this.dialog_cliente = false;
-      this.habitaciones = []
+      this.habitaciones = [];
 
       this.$validator.reset();
       this.$validator.reset();
     },
 
     buscar_habitacion() {
+      let objeto = new Object();
+      objeto.inicio = this.form.arrival_date;
+      objeto.fin = this.form.departure_date;
+      objeto.servicios = this.servicios.length != 0 ? this.servicios : null;
+
       this.loading = true;
       this.$store.state.services.reservationService
-        .buscar_habitaciones(this.form.arrival_date, this.form.departure_date)
+        .buscar_habitaciones(objeto)
         .then((r) => {
           this.loading = false;
 
@@ -512,7 +528,7 @@ export default {
           this.promocion = null;
           this.promociones = null;
           this.dialog = false;
-          console.log(this.form.details)
+          console.log(this.form.details);
         } else {
           this.promocion = null;
           this.promociones = null;
@@ -545,11 +561,11 @@ export default {
         })
         .catch((r) => {
           this.loading = false;
-        });      
+        });
     },
 
     guardar_reservacion() {
-      console.log(this.form.client_id)
+      console.log(this.form.client_id);
       this.$swal({
         title: "Guardar Reservación",
         text: "¿Está seguro de realizar esta acción?",
@@ -557,9 +573,12 @@ export default {
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.form.nit = this.form.client_id.nit
-          this.form.name = this.form.client_id.full_name
-          this.form.ubication = this.form.client_id.municipality.full_name+", "+this.form.client_id.ubication
+          this.form.nit = this.form.client_id.nit;
+          this.form.name = this.form.client_id.full_name;
+          this.form.ubication =
+            this.form.client_id.municipality.full_name +
+            ", " +
+            this.form.client_id.ubication;
 
           this.loading = true;
           this.$store.state.services.reservationService
@@ -591,8 +610,17 @@ export default {
         } else {
           this.close();
         }
-      });      
-    }
-  }
+      });
+    },
+
+    getServicios() {
+      this.$store.state.services.typeServiceService
+        .index()
+        .then((r) => {
+          this.listar_servicios = r.data.data;
+        })
+        .catch((r) => {});
+    },
+  },
 };
 </script>

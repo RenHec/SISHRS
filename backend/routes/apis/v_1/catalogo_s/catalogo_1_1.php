@@ -34,3 +34,12 @@ Route::resource('movement', 'Movement\MovementController')->only('index');
 
 //rutas para CoinController
 Route::resource('coin', 'Coin\CoinController')->except('create', 'show', 'edit');
+
+//rutas para TypeChargeController
+Route::resource('type_charge', 'TypeCharge\TypeChargeController')->except('create', 'show', 'edit');
+
+//rutas para TypeMessageController
+Route::resource('type_message', 'TypeMessage\TypeMessageController')->except('create', 'show', 'edit');
+
+//rutas para TypeServiceController
+Route::resource('type_service', 'TypeService\TypeServiceController')->only('index');

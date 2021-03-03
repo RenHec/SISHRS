@@ -9,7 +9,10 @@ use App\Models\V1\Catalogo\Status;
 use App\Imports\DepartamentoImport;
 use App\Models\V1\Catalogo\Movement;
 use App\Models\V1\Catalogo\TypeBed;
+use App\Models\V1\Catalogo\TypeCharge;
+use App\Models\V1\Catalogo\TypeMessage;
 use App\Models\V1\Catalogo\TypeRoom;
+use App\Models\V1\Catalogo\TypeService;
 use App\Models\V1\Seguridad\Usuario;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\V1\Seguridad\UsuarioRol;
@@ -56,11 +59,46 @@ class DatabaseSeeder extends Seeder
         $insert->name = 'Cama';
         $insert->save();
 
+        $insert = new TypeService();
+        $insert->name = 'Hotel';
+        $insert->save();
+        $insert = new TypeService();
+        $insert->name = 'SPA';
+        $insert->save();
+
         $insert = new TypeRoom();
         $insert->name = 'Bungalo';
+        $insert->type_service_id = 1;
         $insert->save();
+
         $insert = new TypeRoom();
         $insert->name = 'Principal';
+        $insert->type_service_id = 1;
+        $insert->save();
+
+        $insert = new TypeRoom();
+        $insert->name = 'Cabina';
+        $insert->type_service_id = 2;
+        $insert->save();
+
+        $insert = new TypeCharge();
+        $insert->name = 'Día';
+        $insert->save();
+
+        $insert = new TypeCharge();
+        $insert->name = 'Noche';
+        $insert->save();
+
+        $insert = new TypeCharge();
+        $insert->name = 'Hora';
+        $insert->save();
+
+        $insert = new TypeMessage();
+        $insert->name = 'Masaje 1';
+        $insert->save();
+
+        $insert = new TypeMessage();
+        $insert->name = 'Masaje 2';
         $insert->save();
 
         $insert = new Movement();

@@ -18,6 +18,7 @@ import Coin from '@/components/catalogo/CoinComponent'
 import Movement from '@/components/catalogo/MovementComponent'
 import Municipality from '@/components/catalogo/MunicipalityComponent'
 import Departament from '@/components/catalogo/DepartamentComponent'
+import TypeService from '@/components/catalogo/TypeServiceComponent'
 
 //Principal
 import PictureRoom from '@/components/principal/PictureRoomComponent'
@@ -26,6 +27,8 @@ import TypeBed from '@/components/principal/TypeBedComponent'
 import TypeRoom from '@/components/principal/TypeRoomComponent'
 import Ofert from '@/components/principal/OfertComponent'
 import Reservation from '@/components/principal/ReservationComponent'
+import TypeCharge from '@/components/principal/TypeChargeComponent'
+import TypeMessage from '@/components/principal/TypeMessageComponent'
 
 Vue.use(Router)
 
@@ -102,6 +105,11 @@ const routes = [{
   name: 'Departament',
   component: Departament,
   beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/type_service',
+  name: 'TypeService',
+  component: TypeService,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
 },
 //Principal
 {
@@ -134,7 +142,17 @@ const routes = [{
   name: 'Reservation',
   component: Reservation,
   beforeEnter: multiguard([isLoggedIn, permissionsValidations])
-},
+}, {
+  path: '/type_charge',
+  name: 'TypeCharge',
+  component: TypeCharge,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/type_massage',
+  name: 'TypeMessage',
+  component: TypeMessage,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}
 ]
 
 export default new Router({

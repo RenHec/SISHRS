@@ -51,7 +51,7 @@ class TypeRoomController extends ApiController
      */
     public function index()
     {
-        $data = TypeRoom::all();
+        $data = TypeRoom::with('type_service')->get();
         return $this->showAll($data);
     }
 
@@ -95,7 +95,9 @@ class TypeRoomController extends ApiController
         $this->validate($request, $this->rules(), $this->messages());
 
         try {
-            TypeRoom::create($request->all());
+            $data = $request->all();
+            $data['type_service_id'] = $request->type_service_id['id'];
+            TypeRoom::create($data);
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
             return $this->errorResponse('Error en el controlador', 423);
@@ -153,6 +155,7 @@ class TypeRoomController extends ApiController
 
         try {
             $typeroom->name = $request->name;
+            $typeroom->type_service_id = $request->type_service_id['id'];
 
             if (!$typeroom->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);
