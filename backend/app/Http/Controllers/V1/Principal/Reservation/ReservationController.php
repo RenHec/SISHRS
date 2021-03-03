@@ -207,7 +207,7 @@ class ReservationController extends ApiController
                         'reservation_id' => $reservation->id,
                         'room_id' => $value['room_id'],
                         'coin_id' => $reservation->coin_id,
-                        'sub' => intval($reservation->accommodation) * floatval($value['price']),
+                        'sub' => intval($reservation->accommodation) == 0 ? 1 * floatval($value['price']) : intval($reservation->accommodation) * floatval($value['price']),
                         'room_price_id' => $value['room_price_id']
                     ]
                 );
