@@ -176,6 +176,7 @@
                         <v-chip
                           v-if="room.id == item.id"
                           v-bind:key="x"
+                          :disabled="!item.esconder"
                           @click="seleccionar_precio(room)"
                           >{{ room.name }}</v-chip
                         >
