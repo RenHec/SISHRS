@@ -202,11 +202,13 @@ class ReservationController extends ApiController
             foreach ($request->details as $value) {
                 $detail = ReservationDetail::create(
                     [
-                        'price' => intval($reservation->accommodation) * floatval($value['price']),
+                        'price' => floatval($value['price']),
                         'ofert' => is_null($value['ofert']) ? false : true,
                         'reservation_id' => $reservation->id,
                         'room_id' => $value['room_id'],
-                        'coin_id' => $reservation->coin_id
+                        'coin_id' => $reservation->coin_id,
+                        'sub' => intval($reservation->accommodation) * floatval($value['price']),
+                        'room_price_id' => $value['room_price_id']
                     ]
                 );
 
@@ -220,7 +222,7 @@ class ReservationController extends ApiController
                     );
                 }
 
-                $reservation->total += $detail->price;
+                $reservation->total += floatval($detail->sub);
             }
 
             if ($reservation->total > 0)

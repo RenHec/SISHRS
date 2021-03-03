@@ -516,6 +516,7 @@ export default {
           this.seleccionados.forEach((element) => {
             if (element.id == item.id) {
               objecto.price = element.sf_price;
+              objecto.room_price_id = element.rooms_prices;
             }
           });
 
@@ -604,7 +605,7 @@ export default {
           this.promocion = null;
           this.promociones = null;
           this.dialog = false;
-          console.log(this.form.details);
+          
         } else {
           this.promocion = null;
           this.promociones = null;
