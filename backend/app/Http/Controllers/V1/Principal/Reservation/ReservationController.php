@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\Movement;
 use Illuminate\Support\Facades\Auth;
-use App\Models\V1\Principal\OfertRoom;
 use App\Http\Controllers\ApiController;
 use App\Models\V1\Principal\PictureRoom;
 use App\Models\V1\Principal\Reservation;
@@ -105,13 +104,14 @@ class ReservationController extends ApiController
                     ->whereBetween(DB::RAW('DATE_FORMAT(reservations.departure_date, "%Y-%m-%d")'), [$inicio, $fin])
                     ->whereRaw('reservations_details.room_id = rooms.id');
             })
-            ->when(count($array_servicios) != 0, function($query) use ($array_servicios) {
+            ->when(count($array_servicios) != 0, function ($query) use ($array_servicios) {
                 $query->whereIn('rooms.type_service_id', $array_servicios);
             })
             ->whereNull('rooms.deleted_at')
             ->get();
 
         $array = array();
+        $array_ids = array();
 
         foreach ($data as $value) {
             $photo = PictureRoom::where('room_id', $value->id)->orderBy('position', 'ASC')->first();
@@ -129,9 +129,49 @@ class ReservationController extends ApiController
             $info['esconder'] = false;
 
             array_push($array, $info);
+            array_push($array_ids, $value->id);
         }
 
-        return $this->successResponse($array);
+        $precios = DB::table('rooms_prices')
+            ->join('rooms', 'rooms_prices.room_id', 'rooms.id')
+            ->join('coins', 'rooms.coin_id', 'coins.id')
+            ->join('type_charge', 'rooms_prices.type_charge_id', 'type_charge.id')
+            ->select(
+                'rooms.id AS id',
+                'rooms_prices.id AS rooms_prices',
+                DB::RAW('CONCAT(type_charge.name," - ",coins.symbol," ",FORMAT(rooms_prices.price,2)) AS name'),
+                'rooms_prices.price AS sf_price'
+            )
+            ->whereIn('rooms_prices.room_id', $array_ids)
+            ->get();
+
+        $masajes = DB::table('rooms_massages')
+            ->join('type_massages', 'rooms_massages.type_massage_id', 'type_massages.id')
+            ->select(
+                'rooms_massages.room_id AS id',
+                'type_massages.name AS name'
+            )
+            ->whereIn('rooms_massages.room_id', $array_ids)
+            ->get();
+
+        return $this->successResponse(['habitaciones' => $array, 'precios' => $precios, 'masajes' => $masajes]);
+    }
+
+    public function precios(Room $room)
+    {
+        $data = DB::table('rooms_prices')
+            ->join('rooms', 'rooms_prices.room_id', 'rooms.id')
+            ->join('coins', 'rooms.coin_id', 'coins.id')
+            ->join('type_charge', 'rooms_prices.type_charge_id', 'type_charge.id')
+            ->select(
+                'rooms_prices.id AS rooms_prices',
+                DB::RAW('CONCAT(type_charge.name," - ",coins.symbol," ",FORMAT(rooms_prices.price,2)) AS name'),
+                'rooms_prices.price AS sf_price'
+            )
+            ->where('rooms_prices.room_id', $room->id)
+            ->get();
+
+        return $this->successResponse($data);
     }
 
     public function store(Request $request)

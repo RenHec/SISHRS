@@ -55,7 +55,14 @@
                       @input="formatear_fecha_inicio"
                       v-on="on"
                       :disabled="bloquear"
+                      data-vv-scope="create"
+                      data-vv-name="fecha de inicio"
+                      v-validate="'required|date_format:yyyy-mm-dd'"
                     ></v-text-field>
+                    <FormError
+                      :attribute_name="'create.fecha de inicio'"
+                      :errors_form="errors"
+                    ></FormError>
                   </template>
                   <v-date-picker
                     v-model="form.arrival_date"
@@ -89,7 +96,14 @@
                       @input="formatear_fecha_fin"
                       v-on="on"
                       :disabled="bloquear"
+                      data-vv-scope="create"
+                      data-vv-name="fecha de finalización"
+                      v-validate="'required|date_format:yyyy-mm-dd'"
                     ></v-text-field>
+                    <FormError
+                      :attribute_name="'create.fecha de finalización'"
+                      :errors_form="errors"
+                    ></FormError>
                   </template>
                   <v-date-picker
                     v-model="form.departure_date"
@@ -104,7 +118,7 @@
                 <v-btn
                   color="warning darken-1"
                   x-large
-                  @click="buscar_habitacion"
+                  @click="buscar_habitacion('create')"
                   >Buscar habitaciones</v-btn
                 >
               </v-col>
@@ -132,8 +146,6 @@
                   <v-card-title>{{ item.name }}</v-card-title>
 
                   <v-card-text>
-                    <div class="my-4 subtitle-1">{{ item.price }}</div>
-
                     <div v-html="item.description"></div>
                   </v-card-text>
 
@@ -142,15 +154,50 @@
                   <v-card-title>Información extra</v-card-title>
 
                   <v-card-text>
-                    <v-chip-group
-                      active-class="deep-purple accent-4 white--text"
-                      column
-                    >
+                    <v-chip-group column>
                       <v-chip>{{ item.type_room }}</v-chip>
 
                       <v-chip>{{ "Personas: " + item.amount_people }}</v-chip>
 
                       <v-chip>{{ item.type_bed }}</v-chip>
+                    </v-chip-group>
+                  </v-card-text>
+
+                  <v-divider class="mx-4"></v-divider>
+
+                  <v-card-title>Precios</v-card-title>
+
+                  <v-card-text>
+                    <v-chip-group
+                      active-class="success accent-4 white--text"
+                      column
+                    >
+                      <template v-for="(room, x) in todos_precios">
+                        <v-chip
+                          v-if="room.id == item.id"
+                          v-bind:key="x"
+                          @click="seleccionar_precio(room)"
+                          >{{ room.name }}</v-chip
+                        >
+                      </template>
+                    </v-chip-group>
+                  </v-card-text>
+
+                  <v-divider v-if="todos_masajes.length > 0" class="mx-4"></v-divider>
+
+                  <v-card-title v-if="todos_masajes.length > 0">Masajes</v-card-title>
+
+                  <v-card-text v-if="todos_masajes.length > 0">
+                    <v-chip-group
+                      column
+                    >
+                      <template v-for="(masaje, x) in todos_masajes">
+                        <v-chip
+                          v-if="masaje.id == item.id"
+                          v-bind:key="x"
+                          >{{ masaje.name }}</v-chip
+                        >
+                      </template>
                     </v-chip-group>
                   </v-card-text>
 
@@ -327,6 +374,9 @@ export default {
       clientes: [],
       servicios: [],
       listar_servicios: [],
+      todos_precios: [],
+      seleccionados: [],
+      todos_masajes: [],
       form: {
         id: 0,
         nit: null,
@@ -404,41 +454,50 @@ export default {
       this.dialog = false;
       this.dialog_cliente = false;
       this.habitaciones = [];
+      this.todos_precios = [];
+      this.todos_masajes = [];
+      this.seleccionados = [];
 
       this.$validator.reset();
       this.$validator.reset();
     },
 
-    buscar_habitacion() {
-      let objeto = new Object();
-      objeto.inicio = this.form.arrival_date;
-      objeto.fin = this.form.departure_date;
-      objeto.servicios = this.servicios.length != 0 ? this.servicios : null;
+    buscar_habitacion(scope) {
+      this.$validator.validateAll(scope).then((result) => {
+        if (result) {
+          let objeto = new Object();
+          objeto.inicio = this.form.arrival_date;
+          objeto.fin = this.form.departure_date;
+          objeto.servicios = this.servicios.length != 0 ? this.servicios : [];
 
-      this.loading = true;
-      this.$store.state.services.reservationService
-        .buscar_habitaciones(objeto)
-        .then((r) => {
-          this.loading = false;
+          this.loading = true;
+          this.$store.state.services.reservationService
+            .buscar_habitaciones(objeto)
+            .then((r) => {
+              this.loading = false;
 
-          if (r.response) {
-            if (r.response.data.code === 404) {
-              this.$toastr.warning(r.response.data.error, "Advertencia");
-              return;
-            } else if (r.response.data.code === 423) {
-              this.$toastr.warning(r.response.data.error, "Advertencia");
-              return;
-            } else {
-              for (let value of Object.values(r.response.data)) {
-                this.$toastr.error(value, "Mensaje");
+              if (r.response) {
+                if (r.response.data.code === 404) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else if (r.response.data.code === 423) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else {
+                  for (let value of Object.values(r.response.data)) {
+                    this.$toastr.error(value, "Mensaje");
+                  }
+                }
+                return;
               }
-            }
-            return;
-          }
 
-          this.habitaciones = r.data;
-        })
-        .catch((r) => {});
+              this.habitaciones = r.data.habitaciones;
+              this.todos_precios = r.data.precios;
+              this.todos_masajes = r.data.masajes;
+            })
+            .catch((r) => {});
+        }
+      });
     },
 
     reservar(item) {
@@ -451,7 +510,23 @@ export default {
         if (result.value) {
           this.loading_room = true;
           let objecto = new Object();
-          objecto.price = item.sf_price;
+          objecto.price = null;
+
+          this.seleccionados.forEach((element) => {
+            if (element.id == item.id) {
+              objecto.price = element.sf_price;
+            }
+          });
+
+          if (!objecto.price) {
+            this.$toastr.error(
+              "El precio no fue seleccionado.",
+              "Error"
+            ); 
+            this.loading_room = false;
+            return 0;
+          }
+
           objecto.room_id = item.id;
           objecto.ofert = null;
 
@@ -565,7 +640,6 @@ export default {
     },
 
     guardar_reservacion() {
-      console.log(this.form.client_id);
       this.$swal({
         title: "Guardar Reservación",
         text: "¿Está seguro de realizar esta acción?",
@@ -611,6 +685,56 @@ export default {
           this.close();
         }
       });
+    },
+
+    traer_precios(item) {
+      this.loading = true;
+
+      this.$store.state.services.reservationService
+        .precios(item)
+        .then((r) => {
+          if (r.response) {
+            if (r.response.data.code === 423) {
+              this.$toastr.error(r.response.data.error, "Mensaje");
+            } else {
+              for (let value of Object.values(r.response.data.error)) {
+                this.$toastr.error(value, "Mensaje");
+              }
+            }
+            this.loading = false;
+            return;
+          }
+
+          this.loading = false;
+          return r.data.data;
+        })
+        .catch((r) => {
+          this.loading = false;
+          return [];
+        });
+    },
+
+    seleccionar_precio(item) {
+      this.loading = true;
+      if (this.seleccionados.length > 0) {
+        this.seleccionados.forEach((element) => {
+          if (element.id == item.id) {
+            element.id = item.id;
+            element.rooms_prices = item.rooms_prices;
+            element.name = item.name;
+            element.sf_price = item.sf_price;
+
+            this.loading = false;
+            return 0;
+          }
+        });
+
+        this.seleccionados.push(item);
+        this.loading = false;
+      } else {
+        this.seleccionados.push(item);
+        this.loading = false;
+      }
     },
 
     getServicios() {

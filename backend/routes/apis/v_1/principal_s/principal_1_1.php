@@ -40,6 +40,7 @@ Route::resource('reservation', 'Reservation\ReservationController')->except('cre
 Route::name('reservation.pendiente')->get('reservation_pendiente', 'Reservation\ReservationController@pendiente');
 Route::name('reservation.promocion')->get('reservation_promocion/{room}', 'Reservation\ReservationController@promocion');
 Route::name('reservation.calendario')->get('reservation_calendario', 'Reservation\ReservationController@calendario');
+Route::name('reservation.precios')->get('reservation_precios/{room}', 'Reservation\ReservationController@precios');
 Route::name('reservation.buscar_habitaciones')->post('reservation_buscar_habitaciones', 'Reservation\ReservationController@buscar_habitaciones');
 
 //rutas para ReservationDetailController
