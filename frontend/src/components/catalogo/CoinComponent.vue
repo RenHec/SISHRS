@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-col cols="12" md="12">
+    <v-col cols="12" md="10">
       <v-card>
         <v-overlay :value="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -16,7 +16,7 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="3">
                 <v-text-field
                   counter
                   outlined
@@ -46,6 +46,22 @@
                 ></v-text-field>
                 <FormError
                   :attribute_name="'create.nombre'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="3" class="text-center">
+                <label>Cambio</label>
+                <input
+                  dark
+                  placeholder="Cambio"
+                  class="nuevo-input"
+                  v-model="form.change"
+                  data-vv-name="cambio"
+                  v-validate="'required|decimal:2'"
+                  data-vv-scope="create"
+                />
+                <FormError
+                  :attribute_name="'create.cambio'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -146,6 +162,11 @@ export default {
           align: "start",
           value: "name",
         },
+        {
+          text: "Cambio",
+          align: "start",
+          value: "change",
+        },
         { text: "Opciones", value: "actions", sortable: false },
       ],
       footer: {
@@ -160,6 +181,7 @@ export default {
         id: 0,
         symbol: null,
         name: null,
+        change: null
       },
     };
   },
@@ -186,6 +208,7 @@ export default {
       this.form.id = 0;
       this.form.symbol = null;
       this.form.name = null;
+      this.form.change = null;
 
       this.$validator.reset();
       this.$validator.reset();
@@ -222,6 +245,7 @@ export default {
       this.form.id = item.id;
       this.form.symbol = item.symbol;
       this.form.name = item.name;
+      this.form.change = item.change;
 
       this.editedIndex = true;
       this.dialog = true;

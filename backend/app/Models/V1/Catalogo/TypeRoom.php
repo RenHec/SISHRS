@@ -62,7 +62,7 @@ class TypeRoom extends Model
     }
 
     /**
-     * Get the type service associated with the municipality.
+     * Get the type service associated with the type_rooms.
      *
      * @return object
      */

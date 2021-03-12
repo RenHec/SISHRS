@@ -17,6 +17,7 @@ class CreateRoomsMassagesTable extends Migration
             $table->id();
             $table->foreignId('type_massage_id')->constrained('type_massages');
             $table->foreignId('room_id')->constrained('rooms');
+            $table->boolean('web')->default(false);
             $table->timestamps();
         });
     }

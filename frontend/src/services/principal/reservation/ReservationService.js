@@ -37,6 +37,11 @@ class ReservationService {
     return self.axios.post(`${self.baseUrl}_buscar_habitaciones`, data);
   }
 
+  show(data) {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}/${data.id}`);
+  }
+
   store(data) {
     let self = this
     return self.axios.post(`${self.baseUrl}`, data)

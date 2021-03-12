@@ -29,7 +29,7 @@ class ReservationServiceController extends ApiController
                 'coin_id' => $reservationservice->coin_id
             ]);
 
-            $reservationservice->total += $service->price;
+            $reservationservice->total += floatval($service->price);
             $reservationservice->save();
 
             DB::commit();
@@ -54,7 +54,7 @@ class ReservationServiceController extends ApiController
 
             DB::beginTransaction();
             $reservation = Reservation::find($reservationservice->reservation_id);
-            $reservation->total -= $reservationservice->price;
+            $reservation->total -= floatval($reservationservice->price);
             $reservation->save();
 
             $reservationservice->forceDelete();

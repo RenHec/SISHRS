@@ -2,6 +2,7 @@
 
 namespace App\Models\V1\Catalogo;
 
+use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,11 @@ class TypeMessage extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
+        'time',
+        'price',
+        'coin_id',
+        'type_service_id'
     ];
 
     /**
@@ -43,4 +48,24 @@ class TypeMessage extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * Get the type service associated with the type_massages.
+     *
+     * @return object
+     */
+    public function type_service()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
+    }
+
+    /**
+     * Get the coin associated with the type_massages.
+     *
+     * @return object
+     */
+    public function coin()
+    {
+        return $this->belongsTo(Coin::class, 'coin_id', 'id');
+    }
 }

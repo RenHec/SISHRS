@@ -15,7 +15,11 @@ class CreateTypeMassagesTable extends Migration
     {
         Schema::create('type_massages', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50)->unique();
+            $table->smallInteger('time');
+            $table->string('name', 50);
+            $table->decimal('price', 11, 2);
+            $table->foreignId('coin_id')->constrained('coins');
+            $table->foreignId('type_service_id')->constrained('type_services');
             $table->softDeletes();
             $table->timestamps();
         });

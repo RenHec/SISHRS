@@ -15,13 +15,15 @@ class CreateBinnacleReservationsTable extends Migration
     {
         Schema::create('binnacle_reservations', function (Blueprint $table) {
             $table->id();
-            $table->date('start');
-            $table->date('end');
+            $table->dateTime('start');
+            $table->dateTime('end');
             $table->boolean('active')->default(true);
             $table->smallInteger('days')->default(60);
             $table->smallInteger('subtraction')->default(0);
             $table->foreignId('movement_id')->constrained('movements');
-            $table->foreignId('reservation_id')->constrained('reservations');
+
+            $table->foreignId('type_service_id')->constrained('type_services');
+            $table->foreignId('reservation_detail_id')->constrained('reservations_details');
             $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });

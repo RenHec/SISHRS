@@ -30,9 +30,7 @@ class Reservation extends Model
         'name',
         'ubication',
         'total',
-        'arrival_date',
-        'departure_date',
-        'accommodation',
+        
         'client_id',
         'user_id',
         'status_id',
@@ -46,9 +44,7 @@ class Reservation extends Model
      */
     protected $casts = [
         'created_at' => 'datetime:Y-m-d h:i:s a',
-        'updated_at' => 'datetime:Y-m-d h:i:s a',
-        'arrival_date' => 'date:Y-m-d',
-        'departure_date' => 'date:Y-m-d'
+        'updated_at' => 'datetime:Y-m-d h:i:s a'
     ];
 
     /**

@@ -10,7 +10,7 @@
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
         <v-card-title>
-          <span class="headline">Agregar fotografías a la habitación</span>
+          <span class="headline">Agregar fotografías del servicio</span>
         </v-card-title>
 
         <v-card-text>
@@ -22,7 +22,7 @@
                   v-model="habitacion"
                   :items="habitaciones"
                   chips
-                  label="Seleccionar la habitación"
+                  label="Seleccionar el servicio"
                   outlined
                   :clearable="true"
                   :deletable-chips="true"
@@ -31,10 +31,10 @@
                   return-object
                   v-validate="'required'"
                   data-vv-scope="create"
-                  data-vv-name="habitación"
+                  data-vv-name="servicio"
                 ></v-autocomplete>
                 <FormError
-                  :attribute_name="'create.habitación'"
+                  :attribute_name="'create.servicio'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -45,7 +45,7 @@
                   counter
                   accept="image/png, image/jpeg, image/jpg"
                   multiple
-                  placeholder="Seleccionar fotografías de la habitación"
+                  placeholder="Seleccionar fotografías del servicio"
                   outlined
                   :show-size="1000"
                   @change="cargaMasiva($event)"

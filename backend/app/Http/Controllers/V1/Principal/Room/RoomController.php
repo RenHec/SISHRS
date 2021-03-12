@@ -109,10 +109,12 @@ class RoomController extends ApiController
             $data['type_room_id'] = $request->type_room_id['id'];
             $data['coin_id'] = $request->coin_id['id'];
             $data['type_service_id'] = $request->type_room_id['type_service_id'];
+            $data['amount_people'] = $request->number_adults + $request->number_children;
+            $data['pets'] = $request->amount_pets > 0 ? true : false;
 
             $room = Room::create($data);
 
-            foreach ($request->pictures as $value) {
+            foreach($request->pictures as $key => $value) {
                 if(isset($value['photo']) && !is_null($value['photo']) && !empty($value['photo'])) {
                     $picture_name = Str::random(10);
 
@@ -128,7 +130,7 @@ class RoomController extends ApiController
                     PictureRoom::create(
                         [
                             'photo' => $path,
-                            'position' => 0,
+                            'position' => $key+1,
                             'view' => true,
                             'room_id' => $room->id
                         ]
@@ -140,9 +142,10 @@ class RoomController extends ApiController
                 $insert = RoomPrice::create(
                     [
                         'price' => floatval($value['price']),
-                        'default' => $value['default'],
+                        'default' => false,
                         'type_charge_id' => $value['type_charge_id'],
-                        'room_id' => $room->id
+                        'room_id' => $room->id,
+                        'web' => $value['web']
                     ]
                 );
 
@@ -221,8 +224,11 @@ class RoomController extends ApiController
         try {
             $room->number = $request->number;
             $room->name = $request->name;
-            $room->amount_people = $request->amount_people;
+            $room->amount_people = $request->number_adults + $request->number_children;
             $room->amount_bed = $request->amount_bed;
+            $room->number_adults = $request->number_adults;
+            $room->number_children = $request->number_children;
+            $room->amount_pets = $request->amount_pets;
             $room->price = floatval($request->price);
             $room->description = $request->description;
             $room->type_bed_id = $request->type_bed_id['id'];
@@ -305,7 +311,6 @@ class RoomController extends ApiController
         $validar = [
             'number' => 'required|between:1,999',
             'name' => 'required|max:100',
-            'amount_people' => 'required|between:1,99',
             'amount_bed' => 'required|between:1,99',
             'description' => 'required',
             'type_bed_id.id' => 'required|integer|exists:type_beds,id',

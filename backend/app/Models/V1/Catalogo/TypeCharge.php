@@ -2,9 +2,10 @@
 
 namespace App\Models\V1\Catalogo;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TypeCharge extends Model
 {
@@ -23,7 +24,8 @@ class TypeCharge extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
+        'type_service_id'
     ];
 
     /**
@@ -43,4 +45,14 @@ class TypeCharge extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * Get the type service associated with the type_charge.
+     *
+     * @return object
+     */
+    public function type_service()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
+    }
 }

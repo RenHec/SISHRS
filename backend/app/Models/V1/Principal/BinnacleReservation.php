@@ -4,8 +4,9 @@ namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Movement;
 use App\Models\V1\Seguridad\Usuario;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BinnacleReservation extends Model
 {
@@ -30,8 +31,9 @@ class BinnacleReservation extends Model
         'days',
         'subtraction',
         'movement_id',
-        'reservation_id',
-        'user_id'
+        'reservation_detail_id',
+        'user_id',
+        'type_service_id'
     ];
 
     /**
@@ -42,8 +44,6 @@ class BinnacleReservation extends Model
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
         'updated_at' => 'datetime:d/m/Y h:i:s a',
-        'start' => 'date:d/m/Y',
-        'end' => 'date:d/m/Y',
         'active' => 'boolean'
     ];
 
@@ -65,13 +65,13 @@ class BinnacleReservation extends Model
     }
 
     /**
-     * Get the reservation associated with the binnacle_reservations.
+     * Get the reservation_detail associated with the binnacle_reservations.
      *
      * @return object
      */
-    public function reservation()
+    public function reservation_detail()
     {
-        return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
+        return $this->belongsTo(ReservationDetail::class, 'reservation_detail_id', 'id');
     }
 
     /**
@@ -82,5 +82,15 @@ class BinnacleReservation extends Model
     public function user()
     {
         return $this->belongsTo(Usuario::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the type_service associated with the binnacle_reservations.
+     *
+     * @return object
+     */
+    public function type_service()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
     }
 }

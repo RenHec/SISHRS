@@ -26,7 +26,8 @@ class RoomPrice extends Model
         'price',
         'default',
         'type_charge_id',
-        'room_id'
+        'room_id',
+        'web'
     ];
 
     /**
@@ -37,7 +38,8 @@ class RoomPrice extends Model
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
         'updated_at' => 'datetime:d/m/Y h:i:s a',
-        'default' => 'boolean'
+        'default' => 'boolean',
+        'web' => 'boolean'
     ];
 
     /**

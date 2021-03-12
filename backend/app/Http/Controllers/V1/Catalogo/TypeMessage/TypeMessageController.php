@@ -50,7 +50,7 @@ class TypeMessageController extends ApiController
      */
     public function index()
     {
-        $data = TypeMessage::all();
+        $data = TypeMessage::with('type_service', 'coin')->withTrashed()->get();
         return $this->showAll($data);
     }
 
@@ -94,7 +94,12 @@ class TypeMessageController extends ApiController
         $this->validate($request, $this->rules(), $this->messages());
 
         try {
-            TypeMessage::create($request->all());
+            $data = $request->all();
+            $data['coin_id'] = $request->coin_id['id'];
+            $data['type_service_id'] = $request->type_service_id['id'];
+            $data['price'] = str_replace(',','', $request->price);
+            
+            TypeMessage::create($data);
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
             return $this->errorResponse('Error en el controlador', 423);
@@ -146,17 +151,21 @@ class TypeMessageController extends ApiController
      *      ),
      *  )
      */
-    public function update(Request $request, TypeMessage $typemessage)
+    public function update(Request $request, TypeMessage $type_message)
     {
-        $this->validate($request, $this->rules($typemessage->id), $this->messages());
+        $this->validate($request, $this->rules($type_message->id), $this->messages());
 
         try {
-            $typemessage->name = $request->name;
+            $type_message->time = $request->time;
+            $type_message->name = $request->name;
+            $type_message->price = str_replace(',','', $request->price);
+            $type_message->coin_id = $request->coin_id['id'];
+            $type_message->type_service_id = $request->type_service_id['id'];
 
-            if (!$typemessage->isDirty())
+            if (!$type_message->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);
 
-            $typemessage->save();
+            $type_message->save();
 
             return $this->successResponse('Registro actualizado.');
         } catch (\Exception $e) {
@@ -209,14 +218,14 @@ class TypeMessageController extends ApiController
      *      ),
      *  )
      */
-    public function destroy($typemessage)
+    public function destroy($type_message)
     {
-        $typemessage = TypeMessage::withTrashed()->find($typemessage);
-        if (is_null($typemessage->deleted_at)) {
-            $typemessage->delete();
+        $type_message = TypeMessage::withTrashed()->find($type_message);
+        if (is_null($type_message->deleted_at)) {
+            $type_message->delete();
             $message = 'descativado';
         } else {
-            $typemessage->restore();
+            $type_message->restore();
             $message = 'activado';
         }
 

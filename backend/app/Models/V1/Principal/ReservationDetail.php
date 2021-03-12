@@ -3,8 +3,10 @@
 namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Coin;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\V1\Catalogo\Status;
+use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReservationDetail extends Model
 {
@@ -29,7 +31,12 @@ class ReservationDetail extends Model
         'room_id',
         'coin_id',
         'sub',
-        'room_price_id'
+        'arrival_date',
+        'departure_date',
+        'accommodation',
+        'description',
+        'type_service_id',
+        'status_id'
     ];
 
     /**
@@ -70,6 +77,17 @@ class ReservationDetail extends Model
     }
 
     /**
+     * Get the reservation associated with the reservations_details.
+     *
+     * @return object
+     */
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
+    }
+
+
+    /**
      * Get the ofert associated with the reservations_details.
      *
      * @return object
@@ -77,5 +95,25 @@ class ReservationDetail extends Model
     public function ofert()
     {
         return $this->hasOne(ReservationOfert::class, 'reservation_detail_id', 'id');
+    }
+
+    /**
+     * Get the status associated with the reservations.
+     *
+     * @return object
+     */
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'status_id', 'id');
+    }
+
+    /**
+     * Get the type_service associated with the reservations.
+     *
+     * @return object
+     */
+    public function type_service()
+    {
+        return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
     }
 }

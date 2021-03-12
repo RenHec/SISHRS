@@ -24,7 +24,8 @@ class RoomMassage extends Model
      */
     protected $fillable = [
         'type_massage_id',
-        'room_id'
+        'room_id',
+        'web'
     ];
 
     /**
@@ -34,7 +35,8 @@ class RoomMassage extends Model
      */
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
-        'updated_at' => 'datetime:d/m/Y h:i:s a'
+        'updated_at' => 'datetime:d/m/Y h:i:s a',
+        'web' => 'boolean'
     ];
 
     /**

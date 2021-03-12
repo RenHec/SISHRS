@@ -50,7 +50,7 @@ class TypeChargeController extends ApiController
      */
     public function index()
     {
-        $data = TypeCharge::all();
+        $data = TypeCharge::with('type_service')->withTrashed()->get();
         return $this->showAll($data);
     }
 
@@ -94,7 +94,10 @@ class TypeChargeController extends ApiController
         $this->validate($request, $this->rules(), $this->messages());
 
         try {
-            TypeCharge::create($request->all());
+            $data = $request->all();
+            $data['type_service_id'] = $request->type_service_id['id'];
+
+            TypeCharge::create($data);
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
             return $this->errorResponse('Error en el controlador', 423);
@@ -146,17 +149,18 @@ class TypeChargeController extends ApiController
      *      ),
      *  )
      */
-    public function update(Request $request, TypeCharge $typecharge)
+    public function update(Request $request, TypeCharge $type_charge)
     {
-        $this->validate($request, $this->rules($typecharge->id), $this->messages());
+        $this->validate($request, $this->rules($type_charge->id), $this->messages());
 
         try {
-            $typecharge->name = $request->name;
+            $type_charge->name = $request->name;
+            $type_charge->type_service_id = $request->type_service_id['id'];
 
-            if (!$typecharge->isDirty())
+            if (!$type_charge->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);
 
-            $typecharge->save();
+            $type_charge->save();
 
             return $this->successResponse('Registro actualizado.');
         } catch (\Exception $e) {
@@ -209,14 +213,14 @@ class TypeChargeController extends ApiController
      *      ),
      *  )
      */
-    public function destroy($typecharge)
+    public function destroy($type_charge)
     {
-        $typecharge = TypeCharge::withTrashed()->find($typecharge);
-        if (is_null($typecharge->deleted_at)) {
-            $typecharge->delete();
+        $type_charge = TypeCharge::withTrashed()->find($type_charge);
+        if (is_null($type_charge->deleted_at)) {
+            $type_charge->delete();
             $message = 'descativado';
         } else {
-            $typecharge->restore();
+            $type_charge->restore();
             $message = 'activado';
         }
 
@@ -227,7 +231,7 @@ class TypeChargeController extends ApiController
     public function rules($id = null)
     {
         $validar = [
-            'name' => is_null($id) ? 'required|max:50|unique:type_charge,name' : "required|max:50|unique:type_charge,name,{$id}"
+            'name' => 'required|max:50'
         ];
 
         return $validar;

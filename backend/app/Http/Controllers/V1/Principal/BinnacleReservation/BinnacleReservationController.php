@@ -226,7 +226,7 @@ class BinnacleReservationController extends ApiController
 
             DB::commit();
 
-            return $this->successResponse('Reservación reubicada.');
+            return $this->successResponse('Reservación cancelada.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->errorResponse('Error en el controlador', 423);

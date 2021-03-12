@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-col cols="12" md="4">
+    <v-col cols="12" md="10">
       <v-card>
         <v-overlay :value="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -16,7 +16,28 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="12">
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="form.type_service_id"
+                  :items="type_services"
+                  chips
+                  label="Seleccionar tipo de servicio"
+                  outlined
+                  :clearable="true"
+                  :deletable-chips="true"
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                  data-vv-name="tipo de servicio"
+                ></v-autocomplete>
+                <FormError
+                  :attribute_name="'create.tipo de servicio'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="6">
                 <v-text-field
                   counter
                   outlined
@@ -29,6 +50,61 @@
                 ></v-text-field>
                 <FormError
                   :attribute_name="'create.nombre'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-autocomplete
+                  v-model="form.coin_id"
+                  :items="coins"
+                  chips
+                  label="Seleccionar moneda"
+                  outlined
+                  :clearable="true"
+                  :deletable-chips="true"
+                  item-text="name"
+                  item-value="id"
+                  return-object
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                  data-vv-name="moneda"
+                ></v-autocomplete>
+                <FormError
+                  :attribute_name="'create.moneda'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="4" class="text-center">
+                <label>Precio</label>
+                <input
+                  dark
+                  placeholder="Precio"
+                  class="nuevo-input"
+                  v-model="form.price"
+                  @input="form.price = formatear_numero($event)"
+                  data-vv-name="precio"
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                />
+                <FormError
+                  :attribute_name="'create.precio'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="2">
+                <label>Minutos</label>
+                <vue-number-input
+                  v-model="form.time"
+                  :min="1"
+                  :max="999"
+                  controls
+                  placeholder="Tiempo del servicio"
+                  data-vv-scope="create"
+                  data-vv-name="tiempo del servicio"
+                  v-validate="'required'"
+                ></vue-number-input>
+                <FormError
+                  :attribute_name="'create.tiempo del servicio'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -120,9 +196,29 @@ export default {
       search: "",
       headers: [
         {
+          text: "Servicio",
+          align: "start",
+          value: "type_service.name",
+        },
+        {
           text: "Nombre",
           align: "start",
           value: "name",
+        },
+        {
+          text: "Tiempo",
+          align: "start",
+          value: "time",
+        },
+        {
+          text: "Moneda",
+          align: "start",
+          value: "coin.symbol",
+        },
+        {
+          text: "Precio",
+          align: "start",
+          value: "price",
         },
         { text: "Opciones", value: "actions", sortable: false },
       ],
@@ -134,15 +230,23 @@ export default {
         nextIcon: "mdi-plus",
       },
       desserts: [],
+      coins: [],
+      type_services: [],
       form: {
         id: 0,
         name: null,
+        time: null,
+        price: null,
+        coin_id: null,
+        type_service_id: null,
       },
     };
   },
   computed: {
     formTitle() {
-      return !this.editedIndex ? "Agregar Tipo de Masaje" : "Editar Tipo de Masaje";
+      return !this.editedIndex
+        ? "Agregar Tipo de Masaje"
+        : "Editar Tipo de Masaje";
     },
   },
 
@@ -154,14 +258,35 @@ export default {
 
   created() {
     this.initialize();
+    this.getTypeService();
+    this.getCoin();
   },
 
   methods: {
+    formatear_numero(n) {
+      if (n) {
+        let numero = n.target.value.replace(",", "");
+        numero = !isNaN(numero)
+          ? parseInt(numero).toLocaleString("de-DE", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            })
+          : null;
+        return !isNaN(numero) ? numero.replace(".", ",") : null;
+      } else {
+        return null;
+      }
+    },
+
     limpiar() {
       this.editedIndex = false;
 
       this.form.id = 0;
       this.form.name = null;
+      this.form.time = null;
+      this.form.price = null;
+      this.form.coin_id = null;
+      this.form.type_service_id = null;
 
       this.$validator.reset();
       this.$validator.reset();
@@ -197,14 +322,16 @@ export default {
     mapear(item) {
       this.form.id = item.id;
       this.form.name = item.name;
+      this.form.time = item.time;
+      this.form.coin_id = item.coin;
+      this.form.type_service_id = item.type_service;
+      this.form.price = item.price;
 
       this.editedIndex = true;
-      this.dialog = true;
     },
 
     close() {
       this.limpiar();
-      this.dialog = false;
     },
 
     validar_formulario(scope) {
@@ -337,6 +464,24 @@ export default {
           this.close();
         }
       });
+    },
+
+    getTypeService() {
+      this.$store.state.services.typeServiceService
+        .index()
+        .then((r) => {
+          this.type_services = r.data.data;
+        })
+        .catch((r) => {});
+    },
+
+    getCoin() {
+      this.$store.state.services.coinService
+        .index()
+        .then((r) => {
+          this.coins = r.data.data;
+        })
+        .catch((r) => {});
     },
   },
 };

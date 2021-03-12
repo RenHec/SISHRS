@@ -18,20 +18,32 @@
             <v-row>
               <v-col cols="12" :md="!bloquear ? '2' : '3'"></v-col>
 
-              <v-col cols="12" md="3">
+              <v-col cols="12" :md="mostrar_masaje ? '2' : '3'">
                 <v-autocomplete
                   v-model="servicios"
                   :items="listar_servicios"
+                  @input="reiniciar"
                   chips
                   label="Seleccionar servicios"
                   outlined
                   :clearable="true"
                   :deletable-chips="true"
+                  :disabled="bloquear"
                   item-text="name"
                   item-value="id"
                   return-object
-                  multiple
                 ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="2" v-if="mostrar_masaje">
+                <label>Personas</label>
+                <vue-number-input
+                  v-model="cantidad"
+                  :min="1"
+                  :max="15"
+                  controls
+                  :disabled="bloquear"
+                  placeholder="Personas"
+                ></vue-number-input>
               </v-col>
               <v-col cols="12" md="2">
                 <v-menu
@@ -74,7 +86,41 @@
                 </v-menu>
               </v-col>
 
-              <v-col cols="12" md="2">
+              <v-col cols="12" md="2" v-if="mostrar_masaje">
+                <v-menu
+                  ref="menu_hora"
+                  v-model="menu_hora"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="form.hora"
+                      label="Hora"
+                      persistent-hint
+                      counter
+                      outlined
+                      readonly
+                      :disabled="bloquear"
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-time-picker
+                    v-if="menu_hora"
+                    v-model="form.hora"
+                    format="24hr"
+                    full-width
+                    @click:minute="$refs.menu_hora.save(form.hora)"
+                  ></v-time-picker>
+                </v-menu>
+              </v-col>
+
+              <v-col cols="12" md="2" v-if="!mostrar_masaje">
                 <v-menu
                   ref="menu_fin"
                   v-model="menu_fin"
@@ -119,7 +165,7 @@
                   color="warning darken-1"
                   x-large
                   @click="buscar_habitacion('create')"
-                  >Buscar habitaciones</v-btn
+                  >Buscar</v-btn
                 >
               </v-col>
               <v-col cols="12" :md="!bloquear ? '2' : '3'"></v-col>
@@ -163,11 +209,16 @@
                     </v-chip-group>
                   </v-card-text>
 
-                  <v-divider class="mx-4"></v-divider>
+                  <v-divider
+                    class="mx-4"
+                    v-if="item.type_service_id == 1"
+                  ></v-divider>
 
-                  <v-card-title>Precios</v-card-title>
+                  <v-card-title v-if="item.type_service_id == 1"
+                    >Precios</v-card-title
+                  >
 
-                  <v-card-text>
+                  <v-card-text v-if="item.type_service_id == 1">
                     <v-chip-group
                       active-class="success accent-4 white--text"
                       column
@@ -184,20 +235,24 @@
                     </v-chip-group>
                   </v-card-text>
 
-                  <v-divider v-if="todos_masajes.length > 0" class="mx-4"></v-divider>
+                  <v-divider
+                    v-if="item.type_service_id != 1"
+                    class="mx-4"
+                  ></v-divider>
 
-                  <v-card-title v-if="todos_masajes.length > 0">Masajes</v-card-title>
+                  <v-card-title v-if="item.type_service_id != 1"
+                    >Masajes</v-card-title
+                  >
 
-                  <v-card-text v-if="todos_masajes.length > 0">
+                  <v-card-text v-if="item.type_service_id != 1">
                     <v-chip-group
                       column
+                      active-class="success accent-4 white--text"
                     >
                       <template v-for="(masaje, x) in todos_masajes">
-                        <v-chip
-                          v-if="masaje.id == item.id"
-                          v-bind:key="x"
-                          >{{ masaje.name }}</v-chip
-                        >
+                        <v-chip v-if="masaje.id == item.id" :disabled="item.esconder" @click="seleccionar_precio(masaje)" v-bind:key="x">{{
+                          masaje.name
+                        }}</v-chip>
                       </template>
                     </v-chip-group>
                   </v-card-text>
@@ -218,13 +273,6 @@
                       @click="eliminar_reservacion(item)"
                     >
                       Eliminar reservación
-                    </v-btn>
-                    <v-btn
-                      v-if="item.esconder"
-                      color="primary lighten-2"
-                      @click="promociones(item, item)"
-                    >
-                      Promociones
                     </v-btn>
                   </v-card-actions>
                 </v-card>
@@ -366,6 +414,7 @@ export default {
       editedIndex: false,
       menu_inicio: false,
       menu_fin: false,
+      menu_hora: false,
       bloquear: false,
       promocion: null,
       index: null,
@@ -373,11 +422,12 @@ export default {
       habitaciones: [],
       items: [],
       clientes: [],
-      servicios: [],
+      servicios: null,
       listar_servicios: [],
       todos_precios: [],
       seleccionados: [],
       todos_masajes: [],
+      cantidad: null,
       form: {
         id: 0,
         nit: null,
@@ -388,12 +438,19 @@ export default {
         client_id: null,
         coin_id: null,
         details: [],
+        hora: null,
+        cantidad: null,
       },
     };
   },
+
   computed: {
     formTitle() {
       return !this.editedIndex ? "Agregar Reservación" : "Editar Reservación";
+    },
+
+    mostrar_masaje() {
+      return this.servicios ? (this.servicios.id != 1 ? true : false) : false;
     },
   },
 
@@ -402,6 +459,13 @@ export default {
   },
 
   methods: {
+    reiniciar() {
+      this.form.arrival_date = null;
+      this.form.departure_date = null;
+      this.form.hora = null;
+      this.form.cantidad = null;
+    },
+
     //formato de fecha
     formatear_fecha_inicio(date) {
       if (!date) return null;
@@ -423,21 +487,6 @@ export default {
       )}-${day.padStart(2, "0")}`;
     },
 
-    formatear_numero(n) {
-      if (n) {
-        let numero = n.target.value.replace(",", "");
-        numero = !isNaN(numero)
-          ? parseInt(numero).toLocaleString("de-DE", {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0,
-            })
-          : null;
-        return !isNaN(numero) ? numero.replace(".", ",") : null;
-      } else {
-        return null;
-      }
-    },
-
     limpiar() {
       this.editedIndex = false;
       this.bloquear = false;
@@ -451,6 +500,9 @@ export default {
       this.form.client_id = null;
       this.form.coin_id = null;
       this.form.details = [];
+      this.form.hora = null;
+      this.form.cantidad = null;
+      this.cantidad = null;
 
       this.dialog = false;
       this.dialog_cliente = false;
@@ -458,6 +510,7 @@ export default {
       this.todos_precios = [];
       this.todos_masajes = [];
       this.seleccionados = [];
+      this.servicios = [];
 
       this.$validator.reset();
       this.$validator.reset();
@@ -468,8 +521,12 @@ export default {
         if (result) {
           let objeto = new Object();
           objeto.inicio = this.form.arrival_date;
-          objeto.fin = this.form.departure_date;
-          objeto.servicios = this.servicios.length != 0 ? this.servicios : [];
+          objeto.fin = this.form.departure_date
+            ? this.form.departure_date
+            : this.form.arrival_date;
+          objeto.hora = this.form.hora;
+          objeto.servicios = this.servicios ? this.servicios : null;
+          this.form.cantidad = objeto.cantidad = this.cantidad ? this.cantidad : null;
 
           this.loading = true;
           this.$store.state.services.reservationService
@@ -516,15 +573,12 @@ export default {
           this.seleccionados.forEach((element) => {
             if (element.id == item.id) {
               objecto.price = element.sf_price;
-              objecto.room_price_id = element.rooms_prices;
+              objecto.description = element.name;
             }
           });
 
           if (!objecto.price) {
-            this.$toastr.error(
-              "El precio no fue seleccionado.",
-              "Error"
-            ); 
+            this.$toastr.error("El precio no fue seleccionado.", "Error");
             this.loading_room = false;
             return 0;
           }
@@ -605,7 +659,6 @@ export default {
           this.promocion = null;
           this.promociones = null;
           this.dialog = false;
-          
         } else {
           this.promocion = null;
           this.promociones = null;
@@ -722,8 +775,7 @@ export default {
         this.seleccionados.forEach((element) => {
           if (element.id == item.id) {
             element.id = item.id;
-            element.rooms_prices = item.rooms_prices;
-            element.name = item.name;
+            element.description = item.name;
             element.sf_price = item.sf_price;
 
             this.loading = false;

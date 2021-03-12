@@ -383,7 +383,7 @@ class PictureRoomController extends ApiController
     {
         try {
 
-            foreach ($request->pictures as $value) {
+            foreach ($request->pictures as $key => $value) {
                 if (isset($value['photo']) && !is_null($value['photo']) && !empty($value['photo'])) {
                     $picture_name = Str::random(10);
 
@@ -399,7 +399,7 @@ class PictureRoomController extends ApiController
                     PictureRoom::create(
                         [
                             'photo' => $path,
-                            'position' => 0,
+                            'position' => $key+1,
                             'view' => true,
                             'room_id' => $picture_room->id
                         ]

@@ -96,7 +96,10 @@ class CoinController extends ApiController
         $this->validate($request, $this->rules(), $this->messages());
 
         try {
-            Coin::create($request->all());
+            $data = $request->all();
+            $data['change'] = str_replace(',', '', $request->change);
+
+            Coin::create($data);
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
             return $this->errorResponse('Error en el controlador', 423);
@@ -155,6 +158,7 @@ class CoinController extends ApiController
         try {
             $coin->symbol = $request->symbol;
             $coin->name = $request->name;
+            $coin->change = str_replace(',', '', $request->change);
 
             if(!$coin->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);

@@ -37,7 +37,11 @@ class Room extends Model
         'type_room_id',
         'coin_id',
         'pets',
-        'type_service_id'
+        'type_service_id',
+        'number_adults',
+        'number_children',
+        'amount_pets',
+        'resta'
     ];
 
     /**
@@ -48,7 +52,8 @@ class Room extends Model
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
         'updated_at' => 'datetime:d/m/Y h:i:s a',
-        'deleted_at' => 'datetime:d/m/Y h:i:s a'
+        'deleted_at' => 'datetime:d/m/Y h:i:s a',
+        'pets' => 'boolean'
     ];
 
     /**

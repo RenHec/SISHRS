@@ -23,7 +23,8 @@ class Coin extends Model
      */
     protected $fillable = [
         'symbol',
-        'name'
+        'name',
+        'change'
     ];
 
     /**

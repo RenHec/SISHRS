@@ -17,9 +17,13 @@ class CreateRoomsTable extends Migration
             $table->id();
             $table->smallInteger('number');
             $table->string('name', 100);
+            $table->smallInteger('number_adults');
+            $table->smallInteger('number_children');
             $table->smallInteger('amount_people');
             $table->smallInteger('amount_bed');
-            $table->decimal('price', 11, 2);
+            $table->smallInteger('amount_pets');
+            $table->smallInteger('resta')->default(0);
+            $table->decimal('price', 11, 2)->default(0);
             $table->longText('description');
             $table->boolean('pets')->default(false);
             $table->foreignId('type_service_id')->constrained('type_services');

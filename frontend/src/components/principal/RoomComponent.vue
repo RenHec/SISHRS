@@ -17,19 +17,19 @@
           <v-container>
             <v-row>
               <v-col cols="12" md="2">
-                <label>Número de habitación</label>
+                <label>Número de servicio</label>
                 <vue-number-input
                   v-model="form.number"
                   :min="1"
                   :max="999"
                   controls
-                  placeholder="Número de habitación"
+                  placeholder="Número de servicio"
                   data-vv-scope="create"
-                  data-vv-name="número de habitación"
+                  data-vv-name="número de servicio"
                   v-validate="'required|max:100'"
                 ></vue-number-input>
                 <FormError
-                  :attribute_name="'create.número de habitación'"
+                  :attribute_name="'create.número de servicio'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -49,24 +49,41 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="3">
-                <label>Número de personas</label>
+              <v-col cols="12" md="2">
+                <label>Número de adultos</label>
                 <vue-number-input
-                  v-model="form.amount_people"
+                  v-model="form.number_adults"
                   :min="1"
                   :max="99"
                   controls
-                  placeholder="Número de personas"
+                  placeholder="Número de adultos"
                   data-vv-scope="create"
-                  data-vv-name="número de personas"
+                  data-vv-name="número de adultos"
                   v-validate="'required'"
                 ></vue-number-input>
                 <FormError
-                  :attribute_name="'create.número de personas'"
+                  :attribute_name="'create.número de adultos'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
+                <label>Número de niños</label>
+                <vue-number-input
+                  v-model="form.number_children"
+                  :min="0"
+                  :max="99"
+                  controls
+                  placeholder="Número de niños"
+                  data-vv-scope="create"
+                  data-vv-name="número de niños"
+                  v-validate="'required'"
+                ></vue-number-input>
+                <FormError
+                  :attribute_name="'create.número de niños'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="2">
                 <label>Número de camas</label>
                 <vue-number-input
                   v-model="form.amount_bed"
@@ -109,8 +126,9 @@
                 <v-autocomplete
                   v-model="form.type_room_id"
                   :items="habitaciones"
+                  @input="getMasaje"
                   chips
-                  label="Seleccionar tipo de habitación"
+                  label="Seleccionar tipo de espacio"
                   outlined
                   :clearable="true"
                   :deletable-chips="true"
@@ -119,10 +137,10 @@
                   return-object
                   v-validate="'required'"
                   data-vv-scope="create"
-                  data-vv-name="tipo de habitación"
+                  data-vv-name="tipo de espacio"
                 ></v-autocomplete>
                 <FormError
-                  :attribute_name="'create.tipo de habitación'"
+                  :attribute_name="'create.tipo de espacio'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -130,7 +148,7 @@
                 <v-autocomplete
                   v-model="form.massages"
                   :items="masajes"
-                  v-if="mostrar_masaje"
+                  v-if="mostrar_masaje && !editedIndex"
                   chips
                   label="Seleccionar masajes"
                   outlined
@@ -157,7 +175,7 @@
                   counter
                   accept="image/png, image/jpeg, image/jpg"
                   multiple
-                  placeholder="Seleccionar fotografías de la habitación"
+                  placeholder="Seleccionar fotografías"
                   outlined
                   :show-size="1000"
                   @change="cargaMasiva($event)"
@@ -181,20 +199,24 @@
                 </v-file-input>
               </v-col>
 
-              <v-col cols="12" md="2" class="text-rigth">
-                <v-switch
-                  v-model="form.pets"
-                  :label="`Se aceptan mascotas: ${form.pets ? 'SI' : 'NO'}`"
-                  data-vv-name="mascota"
-                  v-validate="'required'"
+              <v-col cols="12" md="2" v-if="!mostrar_masaje">
+                <label>Número de mascotas</label>
+                <vue-number-input
+                  v-model="form.amount_pets"
+                  :min="0"
+                  :max="99"
+                  controls
+                  placeholder="Número de mascotas"
                   data-vv-scope="create"
-                ></v-switch>
+                  data-vv-name="número de mascotas"
+                  v-validate="'required'"
+                ></vue-number-input>
                 <FormError
-                  :attribute_name="'create.mascota'"
+                  :attribute_name="'create.número de mascotas'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="3" v-if="!mostrar_masaje">
                 <v-autocomplete
                   v-model="form.coin_id"
                   :items="monedas"
@@ -218,7 +240,7 @@
 
               <v-col cols="12" md="7"></v-col>
 
-              <v-row v-if="!editedIndex">
+              <v-row v-if="!editedIndex && !mostrar_masaje">
                 <v-col cols="12" md="2">
                   <v-autocomplete
                     v-model="type_charge_id"
@@ -244,31 +266,31 @@
                   <label>Precio de costo</label>
                   <input
                     dark
-                    placeholder="Precio de la habitación"
+                    placeholder="Precio"
                     class="nuevo-input"
                     v-model="price.price"
                     @input="price.price = formatear_numero($event)"
-                    data-vv-name="precio de la habitación"
+                    data-vv-name="precio"
                     v-validate="'required'"
                     data-vv-scope="agregar_precio"
                   />
                   <FormError
-                    :attribute_name="'agregar_precio.precio de la habitación'"
+                    :attribute_name="'agregar_precio.precio'"
                     :errors_form="errors"
                   ></FormError>
                 </v-col>
                 <v-col cols="12" md="2" class="text-rigth">
                   <v-switch
-                    v-model="price.default"
-                    :label="`Colocar por defecto: ${
-                      price.default ? 'SI' : 'NO'
+                    v-model="price.web"
+                    :label="`Precio para la WEB: ${
+                      price.web ? 'SI' : 'NO'
                     }`"
-                    data-vv-name="por defecto"
+                    data-vv-name="precio web"
                     v-validate="'required'"
                     data-vv-scope="agregar_precio"
                   ></v-switch>
                   <FormError
-                    :attribute_name="'agregar_precio.por defecto'"
+                    :attribute_name="'agregar_precio.precio web'"
                     :errors_form="errors"
                   ></FormError>
                 </v-col>
@@ -286,7 +308,7 @@
                         <tr>
                           <th class="text-center">Tipo de Cobro</th>
                           <th class="text-center">Precio</th>
-                          <th class="text-center">Por Defecto</th>
+                          <th class="text-center">WEB</th>
                         </tr>
                       </thead>
                       <tbody v-if="form.prices.length > 0">
@@ -296,7 +318,7 @@
                           </td>
                           <td class="text-center">{{ item.price }}</td>
                           <td class="text-center">
-                            {{ item.default ? "SI" : "NO" }}
+                            {{ item.web ? "SI" : "NO" }}
                           </td>
                           <td class="text-center">
                             <v-btn color="error" @click="quitar_price(item)"
@@ -311,7 +333,7 @@
               </v-row>
 
               <v-col cols="12" md="12" class="text-center">
-                <h3>Descripción de la habitación</h3>
+                <h3>Descripción del servicio</h3>
                 <quill-editor
                   class="editor"
                   v-validate="'required|min:50'"
@@ -368,7 +390,7 @@
           <br />
           <v-card color="#385F73" dark>
             <v-card-title class="headline">
-              {{ item.number+" "+item.name }}
+              {{ item.number + " " + item.name }}
             </v-card-title>
             <hr />
             <v-card-subtitle>
@@ -377,7 +399,7 @@
                 <li>
                   Tipo de Cama: {{ item.amount_bed }} {{ item.type_bed.name }}
                 </li>
-                <li>Habitación: {{ item.type_room.name }}</li>
+                <li>Servicio: {{ item.type_room.name }}</li>
               </ul>
               <p v-html="item.description"></p>
             </v-card-subtitle>
@@ -397,13 +419,7 @@
           >
             Masajes
           </v-btn>
-          <v-btn
-            class="ma-2"
-            color="default lighten-2"
-            small
-          >
-            Precios
-          </v-btn>
+          <v-btn class="ma-2" color="default lighten-2" small> Precios </v-btn>
           <v-btn
             class="ma-2"
             text
@@ -459,7 +475,7 @@ export default {
       search: "",
       headers: [
         {
-          text: "Número de habitación",
+          text: "Número de servicio",
           align: "start",
           value: "number",
         },
@@ -498,8 +514,8 @@ export default {
         id: 0,
         number: null,
         name: null,
-        amount_people: null,
-        amount_bed: null,
+        amount_people: 0,
+        amount_bed: 0,
         price: null,
         description: null,
         type_bed_id: null,
@@ -509,32 +525,29 @@ export default {
         pets: false,
         prices: [],
         massages: [],
+        number_adults: 0,
+        number_children: 0,
+        amount_pets: 0,
       },
       type_charge_id: null,
       price: {
         price: null,
         default: false,
         type_charge_id: null,
+        web: false,
       },
     };
   },
   computed: {
     formTitle() {
-      return !this.editedIndex ? "Agregar Habitación" : "Editar Habitación";
+      return !this.editedIndex ? "Agregar Servicio" : "Editar Servicio";
     },
     mostrar_masaje() {
-      this.form.massages = [];
       return this.form.type_room_id
-        ? this.form.type_room_id.type_service_id == 2
+        ? this.form.type_room_id.type_service_id != 1
           ? true
           : false
         : false;
-    },
-  },
-
-  watch: {
-    dialog(val) {
-      val || this.close();
     },
   },
 
@@ -543,8 +556,6 @@ export default {
     this.getMoneda();
     this.getCama();
     this.getHabitacion();
-    this.getPrecio();
-    this.getMasaje();
   },
 
   methods: {
@@ -565,12 +576,13 @@ export default {
 
     limpiar() {
       this.editedIndex = false;
+      this.dialog = false;
 
       this.form.id = 0;
       this.form.number = null;
       this.form.name = null;
-      this.form.amount_people = null;
-      this.form.amount_bed = null;
+      this.form.amount_people = 0;
+      this.form.amount_bed = 0;
       this.form.price = null;
       this.form.description = null;
       this.form.type_bed_id = null;
@@ -579,6 +591,10 @@ export default {
       this.form.pictures = [];
       this.form.prices = [];
       this.form.pets = false;
+      this.form.massages = [];
+      this.form.number_adults = 0;
+      this.form.number_children = 0;
+      this.form.amount_pets = 0;
 
       this.$validator.reset();
       this.$validator.reset();
@@ -625,23 +641,20 @@ export default {
       this.form.pets = item.pets;
       this.form.pictures = [];
       this.form.prices = [];
+      this.form.massages = [];
       this.masiva_image = [];
+      this.form.number_adults = item.number_adults;
+      this.form.number_children = item.number_children;
+      this.form.amount_pets = item.amount_pets;
 
       this.editedIndex = true;
-      this.dialog = true;
     },
 
     close() {
       this.limpiar();
-      this.dialog = false;
     },
 
     validar_formulario(scope) {
-      if (this.form.prices.length == 0) {
-        this.$toastr.warning("Debe de agregar al menos un precio.", "Mensaje");
-        return 0;
-      }
-
       this.$validator.validateAll(scope).then((result) => {
         if (result)
           this.editedIndex ? this.update(this.form) : this.store(this.form);
@@ -692,6 +705,11 @@ export default {
     },
 
     store(data) {
+      if (this.form.prices.length == 0 && this.form.massages.length == 0) {
+        this.$toastr.warning("Debe de agregar al menos un precio.", "Mensaje");
+        return 0;
+      }
+
       this.$swal({
         title: "Agregar",
         text: "¿Está seguro de realizar esta acción?",
@@ -810,22 +828,36 @@ export default {
         .catch((r) => {});
     },
 
-    getPrecio() {
-      this.$store.state.services.typeChargeService
-        .index()
-        .then((r) => {
-          this.precios = r.data.data;
-        })
-        .catch((r) => {});
-    },
-
-    getMasaje() {
+    getMasaje(item) {
+      this.masajes = [];
+      this.precios = [];
+      this.form.prices = [];
       this.$store.state.services.typeMessageService
         .index()
         .then((r) => {
-          this.masajes = r.data.data;
+          r.data.data.forEach((x) => {
+            if (!x.deleted_at && item.type_service_id == x.type_service_id) {
+              this.form.coin_id = x.coin;
+              this.masajes.push({
+                id: x.id,
+                name: `${x.name} | Precio: ${x.coin.symbol} ${x.price} | Tiempo: ${x.time} min.`,
+              });
+            }
+          });
         })
         .catch((r) => {});
+
+      if(item.type_service_id == 1) {
+        this.$store.state.services.typeChargeService
+          .index()
+          .then((r) => {
+            r.data.data.forEach(x => {
+              if(!x.deleted_at && item.type_service_id == x.type_service_id)
+              this.precios.push(x)
+            })
+          })
+          .catch((r) => {});
+      }
     },
 
     agregar_precio(scope) {
@@ -836,12 +868,13 @@ export default {
           objeto.default = this.price.default;
           objeto.type_charge_id = this.type_charge_id.id;
           objeto.type_charge = this.type_charge_id;
+          objeto.web = this.price.web;
 
           this.form.prices.push(objeto);
-          this.precios.splice(this.precios.indexOf(this.type_charge_id), 1);
 
           this.price.price = null;
           this.price.default = false;
+          this.price.web = false;
           this.price.type_charge_id = null;
           this.type_charge_id = null;
 
@@ -855,7 +888,6 @@ export default {
 
     quitar_price(index) {
       this.form.prices.splice(this.form.prices.indexOf(index), 1);
-      this.precios.push(index.type_charge);
     },
   },
 };

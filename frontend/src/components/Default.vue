@@ -1,5 +1,8 @@
 <template>
   <v-row class="fill-height">
+    <v-overlay :value="loading">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
     <v-col cols="12" md="1"></v-col>
     <v-col cols="12" md="10">
       <v-sheet height="64">
@@ -62,26 +65,36 @@
           :activator="selectedElement"
           offset-x
         >
-          <v-card color="grey lighten-4" min-width="350px" flat>
-            <v-toolbar :color="selectedEvent.color" dark>
-              <v-btn icon>
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+          <v-card
+            color="grey lighten-4"
+            v-if="selectedEvent"
+            flat
+          >
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title
+                v-html="
+                  selectedEvent.reservation.code + ' - ' + selectedEvent.reservation.client.full_name
+                "
+              ></v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
-              </v-btn>
-              <v-btn icon>
-                <v-icon>mdi-dots-vertical</v-icon>
+              <v-btn icon @click="selectedOpen = false">
+                <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-toolbar>
-            <v-card-text>
-              <span v-html="selectedEvent.details"></span>
+            <v-card-text> 
+
+                <hr>
+                <h3>Servicios</h3>
+                <ul>
+                  <li style="color: black;">
+                    {{ selectedEvent.description }}
+                  </li>
+                </ul>
+
             </v-card-text>
             <v-card-actions>
-              <v-btn text color="secondary" @click="selectedOpen = false">
-                Cancel
+              <v-btn color="error" @click="cancelar_reservacion(selectedEvent)">
+                Cancelar
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -98,6 +111,7 @@ export default {
   components: {},
   data() {
     return {
+      loading: false,
       focus: "",
       type: "month",
       typeToLabel: {
@@ -106,7 +120,7 @@ export default {
         day: "Day",
         "4day": "4 Days",
       },
-      selectedEvent: {},
+      selectedEvent: null,
       selectedElement: null,
       selectedOpen: false,
       events: [],
@@ -119,21 +133,7 @@ export default {
         "orange",
         "grey darken-1",
       ],
-      names: [
-        "Meeting",
-        "Holiday",
-        "PTO",
-        "Travel",
-        "Event",
-        "Birthday",
-        "Conference",
-        "Party",
-      ],
     };
-  },
-
-  created() {
-    //this.initialize();
   },
 
   mounted() {
@@ -141,43 +141,6 @@ export default {
   },
 
   methods: {
-    initialize() {
-      this.events = [];
-      this.loading = true;
-
-      this.$store.state.services.reservationService
-        .index()
-        .then((r) => {
-          if (r.response) {
-            if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
-            } else {
-              for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
-              }
-            }
-            this.loading = false;
-            return;
-          }
-
-          r.data.data.forEach((element) => {
-            const allDay = this.rnd(0, 3) === 0;
-            events.push({
-              name: element.code,
-              start: element.arrival_date,
-              end: element.departure_date,
-              color: this.colors[this.rnd(0, this.colors.length - 1)],
-              timed: !allDay,
-            });
-          });
-
-          this.loading = false;
-        })
-        .catch((r) => {
-          this.loading = false;
-        });
-    },
-
     viewDay({ date }) {
       this.focus = date;
       this.type = "day";
@@ -195,17 +158,38 @@ export default {
       this.$refs.calendar.next();
     },
     showEvent({ nativeEvent, event }) {
+      this.loading = true;
       const open = () => {
-        this.selectedEvent = event;
-        this.selectedElement = nativeEvent.target;
-        setTimeout(() => {
-          this.selectedOpen = true;
-        }, 10);
+        this.$store.state.services.reservationService
+          .show(event)
+          .then((r) => {
+            if (r.response) {
+              if (r.response.data.code === 423) {
+                this.$toastr.error(r.response.data.error, "Mensaje");
+              } else {
+                for (let value of Object.values(r.response.data.error)) {
+                  this.$toastr.error(value, "Mensaje");
+                }
+              }
+              this.loading = false;
+              return;
+            }
+
+            this.selectedEvent =
+              r.data.data.length != 0 ? r.data.data[0] : null;
+            this.selectedOpen = this.selectedEvent ? true : false;
+            this.selectedElement = nativeEvent.target;
+            this.loading = false;
+          })
+          .catch((r) => {
+            this.loading = false;
+          });
       };
 
       if (this.selectedOpen) {
         this.selectedOpen = false;
         setTimeout(open, 10);
+        this.loading = false;
       } else {
         open();
       }
@@ -217,7 +201,7 @@ export default {
       this.loading = true;
 
       this.$store.state.services.reservationService
-        .index()
+        .calendario()
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
@@ -234,9 +218,10 @@ export default {
           r.data.data.forEach((element) => {
             const allDay = this.rnd(0, 3) === 0;
             events.push({
-              name: `${element.code} - ${element.client.full_name}`,
-              start: new Date(`${element.arrival_date}T10:00:00`),
-              end: new Date(`${element.departure_date}T10:00:00`),
+              id: element.id,
+              name: `${element.reservation.code} - ${element.reservation.client.full_name} | ${element.description}`,
+              start: new Date(`${element.arrival_date}`),
+              end: new Date(`${element.departure_date}`),
               color: this.colors[this.rnd(0, this.colors.length - 1)],
               timed: !allDay,
             });
@@ -252,6 +237,47 @@ export default {
     rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a;
     },
+    cancelar_reservacion(data) {
+      this.$swal({
+        title: "Cancelar Reservación No. \n"+data.code,
+        text: "¿Está seguro de realizar esta acción?",
+        type: "error",
+        showCancelButton: true,
+      }).then((result) => {
+        if (result.value) {
+          this.loading = true;
+          this.$store.state.services.binnacleReservationService
+            .destroy(data)
+            .then((r) => {
+              if (r.response) {
+                if (r.response.data.code === 404) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else if (r.response.data.code === 423) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else {
+                  for (let value of Object.values(r.response.data)) {
+                    this.$toastr.error(value, "Mensaje");
+                  }
+                }
+                return;
+              }
+
+              this.$toastr.success(r.data, "Mensaje");
+              this.events.forEach(element => {
+                if(element.id == data.id) {
+                  this.events.splice(this.events.indexOf(element), 1);
+                }
+              })
+              this.loading = false;
+            })
+            .catch((r) => {
+              this.loading = false;
+            });
+        }
+      });
+    }
   },
 };
 </script>
