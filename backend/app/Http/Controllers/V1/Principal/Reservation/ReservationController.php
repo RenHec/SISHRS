@@ -266,7 +266,8 @@ class ReservationController extends ApiController
                         'accommodation' => $accommodation,
                         'description' => $value['description'],
                         'type_service_id' => $room->type_service_id,
-                        'status_id' => Status::CONFIRMADO
+                        'status_id' => Status::CONFIRMADO,
+                        'quote' => !is_null($request->cantidad) ? $request->cantidad : 0
                     ]
                 );
 

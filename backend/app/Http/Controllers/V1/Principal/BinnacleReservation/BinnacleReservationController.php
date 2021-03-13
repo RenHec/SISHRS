@@ -4,13 +4,15 @@ namespace App\Http\Controllers\V1\Principal\BinnacleReservation;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\ApiController;
-use App\Models\V1\Catalogo\Movement;
+use App\Models\V1\Principal\Room;
 use App\Models\V1\Catalogo\Status;
-use App\Models\V1\Principal\Reservation;
-use App\Models\V1\Principal\BinnacleReservation;
+use Illuminate\Support\Facades\DB;
+use App\Models\V1\Catalogo\Movement;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ApiController;
+use App\Models\V1\Principal\Reservation;
+use App\Models\V1\Principal\ReservationDetail;
+use App\Models\V1\Principal\BinnacleReservation;
 
 class BinnacleReservationController extends ApiController
 {
@@ -198,14 +200,19 @@ class BinnacleReservationController extends ApiController
      *      ),
      *  )
      */
-    public function destroy(Reservation $binnacle_reservation)
+    public function destroy(ReservationDetail $binnacle_reservation)
     {
         try {
             DB::beginTransaction();
+
+            $room = Room::find($binnacle_reservation->room_id);
+            $room->resta -= $binnacle_reservation->quote;
+            $room->save();
+
             $binnacle_reservation->status_id = Status::CANCELACION;
             $binnacle_reservation->save();
 
-            BinnacleReservation::where('reservation_id', $binnacle_reservation->id)
+            BinnacleReservation::where('reservation_detail_id', $binnacle_reservation->id)
                 ->update(
                     [
                         'active' => false
@@ -214,13 +221,14 @@ class BinnacleReservationController extends ApiController
 
             BinnacleReservation::create(
                 [
-                    'start' => date('Y-m-d'),
-                    'end' => date('Y-m-d'),
+                    'start' => date('Y-m-d h:i:s'),
+                    'end' => date('Y-m-d h:i:s'),
                     'days' => 0,
                     'subtraction' => 0,
-                    'reservation_id' => $binnacle_reservation->id,
+                    'reservation_detail_id' => $binnacle_reservation->id,
                     'movement_id' => Movement::CANCELADA,
-                    'user_id' => Auth::user()->id
+                    'user_id' => Auth::user()->id,
+                    'type_service_id' => $room->type_service_id
                 ]
             );
 

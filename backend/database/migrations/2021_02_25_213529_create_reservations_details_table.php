@@ -18,6 +18,7 @@ class CreateReservationsDetailsTable extends Migration
             $table->dateTime('arrival_date');
             $table->dateTime('departure_date');
             $table->smallInteger('accommodation');
+            $table->smallInteger('quote')->default(0);
 
             $table->decimal('price', 11, 2);
             $table->decimal('sub', 11, 2);

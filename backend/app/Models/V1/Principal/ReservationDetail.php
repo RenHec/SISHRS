@@ -36,7 +36,8 @@ class ReservationDetail extends Model
         'accommodation',
         'description',
         'type_service_id',
-        'status_id'
+        'status_id',
+        'quote'
     ];
 
     /**
