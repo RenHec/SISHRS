@@ -22,13 +22,13 @@
                   outlined
                   v-model="form.nit"
                   type="text"
-                  label="número de NIT"
+                  label="NIT"
                   data-vv-scope="create"
-                  data-vv-name="número de NIT"
+                  data-vv-name="NIT"
                   v-validate="'required|numeric|min:5|max:15'"
                 ></v-text-field>
                 <FormError
-                  :attribute_name="'create.número de NIT'"
+                  :attribute_name="'create.NIT'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
