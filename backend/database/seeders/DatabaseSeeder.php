@@ -5,18 +5,19 @@ namespace Database\Seeders;
 use App\Imports\RolMenuImport;
 use Illuminate\Database\Seeder;
 use App\Imports\MunicipioImport;
-use App\Models\V1\Catalogo\Status;
-use App\Imports\DepartamentoImport;
 use App\Models\V1\Catalogo\Coin;
-use App\Models\V1\Catalogo\Movement;
+use App\Models\V1\Catalogo\Status;
+use Illuminate\Support\Facades\DB;
+use App\Imports\DepartamentoImport;
 use App\Models\V1\Catalogo\TypeBed;
-use App\Models\V1\Catalogo\TypeCharge;
-use App\Models\V1\Catalogo\TypeMessage;
-use App\Models\V1\Catalogo\TypeRoom;
-use App\Models\V1\Catalogo\TypeService;
 use App\Models\V1\Principal\Client;
+use App\Models\V1\Catalogo\Movement;
+use App\Models\V1\Catalogo\TypeRoom;
 use App\Models\V1\Seguridad\Usuario;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\V1\Catalogo\TypeCharge;
+use App\Models\V1\Catalogo\TypeMessage;
+use App\Models\V1\Catalogo\TypeService;
 use App\Models\V1\Seguridad\UsuarioRol;
 use Illuminate\Support\Facades\Artisan;
 
@@ -206,19 +207,20 @@ class DatabaseSeeder extends Seeder
 
         $insert = new Client();
         $insert->nit = '765894';
-        $insert->first_name = 'Héctor';
-        $insert->second_name = 'Renato';
-        $insert->surname = 'de la Cruz';
-        $insert->second_surname = 'Ojeda';
+        $insert->name = 'Héctor Renato de la Cruz Ojeda';
         $insert->email = 'emisor.tarea@gmail.com';
         $insert->ubication = 'Chiquililla';
         $insert->departament_id = 1;
         $insert->municipality_id = 1;
         $insert->save();
         
-        Usuario::factory(100)->create();
-        UsuarioRol::factory(200)->create();    
+        Usuario::factory(1)->create();
+        UsuarioRol::factory(1)->create();    
         
         Artisan::call('passport:install');
+
+        DB::table('oauth_clients')
+            ->where('id', 2)
+            ->update(['secret' => 'fb8QYHjGOBKEL4S8CMDNkXW44lSHGmM6lrvoxwO1']);
     }
 }

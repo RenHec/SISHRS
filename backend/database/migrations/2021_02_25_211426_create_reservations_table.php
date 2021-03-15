@@ -19,6 +19,7 @@ class CreateReservationsTable extends Migration
             $table->string('nit', 15)->default('CF');
             $table->string('name', 200);
             $table->string('ubication', 350)->nullable();
+            $table->boolean('event')->default(false);
 
             $table->decimal('total', 11, 2);
             

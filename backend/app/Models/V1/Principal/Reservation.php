@@ -4,9 +4,13 @@ namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\Status;
+use App\Models\V1\Principal\Client;
 use App\Models\V1\Seguridad\Usuario;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\V1\Principal\ReservationDetail;
+use App\Models\V1\Principal\ReservationService;
+use App\Models\V1\Principal\BinnacleReservation;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Reservation extends Model
 {
@@ -30,6 +34,7 @@ class Reservation extends Model
         'name',
         'ubication',
         'total',
+        'event',
         
         'client_id',
         'user_id',
@@ -44,7 +49,8 @@ class Reservation extends Model
      */
     protected $casts = [
         'created_at' => 'datetime:Y-m-d h:i:s a',
-        'updated_at' => 'datetime:Y-m-d h:i:s a'
+        'updated_at' => 'datetime:Y-m-d h:i:s a',
+        'event' => 'boolean'
     ];
 
     /**
@@ -71,7 +77,6 @@ class Reservation extends Model
         $moneda = Coin::find($this->coin_id)->symbol;
         return "{$moneda} " . number_format($this->total, 2, '.', ',');
     }
-
 
     /**
      * Get the client associated with the reservations.

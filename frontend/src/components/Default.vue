@@ -73,7 +73,7 @@
             <v-toolbar color="primary" dark>
               <v-toolbar-title
                 v-html="
-                  selectedEvent.reservation.code + ' - ' + selectedEvent.reservation.client.full_name
+                  selectedEvent.name
                 "
               ></v-toolbar-title>
               <v-spacer></v-spacer>
@@ -86,8 +86,11 @@
                 <hr>
                 <h3>Servicios</h3>
                 <ul>
-                  <li style="color: black;">
-                    {{ selectedEvent.description }}
+                  <li style="color: black;" v-if="selectedEvent.accommodation != 0">
+                    {{ selectedEvent.accommodation }} X {{ selectedEvent.description }} - {{ selectedEvent.guest }} = {{ selectedEvent.sub }}
+                  </li>
+                  <li style="color: black;" v-else>
+                    {{ selectedEvent.quote }} X {{ selectedEvent.description }} - {{ selectedEvent.guest }} = {{ selectedEvent.sub }}
                   </li>
                 </ul>
 
@@ -219,11 +222,11 @@ export default {
             const allDay = this.rnd(0, 3) === 0;
             events.push({
               id: element.id,
-              name: `${element.reservation.code} - ${element.reservation.client.full_name} | ${element.description}`,
+              name: element.name,
               start: new Date(`${element.arrival_date}`),
               end: new Date(`${element.departure_date}`),
               color: this.colors[this.rnd(0, this.colors.length - 1)],
-              timed: !allDay,
+              timed: element.tiempo,
             });
           });
 

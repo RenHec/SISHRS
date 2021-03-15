@@ -12,6 +12,7 @@ use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\Movement;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ApiController;
+use App\Models\V1\Catalogo\Municipio;
 use App\Models\V1\Principal\PictureRoom;
 use App\Models\V1\Principal\Reservation;
 use App\Models\V1\Principal\ReservationOfert;
@@ -65,7 +66,19 @@ class ReservationController extends ApiController
 
     public function calendario()
     {
-        $data = ReservationDetail::with('reservation.client.phones')->whereIn('status_id', [Status::CONFIRMADO, Status::EN_PROCESO])->get();
+        $data = DB::table('reservations')
+            ->join('clients', 'reservations.client_id', 'clients.id')
+            ->join('reservations_details', 'reservations.id', 'reservations_details.reservation_id')
+            ->select(
+                'reservations.id AS id',
+                DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
+                'reservations_details.arrival_date AS arrival_date',
+                'reservations_details.departure_date AS departure_date',
+                DB::RAW('TIME(reservations_details.arrival_date) AS tiempo')
+            )
+            ->whereIn('reservations.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
+            ->get();
+        
         return $this->showAll($data);
     }
 
@@ -80,7 +93,6 @@ class ReservationController extends ApiController
         $data = DB::table('rooms')
             ->join('type_beds', 'rooms.type_bed_id', 'type_beds.id')
             ->join('type_rooms', 'rooms.type_room_id', 'type_rooms.id')
-            ->join('coins', 'rooms.coin_id', 'coins.id')
             ->join('type_services', 'rooms.type_service_id', 'type_services.id')
             ->select(
                 'rooms.id AS id',
@@ -88,10 +100,7 @@ class ReservationController extends ApiController
                 'rooms.amount_people AS amount_people',
                 'type_rooms.name AS type_room',
                 DB::RAW('CONCAT(rooms.amount_bed," ",type_beds.name) AS type_bed'),
-                DB::RAW('CONCAT(coins.symbol," ",FORMAT(rooms.price,2)) AS price'),
-                'rooms.price AS sf_price',
                 'rooms.description AS description',
-                'coins.id AS coin_id',
                 'rooms.type_service_id AS type_service_id'
             )
             ->when($inicio && $fin && !$hora, function ($query) use ($inicio, $fin) {
@@ -99,7 +108,20 @@ class ReservationController extends ApiController
                     $subquery->select(DB::raw(1))
                         ->from('reservations_details')
                         ->whereIn('reservations_details.status_id', [Status::PENDIENTE, Status::EN_PROCESO, Status::CONFIRMADO])
-                        ->whereBetween(DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d")'), [$inicio, $fin])
+                        //->whereBetween(DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%Y-%m-%d")'), [$inicio, $fin])
+                        //->whereBetween(DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d")'), [$inicio, $fin])
+                        ->whereBetween(DB::RAW("'$inicio'"), [DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%Y-%m-%d")'), DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d")')])
+                        ->whereRaw('reservations_details.room_id = rooms.id');
+                });
+            })
+            ->when($inicio && $fin && !$hora, function ($query) use ($inicio, $fin) {
+                $query->whereNotExists(function ($subquery) use ($inicio, $fin) {
+                    $subquery->select(DB::raw(1))
+                        ->from('reservations_details')
+                        ->whereIn('reservations_details.status_id', [Status::PENDIENTE, Status::EN_PROCESO, Status::CONFIRMADO])
+                        //->whereBetween(DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%Y-%m-%d")'), [$inicio, $fin])
+                        //->whereBetween(DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d")'), [$inicio, $fin])
+                        ->whereBetween(DB::RAW("'$fin'"), [DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%Y-%m-%d")'), DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d")')])
                         ->whereRaw('reservations_details.room_id = rooms.id');
                 });
             })
@@ -108,16 +130,16 @@ class ReservationController extends ApiController
                     $subquery->select(DB::raw(1))
                         ->from('reservations_details')
                         ->whereIn('reservations_details.status_id', [Status::PENDIENTE, Status::EN_PROCESO, Status::CONFIRMADO])
-                        ->where(DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d %h:%i")'), "$inicio $hora")
+                        ->whereBetween(DB::RAW("'$inicio $hora'"), [DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%Y-%m-%d %H:%i")'), DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%Y-%m-%d %H:%i")')])
                         ->whereRaw('reservations_details.room_id = rooms.id');
                 });
             })
             ->when($servicios, function ($query) use ($servicios) {
                 $query->where('rooms.type_service_id', $servicios);
             })
-            ->when($cantidad, function ($query) use ($cantidad) {
+            /*->when($cantidad, function ($query) use ($cantidad) {
                 $query->where(DB::RAW('rooms.amount_people - rooms.resta'), '>', $cantidad - 1);
-            })
+            })*/
             ->whereNull('rooms.deleted_at')
             ->get();
 
@@ -132,10 +154,7 @@ class ReservationController extends ApiController
             $info['amount_people'] = $value->amount_people;
             $info['type_room'] = $value->type_room;
             $info['type_bed'] = $value->type_bed;
-            $info['price'] = $value->price;
-            $info['sf_price'] = $value->sf_price;
             $info['description'] = $value->description;
-            $info['coin_id'] = $value->coin_id;
             $info['type_service_id'] = $value->type_service_id;
             $info['photo'] = is_null($photo) ? null : $photo->picture;
             $info['esconder'] = false;
@@ -145,13 +164,14 @@ class ReservationController extends ApiController
         }
 
         $precios = DB::table('rooms_prices')
-            ->join('rooms', 'rooms_prices.room_id', 'rooms.id')
-            ->join('coins', 'rooms.coin_id', 'coins.id')
+            ->join('coins', 'rooms_prices.coin_id', 'coins.id')
             ->join('type_charge', 'rooms_prices.type_charge_id', 'type_charge.id')
             ->select(
-                'rooms.id AS id',
+                'rooms_prices.room_id AS id',
                 DB::RAW('CONCAT(type_charge.name," - ",coins.symbol," ",FORMAT(rooms_prices.price,2)) AS name'),
-                'rooms_prices.price AS sf_price'
+                'rooms_prices.price AS sf_price',
+                'coins.id AS minutos',
+                'coins.id AS coin_id'
             )
             ->whereIn('rooms_prices.room_id', $array_ids)
             ->get();
@@ -162,7 +182,9 @@ class ReservationController extends ApiController
             ->select(
                 'rooms_massages.room_id AS id',
                 DB::RAW('CONCAT(type_massages.name," | Precio: ",coins.symbol," ",FORMAT(type_massages.price,2)," | Tiempo: ",type_massages.time," min.") AS name'),
-                'type_massages.price AS sf_price'
+                'type_massages.price AS sf_price',
+                'type_massages.time AS minutos',
+                'coins.id AS coin_id'
             )
             ->whereIn('rooms_massages.room_id', $array_ids)
             ->get();
@@ -234,10 +256,27 @@ class ReservationController extends ApiController
             $generar += 1;
             $user = Auth::user()->id;
 
+            $municipio = Municipio::find($request->municipality_id['id']);
+
+            $cliente = Client::firstOrCreate(
+                ['name' => $request->name],
+                [
+                    'nit' => $request->nit,
+                    'email' => $request->email,
+                    'business' => $request->business,
+                    'ubication' => $request->ubication,
+                    'departament_id' => $municipio->departament_id,
+                    'municipality_id' => $municipio->id
+                ]
+            );
+
             $data = $request->all();
             $data['code'] = $this->generadorCodigo($generar);
             $data['total'] = 0;
-            $data['client_id'] = $request->client_id['id'];
+            $data['client_id'] = $cliente->id;
+            $data['nit'] = $cliente->nit;
+            $data['name'] = $cliente->name;
+            $data['ubication'] = $cliente->getFullNameAttribute().', '.$cliente->ubication;
             $data['user_id'] = $user;
             $data['status_id'] = Status::CONFIRMADO;
             $data['coin_id'] = $request->coin_id;
@@ -245,29 +284,45 @@ class ReservationController extends ApiController
             $reservation = Reservation::create($data);
             $multiplicar = !is_null($request->cantidad) ? $request->cantidad : 1;
 
-            $start = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->arrival_date) : date('Y-m-d h:i:s', strtotime($request->arrival_date . ' ' . $request->hora));
-            $end = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->departure_date) : date('Y-m-d h:i:s', strtotime($request->departure_date . ' ' . $request->hora));
+            $start = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->arrival_date) : date('Y-m-d H:i:s', strtotime($request->arrival_date . ' ' . $request->hora));
+            $end = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->departure_date) : date('Y-m-d H:i:s', strtotime($request->departure_date . ' ' . $request->hora));
             $accommodation = is_null($request->hora) ? $start->diffInDays($end) : 0;
 
             foreach ($request->details as $value) {
 
-                $room = Room::find($value['room_id']);
+                if($reservation->event) {
+                    $cliente = Client::firstOrCreate(
+                        ['name' => $value['name']],
+                        [
+                            'nit' => $value['nit'],
+                            'email' => $value['email'],
+                            'business' => false,
+                            'ubication' => null,
+                            'departament_id' => 1,
+                            'municipality_id' => 1
+                        ]
+                    );
+                }
 
+                $room = Room::find($value['room_id']);
+                $minute = "+{$value['minutos']} minute"; 
                 $detail = ReservationDetail::create(
                     [
                         'price' => floatval($value['price']),
                         'ofert' => is_null($value['ofert']) ? false : true,
                         'reservation_id' => $reservation->id,
                         'room_id' => $value['room_id'],
-                        'coin_id' => $reservation->coin_id,
+                        'coin_id' => $value['coin_id'],
                         'sub' => intval($accommodation) == 0 ? $multiplicar * floatval($value['price']) : intval($accommodation) * floatval($value['price']),
                         'arrival_date' => $start,
-                        'departure_date' => $end,
+                        'departure_date' => is_null($request->hora) ? $end : date('Y-m-d H:i:s', strtotime($minute, strtotime($end))),
                         'accommodation' => $accommodation,
                         'description' => $value['description'],
                         'type_service_id' => $room->type_service_id,
                         'status_id' => Status::CONFIRMADO,
-                        'quote' => !is_null($request->cantidad) ? $request->cantidad : 0
+                        'quote' => !is_null($request->cantidad) ? $request->cantidad : 0,
+                        'client_id' => $cliente->id,
+                        'guest' => $cliente->name
                     ]
                 );
 
@@ -313,9 +368,27 @@ class ReservationController extends ApiController
         }
     }
 
-    public function show(ReservationDetail $reservation)
+    public function show(Reservation $reservation)
     {
-        $data = ReservationDetail::with('room', 'coin', 'reservation.client.phones', 'status', 'type_service')->where('id', $reservation->id)->get();
+        $data = DB::table('reservations_details')
+            ->join('reservations', 'reservations_details.reservation_id', 'reservations.id')
+            ->join('clients', 'reservations.client_id', 'clients.id')
+            ->join('coins', 'reservations_details.coin_id', 'coins.id')
+            ->select(
+                'reservations_details.id AS id',
+                DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
+                'reservations_details.description',
+                'reservations_details.accommodation',
+                'reservations_details.quote',
+                'reservations_details.guest',
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.price,2)) AS precio'),
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.sub,2)) AS sub'),
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total,2)) AS total')
+            )
+            ->whereIn('reservations_details.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
+            ->where('reservations_details.reservation_id', $reservation->id)
+            ->get();
+        
         return $this->showAll($data);
     }
 

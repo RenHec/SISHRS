@@ -31,6 +31,8 @@ import binnacleReservationService from '../services/principal/binnaclereservatio
 import clientService from '../services/principal/client/ClientService'
 import clientPhoneService from '../services/principal/client/ClientPhoneService'
 import roomService from '../services/principal/room/RoomService'
+import roomMassageService from '../services/principal/room/RoomMassageService'
+import roomPriceService from '../services/principal/room/RoomPriceService'
 import pictureRoomService from '../services/principal/room/PictureRoomService'
 import ofertRoomService from '../services/principal/room/OfertRoomService'
 import reservationService from '../services/principal/reservation/ReservationService'
@@ -117,6 +119,8 @@ export default {
   clientService: new clientService(Axios, baseUrl),
   clientPhoneService: new clientPhoneService(Axios, baseUrl),
   roomService: new roomService(Axios, baseUrl),
+  roomMassageService: new roomMassageService(Axios, baseUrl),
+  roomPriceService: new roomPriceService(Axios, baseUrl),
   pictureRoomService: new pictureRoomService(Axios, baseUrl),
   ofertRoomService: new ofertRoomService(Axios, baseUrl),
   reservationService: new reservationService(Axios, baseUrl),

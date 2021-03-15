@@ -57,7 +57,7 @@ class RoomController extends ApiController
      */
     public function index()
     {
-        $data = Room::with('type_bed', 'type_room', 'coin', 'type_service')->get();
+        $data = Room::with('type_bed', 'type_room', 'type_service', 'massages.type_massage', 'prices.type_charge')->withTrashed()->orderByDesc('id')->get();
         return $this->showAll($data);
     }
 
@@ -98,16 +98,14 @@ class RoomController extends ApiController
      */
     public function store(Request $request)
     {
-        $this->validate($request, $this->rules(), $this->messages());
+        //$this->validate($request, $this->rules(), $this->messages());
 
         try {
             DB::beginTransaction();
 
             $data = $request->all();
-            $data['price'] = 0;
             $data['type_bed_id'] = $request->type_bed_id['id'];
             $data['type_room_id'] = $request->type_room_id['id'];
-            $data['coin_id'] = $request->coin_id['id'];
             $data['type_service_id'] = $request->type_room_id['type_service_id'];
             $data['amount_people'] = $request->number_adults + $request->number_children;
             $data['pets'] = $request->amount_pets > 0 ? true : false;
@@ -139,17 +137,16 @@ class RoomController extends ApiController
             }
 
             foreach ($request->prices as $value) {
-                $insert = RoomPrice::create(
+                RoomPrice::create(
                     [
-                        'price' => floatval($value['price']),
+                        'price' => str_replace(',', '', $value['price']),
                         'default' => false,
                         'type_charge_id' => $value['type_charge_id'],
                         'room_id' => $room->id,
-                        'web' => $value['web']
+                        'web' => $value['web'],
+                        'coin_id' => $value['coin_id']
                     ]
                 );
-
-                $room->price = $insert->default ? $insert->price : 0;
             }
 
             foreach ($request->massages as $value) {
@@ -160,8 +157,6 @@ class RoomController extends ApiController
                     ]
                 );
             }
-
-            $room->save();
 
             DB::commit();
 
@@ -219,7 +214,7 @@ class RoomController extends ApiController
      */
     public function update(Request $request, Room $room)
     {
-        $this->validate($request, $this->rules(), $this->messages());
+        //$this->validate($request, $this->rules(), $this->messages());
 
         try {
             $room->number = $request->number;
@@ -229,11 +224,8 @@ class RoomController extends ApiController
             $room->number_adults = $request->number_adults;
             $room->number_children = $request->number_children;
             $room->amount_pets = $request->amount_pets;
-            $room->price = floatval($request->price);
             $room->description = $request->description;
-            $room->type_bed_id = $request->type_bed_id['id'];
-            $room->type_room_id = $request->type_room_id['id'];
-            $room->coin_id = $request->coin_id['id'];
+            $room->pets = $request->amount_pets > 0 ? true : false;
 
             if(!$room->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);

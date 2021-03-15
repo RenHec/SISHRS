@@ -122,7 +122,7 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="3" v-if="!editedIndex">
                 <v-autocomplete
                   v-model="form.type_room_id"
                   :items="habitaciones"
@@ -168,7 +168,11 @@
                 ></FormError>
               </v-col>
 
-              <v-col cols="12" md="12" v-if="!editedIndex">
+              <v-col
+                cols="12"
+                :md="!mostrar_masaje ? '10' : '12'"
+                v-if="!editedIndex"
+              >
                 <v-file-input
                   v-model="masiva_image"
                   color="deep-purple accent-4"
@@ -216,10 +220,11 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
+
               <v-col cols="12" md="3" v-if="!mostrar_masaje">
                 <v-autocomplete
-                  v-model="form.coin_id"
-                  :items="monedas"
+                  v-model="price.coin_id"
+                  :items="coins"
                   chips
                   label="Seleccionar moneda"
                   outlined
@@ -229,11 +234,11 @@
                   item-value="id"
                   return-object
                   v-validate="'required'"
-                  data-vv-scope="create"
+                  data-vv-scope="agregar_precio"
                   data-vv-name="moneda"
                 ></v-autocomplete>
                 <FormError
-                  :attribute_name="'create.moneda'"
+                  :attribute_name="'agregar_precio.moneda'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
@@ -282,9 +287,7 @@
                 <v-col cols="12" md="2" class="text-rigth">
                   <v-switch
                     v-model="price.web"
-                    :label="`Precio para la WEB: ${
-                      price.web ? 'SI' : 'NO'
-                    }`"
+                    :label="`Precio para la WEB: ${price.web ? 'SI' : 'NO'}`"
                     data-vv-name="precio web"
                     v-validate="'required'"
                     data-vv-scope="agregar_precio"
@@ -375,7 +378,7 @@
       >
         <template v-slot:top>
           <v-toolbar flat color="success">
-            <v-toolbar-title>Habitaciones</v-toolbar-title>
+            <v-toolbar-title>Servicios</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-text-field
               v-model="search"
@@ -392,34 +395,97 @@
             <v-card-title class="headline">
               {{ item.number + " " + item.name }}
             </v-card-title>
-            <hr />
-            <v-card-subtitle>
-              <ul>
-                <li>Cantidad de Personas: {{ item.amount_people }}</li>
-                <li>
-                  Tipo de Cama: {{ item.amount_bed }} {{ item.type_bed.name }}
-                </li>
-                <li>Servicio: {{ item.type_room.name }}</li>
-              </ul>
-              <p v-html="item.description"></p>
-            </v-card-subtitle>
 
-            <v-card-actions>
-              <h1>Precio {{ item.coin.symbol }} {{ item.price }}</h1>
-            </v-card-actions>
+            <v-divider class="mx-4"></v-divider>
+
+            <v-card-title>Información</v-card-title>
+
+            <v-card-text>
+              <v-chip-group column>
+                <v-chip>{{ "Adultos " + item.number_adults }}</v-chip>
+                <v-chip>{{ "Niños " + item.number_children }}</v-chip>
+                <v-chip>{{ "Total " + item.amount_people }}</v-chip>
+                <v-chip>{{
+                  item.type_bed.name + " " + item.amount_bed
+                }}</v-chip>
+                <v-chip>{{
+                  item.type_bed.name + " " + item.amount_bed
+                }}</v-chip>
+
+                <v-chip>{{
+                  +item.pets ? "Mascotas: SI" : "Mascotas: NO"
+                }}</v-chip>
+                <v-chip v-if="item.pets">{{
+                  "# Mascotas: " + item.amount_pets
+                }}</v-chip>
+
+                <v-chip>{{ item.type_room.full_name }}</v-chip>
+              </v-chip-group>
+            </v-card-text>
+
+            <v-divider class="mx-4"></v-divider>
+            <v-card-title>Descripción</v-card-title>
+            <v-card-text>
+              <div v-html="item.description"></div>
+            </v-card-text>
+
+            <v-divider class="mx-4"></v-divider>
+            <v-card-text>
+              <v-list three-line>
+                <v-list-item
+                  v-for="(price, x) in item.massages"
+                  :key="x"
+                  ripple
+                >
+                  <v-list-item-content>
+                    <span
+                      class="text-uppercase font-weight-regular caption"
+                      v-text="price.type_massage.name"
+                    ></span>
+                    <div>
+                      Precio: {{ price.type_massage.monto }} | Tiempo
+                      {{ price.type_massage.time }} min.
+                    </div>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+              <v-list three-line>
+                <v-list-item v-for="(price, x) in item.prices" :key="x" ripple>
+                  <v-list-item-content>
+                    <span
+                      class="text-uppercase font-weight-regular caption"
+                      v-text="price.type_charge.name"
+                    ></span>
+                    <div>
+                      Precio: {{ price.monto }} | Precio WEB
+                      {{ price.web ? "SI" : "NO" }}
+                    </div>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
           </v-card>
           <br />
         </template>
         <template v-slot:item.actions="{ item }">
           <v-btn
-            v-if="item.type_service_id == 2"
+            v-if="item.type_service_id != 1"
             class="ma-2"
             color="primary lighten-2"
             small
+            @click="costos(item)"
           >
-            Masajes
+            Costos de Servicios
           </v-btn>
-          <v-btn class="ma-2" color="default lighten-2" small> Precios </v-btn>
+          <v-btn
+            class="ma-2"
+            color="default lighten-2"
+            small
+            v-if="item.type_service_id == 1"
+            @click="precios_items(item)"
+          >
+            Precios
+          </v-btn>
           <v-btn
             class="ma-2"
             text
@@ -447,6 +513,204 @@
           <v-alert type="error">No hay información para mostrar.</v-alert>
         </template>
       </v-data-table>
+
+      <v-dialog v-model="dialog_servicios" color="primary">
+        <v-card height="400px">
+          <v-overlay :value="loading">
+            <v-progress-circular indeterminate size="64"></v-progress-circular>
+          </v-overlay>
+          <v-card-title>
+            <span class="headline">Agregar costo del servicio</span>
+          </v-card-title>
+
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-autocomplete
+                    v-model="form.massages"
+                    :items="masajes"
+                    chips
+                    label="Seleccionar masajes"
+                    outlined
+                    :clearable="true"
+                    :deletable-chips="true"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    multiple
+                    v-validate="'required'"
+                    data-vv-scope="servicios"
+                    data-vv-name="masajes"
+                  ></v-autocomplete>
+                  <FormError
+                    :attribute_name="'servicios.masajes'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog_servicios = false"
+              >Cancelar</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="validar_formulario_servicios('servicios')"
+              >Guardar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog
+        v-model="dialog_precio"
+        persistent
+        color="primary"
+        transition="dialog-bottom-transition"
+      >
+        <v-card>
+          <v-overlay :value="loading">
+            <v-progress-circular indeterminate size="64"></v-progress-circular>
+          </v-overlay>
+          <v-card-title>
+            <span class="headline">Agregar Precio</span>
+          </v-card-title>
+
+          <v-card-text>
+            <v-container>
+              <v-row class="text-center">
+                <v-col cols="12" md="2">
+                  <v-autocomplete
+                    v-model="price_uno.coin_id"
+                    :items="coins"
+                    chips
+                    label="Seleccionar moneda"
+                    outlined
+                    :clearable="true"
+                    :deletable-chips="true"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    v-validate="'required'"
+                    data-vv-scope="nuevo_precio"
+                    data-vv-name="moneda"
+                  ></v-autocomplete>
+                  <FormError
+                    :attribute_name="'nuevo_precio.moneda'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="3">
+                  <v-autocomplete
+                    v-model="price_uno.type_charge_id"
+                    :items="precios"
+                    chips
+                    label="Seleccionar tipo de cobro"
+                    outlined
+                    :clearable="true"
+                    :deletable-chips="true"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    v-validate="'required'"
+                    data-vv-scope="nuevo_precio"
+                    data-vv-name="tipo de cobro"
+                  ></v-autocomplete>
+                  <FormError
+                    :attribute_name="'nuevo_precio.tipo de cobro'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="3" class="text-center">
+                  <label>Precio de costo</label>
+                  <input
+                    dark
+                    placeholder="Precio"
+                    class="nuevo-input"
+                    v-model="price_uno.price"
+                    @input="price_uno.price = formatear_numero($event)"
+                    data-vv-name="precio"
+                    v-validate="'required'"
+                    data-vv-scope="nuevo_precio"
+                  />
+                  <FormError
+                    :attribute_name="'nuevo_precio.precio'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="2" class="text-rigth">
+                  <v-switch
+                    v-model="price_uno.web"
+                    :label="`Precio para la WEB: ${
+                      price_uno.web ? 'SI' : 'NO'
+                    }`"
+                    data-vv-name="precio web"
+                    v-validate="'required'"
+                    data-vv-scope="nuevo_precio"
+                  ></v-switch>
+                  <FormError
+                    :attribute_name="'nuevo_precio.precio web'"
+                    :errors_form="errors"
+                  ></FormError>
+                </v-col>
+                <v-col cols="12" md="2">
+                  <v-btn
+                    color="success"
+                    small
+                    @click="validar_formulario_precio('nuevo_precio')"
+                    >Agregar</v-btn
+                  >
+                </v-col>
+
+                <v-col cols="12">
+                  <v-simple-table dark>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-center">Tipo de Cobro</th>
+                          <th class="text-center">Monto</th>
+                          <th class="text-center">Opción</th>
+                        </tr>
+                      </thead>
+                      <tbody v-if="precios_seleccionados.length > 0">
+                        <tr
+                          v-for="(item, index) in precios_seleccionados"
+                          :key="index"
+                        >
+                          <td class="text-center">
+                            {{ item.type_charge.name }}
+                          </td>
+                          <td class="text-center">{{ item.monto }}</td>
+                          <td class="text-center">
+                            <v-btn
+                              color="info"
+                              small
+                              @click="destroy_precio(item)"
+                              >Eliminar</v-btn
+                            >
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="red darken-1" @click="dialog_precio = false"
+              >Cerrar</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-col>
   </v-row>
 </template>
@@ -471,6 +735,8 @@ export default {
     return {
       loading: false,
       dialog: false,
+      dialog_servicios: false,
+      dialog_precio: false,
       editedIndex: false,
       search: "",
       headers: [
@@ -504,23 +770,21 @@ export default {
         nextIcon: "mdi-plus",
       },
       desserts: [],
-      monedas: [],
       camas: [],
       habitaciones: [],
       masiva_image: [],
       precios: [],
       masajes: [],
+      coins: [],
       form: {
         id: 0,
         number: null,
         name: null,
         amount_people: 0,
         amount_bed: 0,
-        price: null,
         description: null,
         type_bed_id: null,
         type_room_id: null,
-        coin_id: null,
         pictures: [],
         pets: false,
         prices: [],
@@ -535,6 +799,17 @@ export default {
         default: false,
         type_charge_id: null,
         web: false,
+        coin_id: null,
+      },
+
+      precios_seleccionados: [],
+      price_uno: {
+        id: null,
+        price: null,
+        default: false,
+        type_charge_id: null,
+        web: false,
+        coin_id: null,
       },
     };
   },
@@ -553,9 +828,9 @@ export default {
 
   created() {
     this.initialize();
-    this.getMoneda();
     this.getCama();
     this.getHabitacion();
+    this.getCoin();
   },
 
   methods: {
@@ -577,17 +852,19 @@ export default {
     limpiar() {
       this.editedIndex = false;
       this.dialog = false;
+      this.dialog_servicios = false;
+      this.dialog_precio = false;
+      this.masajes = [];
+      this.precios = [];
 
       this.form.id = 0;
       this.form.number = null;
       this.form.name = null;
       this.form.amount_people = 0;
       this.form.amount_bed = 0;
-      this.form.price = null;
       this.form.description = null;
       this.form.type_bed_id = null;
       this.form.type_room_id = null;
-      this.form.coin_id = null;
       this.form.pictures = [];
       this.form.prices = [];
       this.form.pets = false;
@@ -595,6 +872,22 @@ export default {
       this.form.number_adults = 0;
       this.form.number_children = 0;
       this.form.amount_pets = 0;
+
+      this.price.coin_id = null;
+      this.price.price = null;
+      this.price.default = false;
+      this.price.web = false;
+      this.price.type_charge_id = null;
+      this.type_charge_id = null;
+
+      this.price_uno.id = null;
+      this.price_uno.coin_id = null;
+      this.price_uno.price = null;
+      this.price_uno.default = false;
+      this.price_uno.web = false;
+      this.price_uno.type_charge_id = null;
+
+      this.precios_seleccionados = [];
 
       this.$validator.reset();
       this.$validator.reset();
@@ -617,9 +910,9 @@ export default {
             this.loading = false;
             return;
           }
-
+          console.log(r.data.data);
           this.desserts = r.data.data;
-          this.close();
+          this.limpiar();
           this.loading = false;
         })
         .catch((r) => {
@@ -633,12 +926,9 @@ export default {
       this.form.name = item.name;
       this.form.amount_people = item.amount_people;
       this.form.amount_bed = item.amount_bed;
-      this.form.price = item.price;
       this.form.description = item.description;
-      this.form.type_bed_id = item.type_bed_id;
-      this.form.type_room_id = item.type_room_id;
-      this.form.coin_id = item.coin_id;
-      this.form.pets = item.pets;
+      this.form.type_bed_id = item.type_bed;
+      this.form.type_room_id = item.type_room;
       this.form.pictures = [];
       this.form.prices = [];
       this.form.massages = [];
@@ -801,15 +1091,6 @@ export default {
       });
     },
 
-    getMoneda() {
-      this.$store.state.services.coinService
-        .index()
-        .then((r) => {
-          this.monedas = r.data.data;
-        })
-        .catch((r) => {});
-    },
-
     getCama() {
       this.$store.state.services.typeBedService
         .index()
@@ -837,7 +1118,6 @@ export default {
         .then((r) => {
           r.data.data.forEach((x) => {
             if (!x.deleted_at && item.type_service_id == x.type_service_id) {
-              this.form.coin_id = x.coin;
               this.masajes.push({
                 id: x.id,
                 name: `${x.name} | Precio: ${x.coin.symbol} ${x.price} | Tiempo: ${x.time} min.`,
@@ -847,14 +1127,14 @@ export default {
         })
         .catch((r) => {});
 
-      if(item.type_service_id == 1) {
+      if (item.type_service_id == 1) {
         this.$store.state.services.typeChargeService
           .index()
           .then((r) => {
-            r.data.data.forEach(x => {
-              if(!x.deleted_at && item.type_service_id == x.type_service_id)
-              this.precios.push(x)
-            })
+            r.data.data.forEach((x) => {
+              if (!x.deleted_at && item.type_service_id == x.type_service_id)
+                this.precios.push(x);
+            });
           })
           .catch((r) => {});
       }
@@ -869,6 +1149,7 @@ export default {
           objeto.type_charge_id = this.type_charge_id.id;
           objeto.type_charge = this.type_charge_id;
           objeto.web = this.price.web;
+          objeto.coin_id = this.price.coin_id.id;
 
           this.form.prices.push(objeto);
 
@@ -888,6 +1169,196 @@ export default {
 
     quitar_price(index) {
       this.form.prices.splice(this.form.prices.indexOf(index), 1);
+    },
+
+    getCoin() {
+      this.$store.state.services.coinService
+        .index()
+        .then((r) => {
+          this.coins = r.data.data;
+        })
+        .catch((r) => {});
+    },
+
+    costos(item) {
+      this.loading = true;
+      this.getMasaje(item.type_room);
+
+      this.form.id = item.id;
+
+      item.massages.forEach((x) => {
+        this.masajes.forEach((y) => {
+          if (x.type_massage_id == y.id) {
+            this.form.massages.push(y);
+          }
+        });
+      });
+
+      this.dialog_servicios = true;
+      this.loading = false;
+    },
+
+    validar_formulario_servicios(scope) {
+      this.$validator.validateAll(scope).then((result) => {
+        if (result) {
+          this.$swal({
+            title: "Modificar Precios",
+            text: "¿Está seguro de realizar esta acción?",
+            type: "success",
+            showCancelButton: true,
+          }).then((result) => {
+            if (result.value) {
+              this.loading = true;
+              this.$store.state.services.roomMassageService
+                .update(this.form)
+                .then((r) => {
+                  this.loading = false;
+
+                  if (r.response) {
+                    if (r.response.data.code === 404) {
+                      this.$toastr.warning(
+                        r.response.data.error,
+                        "Advertencia"
+                      );
+                      return;
+                    } else if (r.response.data.code === 423) {
+                      this.$toastr.warning(
+                        r.response.data.error,
+                        "Advertencia"
+                      );
+                      return;
+                    } else {
+                      for (let value of Object.values(r.response.data)) {
+                        this.$toastr.error(value, "Mensaje");
+                      }
+                    }
+                    return;
+                  }
+
+                  this.$toastr.success(r.data, "Mensaje");
+                  this.initialize();
+                })
+                .catch((r) => {
+                  this.loading = false;
+                });
+            } else {
+              this.close();
+            }
+          });
+        }
+      });
+    },
+
+    precios_items(item) {
+      this.loading = true;
+      this.price_uno.id = item.id;
+      this.precios_seleccionados = item.prices;
+      this.precios = [];
+      if (item.type_service_id == 1) {
+        this.$store.state.services.typeChargeService
+          .index()
+          .then((r) => {
+            r.data.data.forEach((x) => {
+              if (!x.deleted_at && item.type_service_id == x.type_service_id)
+                this.precios.push(x);
+            });
+          })
+          .catch((r) => {});
+      }
+      this.dialog_precio = true;
+      this.loading = false;
+    },
+
+    validar_formulario_precio(scope) {
+      this.$validator.validateAll(scope).then((result) => {
+        if (result) {
+          this.$swal({
+            title: "Agregar Precio",
+            text: "¿Está seguro de realizar esta acción?",
+            type: "success",
+            showCancelButton: true,
+          }).then((result) => {
+            if (result.value) {
+              this.loading = true;
+              this.$store.state.services.roomPriceService
+                .update(this.price_uno)
+                .then((r) => {
+                  this.loading = false;
+
+                  if (r.response) {
+                    if (r.response.data.code === 404) {
+                      this.$toastr.warning(
+                        r.response.data.error,
+                        "Advertencia"
+                      );
+                      return;
+                    } else if (r.response.data.code === 423) {
+                      this.$toastr.warning(
+                        r.response.data.error,
+                        "Advertencia"
+                      );
+                      return;
+                    } else {
+                      for (let value of Object.values(r.response.data)) {
+                        this.$toastr.error(value, "Mensaje");
+                      }
+                    }
+                    return;
+                  }
+
+                  this.$toastr.success(r.data, "Mensaje");
+                  this.initialize();
+                })
+                .catch((r) => {
+                  this.loading = false;
+                });
+            } else {
+              this.close();
+            }
+          });
+        }
+      });
+    },
+
+    destroy_precio(data) {
+      this.$swal({
+        title: "Eliminar Precio",
+        text: "¿Está seguro de realizar esta acción?",
+        type: "error",
+        showCancelButton: true,
+      }).then((result) => {
+        if (result.value) {
+          this.loading = true;
+          this.$store.state.services.roomPriceService
+            .destroy(data)
+            .then((r) => {
+              this.loading = false;
+
+              if (r.response) {
+                if (r.response.data.code === 404) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else if (r.response.data.code === 423) {
+                  this.$toastr.warning(r.response.data.error, "Advertencia");
+                  return;
+                } else {
+                  for (let value of Object.values(r.response.data)) {
+                    this.$toastr.error(value, "Mensaje");
+                  }
+                }
+                return;
+              }
+
+              this.$toastr.success(r.data, "Mensaje");
+              this.initialize();
+            })
+            .catch((r) => {
+              this.loading = false;
+            });
+        } else {
+          this.close();
+        }
+      });
     },
   },
 };

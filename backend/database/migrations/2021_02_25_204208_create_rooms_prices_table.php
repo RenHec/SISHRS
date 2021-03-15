@@ -20,6 +20,7 @@ class CreateRoomsPricesTable extends Migration
             $table->boolean('web')->default(false);
             $table->foreignId('type_charge_id')->constrained('type_charge');
             $table->foreignId('room_id')->constrained('rooms');
+            $table->foreignId('coin_id')->constrained('coins');
             $table->timestamps();
         });
     }

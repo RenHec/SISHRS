@@ -2,6 +2,7 @@
 
 namespace App\Models\V1\Catalogo;
 
+use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -48,6 +49,24 @@ class TypeMessage extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['monto'];
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getMontoAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format($this->price, 2, '.', ',');
+    }
 
     /**
      * Get the type service associated with the type_massages.

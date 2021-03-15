@@ -24,7 +24,7 @@ class UsuarioFactory extends Factory
     public function definition()
     {
         return [
-            'cui' => $this->faker->unique()->numerify('#############'),
+            'cui' => '2342008040608',
             'first_name' => $this->faker->randomElement([$this->faker->firstNameMale, $this->faker->firstNameFemale]),
             'second_name' => $this->faker->randomElement([$this->faker->firstNameMale, $this->faker->firstNameFemale, null]),
             'surname' => $this->faker->lastName,

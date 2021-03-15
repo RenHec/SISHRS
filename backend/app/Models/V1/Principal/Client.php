@@ -24,10 +24,8 @@ class Client extends Model
      */
     protected $fillable = [
         'nit',
-        'first_name',
-        'second_name',
-        'surname',
-        'second_surname',
+        'name',
+        'business',
         'email',
         'ubication',
         'departament_id',
@@ -65,7 +63,7 @@ class Client extends Model
      */
     public function getFullNameAttribute()
     {
-        return str_replace('  ', ' ', "{$this->first_name} {$this->second_name} {$this->surname} {$this->second_surname}");
+        return $this->name;
     }
 
     /**

@@ -16,7 +16,7 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   counter
                   outlined
@@ -32,71 +32,23 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="9">
                 <v-text-field
                   counter
                   outlined
-                  v-model="form.first_name"
+                  v-model="form.name"
                   type="text"
-                  label="primer nombre"
+                  label="nombre del cliente"
                   data-vv-scope="create"
-                  data-vv-name="primer nombre"
+                  data-vv-name="nombre del cliente"
                   v-validate="'required|max:50'"
                 ></v-text-field>
                 <FormError
-                  :attribute_name="'create.primer nombre'"
+                  :attribute_name="'create.nombre del cliente'"
                   :errors_form="errors"
                 ></FormError>
               </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  counter
-                  outlined
-                  v-model="form.second_name"
-                  type="text"
-                  label="segundo nombre"
-                  data-vv-scope="create"
-                  data-vv-name="segundo nombre"
-                  v-validate="'max:50'"
-                ></v-text-field>
-                <FormError
-                  :attribute_name="'create.segundo nombre'"
-                  :errors_form="errors"
-                ></FormError>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  counter
-                  outlined
-                  v-model="form.surname"
-                  type="text"
-                  label="primer apellido"
-                  data-vv-scope="create"
-                  data-vv-name="primer apellido"
-                  v-validate="'required|max:50'"
-                ></v-text-field>
-                <FormError
-                  :attribute_name="'create.primer apellido'"
-                  :errors_form="errors"
-                ></FormError>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  counter
-                  outlined
-                  v-model="form.second_surname"
-                  type="text"
-                  label="segundo apellido"
-                  data-vv-scope="create"
-                  data-vv-name="segundo apellido"
-                  v-validate="'max:50'"
-                ></v-text-field>
-                <FormError
-                  :attribute_name="'create.segundo apellido'"
-                  :errors_form="errors"
-                ></FormError>
-              </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   counter
                   outlined
@@ -105,7 +57,7 @@
                   label="Correo electrónico"
                   data-vv-scope="create"
                   data-vv-name="correo"
-                  v-validate="'required|email|max:75'"
+                  v-validate="'email|max:75'"
                   @input="form.email = $event.toLowerCase()"
                 ></v-text-field>
                 <FormError
@@ -113,6 +65,20 @@
                   :errors_form="errors"
                 ></FormError>
               </v-col>
+              <v-col cols="12" md="4">
+                <v-switch
+                  v-model="form.business"
+                  :label="`Es empresa: ${form.business ? 'SI' : 'NO'}`"
+                  data-vv-name="es empresa"
+                  v-validate="'required'"
+                  data-vv-scope="create"
+                ></v-switch>
+                <FormError
+                  :attribute_name="'create.es empresa'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="5"></v-col>
               <v-col cols="12" md="4">
                 <v-autocomplete
                   v-model="form.municipality_id"
@@ -372,9 +338,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="red darken-1" @click="cerrar_dialog"
-            >Cerrar</v-btn
-          >
+          <v-btn color="red darken-1" @click="cerrar_dialog">Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -407,7 +371,7 @@ export default {
         {
           text: "Nombre",
           align: "start",
-          value: "full_name",
+          value: "name",
         },
         {
           text: "Nombre",
@@ -444,14 +408,12 @@ export default {
       form: {
         id: 0,
         nit: null,
-        first_name: null,
-        second_name: null,
-        surname: null,
-        second_surname: null,
+        name: null,
         email: null,
         ubication: null,
         municipality_id: null,
         phones: [],
+        business: false,
       },
       form_telefono: {
         id: 0,
@@ -499,10 +461,8 @@ export default {
 
       this.form.id = 0;
       this.form.nit = null;
-      this.form.first_name = null;
-      this.form.second_name = null;
-      this.form.surname = null;
-      this.form.second_surname = null;
+      this.form.name = null;
+      this.form.business = null;
       this.form.email = null;
       this.form.ubication = null;
       this.form.municipality_id = null;
@@ -542,10 +502,8 @@ export default {
     mapear(item) {
       this.form.id = item.id;
       this.form.nit = item.nit;
-      this.form.first_name = item.first_name;
-      this.form.second_name = item.second_name;
-      this.form.surname = item.surname;
-      this.form.second_surname = item.second_surname;
+      this.form.name = item.name;
+      this.form.business = item.business;
       this.form.email = item.email;
       this.form.ubication = item.ubication;
       this.form.municipality_id = item.municipality;
@@ -845,7 +803,7 @@ export default {
     cerrar_dialog() {
       this.dialog = false;
       this.initialize();
-    }
+    },
   },
 };
 </script>

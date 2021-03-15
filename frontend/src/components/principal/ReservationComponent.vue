@@ -91,7 +91,6 @@
                   ref="menu_hora"
                   v-model="menu_hora"
                   :close-on-content-click="false"
-                  :nudge-right="40"
                   transition="scale-transition"
                   offset-y
                   max-width="290px"
@@ -104,11 +103,30 @@
                       persistent-hint
                       counter
                       outlined
-                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                      :disabled="bloquear"
+                      data-vv-scope="create"
+                      data-vv-name="hora"
+                      v-validate="'required'"
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="form.hora"
+                      label="Hora"
+                      persistent-hint
+                      counter
+                      outlined
                       :disabled="bloquear"
                       v-bind="attrs"
                       v-on="on"
+                      data-vv-scope="create"
+                      data-vv-name="hora"
+                      v-validate="'required'"
                     ></v-text-field>
+                    <FormError
+                      :attribute_name="'create.hora'"
+                      :errors_form="errors"
+                    ></FormError>
                   </template>
                   <v-time-picker
                     v-if="menu_hora"
@@ -228,7 +246,7 @@
                           v-if="room.id == item.id"
                           v-bind:key="x"
                           :disabled="item.esconder"
-                          @click="seleccionar_precio(room)"
+                          @click="seleccionar_precio(room, item)"
                           >{{ room.name }}</v-chip
                         >
                       </template>
@@ -250,9 +268,13 @@
                       active-class="success accent-4 white--text"
                     >
                       <template v-for="(masaje, x) in todos_masajes">
-                        <v-chip v-if="masaje.id == item.id" :disabled="item.esconder" @click="seleccionar_precio(masaje)" v-bind:key="x">{{
-                          masaje.name
-                        }}</v-chip>
+                        <v-chip
+                          v-if="masaje.id == item.id"
+                          :disabled="item.esconder"
+                          @click="seleccionar_precio(masaje, item)"
+                          v-bind:key="x"
+                          >{{ masaje.name }}</v-chip
+                        >
                       </template>
                     </v-chip-group>
                   </v-card-text>
@@ -336,7 +358,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialog_cliente" width="55%" persistent color="primary">
+    <v-dialog v-model="dialog_cliente" width="90%" persistent color="primary">
       <v-card>
         <v-overlay :value="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -348,12 +370,96 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" md="12">
+              <v-col
+                cols="12"
+                md="12"
+                class="text-center"
+                v-if="!mostrar_masaje"
+              >
+                <v-switch
+                  v-model="form.event"
+                  :label="`¿La reservación es para evento? ${
+                    form.event ? 'SI' : 'NO'
+                  }`"
+                  data-vv-name="evento"
+                  v-validate="'required'"
+                  data-vv-scope="reservar"
+                ></v-switch>
+                <FormError
+                  :attribute_name="'reservar.evento'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+
+              <v-col cols="12" md="3">
+                <v-text-field
+                  counter
+                  outlined
+                  v-model="form.nit"
+                  type="text"
+                  label="número de NIT"
+                  data-vv-scope="reservar"
+                  data-vv-name="número de NIT"
+                  v-validate="'required'"
+                ></v-text-field>
+                <FormError
+                  :attribute_name="'reservar.número de NIT'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="9">
+                <v-text-field
+                  counter
+                  outlined
+                  v-model="form.name"
+                  type="text"
+                  label="nombre del cliente"
+                  data-vv-scope="reservar"
+                  data-vv-name="nombre del cliente"
+                  v-validate="'required|max:100'"
+                ></v-text-field>
+                <FormError
+                  :attribute_name="'reservar.nombre del cliente'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-text-field
+                  counter
+                  outlined
+                  v-model="form.email"
+                  type="text"
+                  label="Correo electrónico"
+                  data-vv-scope="reservar"
+                  data-vv-name="correo"
+                  v-validate="'email|max:75'"
+                  @input="form.email = $event.toLowerCase()"
+                ></v-text-field>
+                <FormError
+                  :attribute_name="'reservar.correo'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-switch
+                  v-model="form.business"
+                  :label="`Es empresa: ${form.business ? 'SI' : 'NO'}`"
+                  data-vv-name="es empresa"
+                  v-validate="'required'"
+                  data-vv-scope="reservar"
+                ></v-switch>
+                <FormError
+                  :attribute_name="'reservar.es empresa'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+              <v-col cols="12" md="5"></v-col>
+              <v-col cols="12" md="4">
                 <v-autocomplete
-                  v-model="form.client_id"
-                  :items="clientes"
+                  v-model="form.municipality_id"
+                  :items="municipios"
                   chips
-                  label="Seleccionar cliente"
+                  label="Seleccionar departamento y municipio"
                   outlined
                   :clearable="true"
                   :deletable-chips="true"
@@ -361,13 +467,103 @@
                   item-value="id"
                   return-object
                   v-validate="'required'"
-                  data-vv-scope="promo"
-                  data-vv-name="cliente"
+                  data-vv-scope="reservar"
+                  data-vv-name="departamento y municipio"
                 ></v-autocomplete>
                 <FormError
-                  :attribute_name="'reservar.cliente'"
+                  :attribute_name="'reservar.departamento y municipio'"
                   :errors_form="errors"
                 ></FormError>
+              </v-col>
+              <v-col cols="12" md="8">
+                <v-text-field
+                  counter
+                  outlined
+                  v-model="form.ubication"
+                  type="text"
+                  label="dirección exacta"
+                  data-vv-scope="reservar"
+                  data-vv-name="dirección exacta"
+                  v-validate="'max:100'"
+                ></v-text-field>
+                <FormError
+                  :attribute_name="'reservar.dirección exacta'"
+                  :errors_form="errors"
+                ></FormError>
+              </v-col>
+
+              <v-col cols="12" v-if="form.event">
+                <v-simple-table dark>
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-center">Servicio</th>
+                        <th class="text-center">NIT</th>
+                        <th class="text-center">Nombre Completo</th>
+                        <th class="text-center">Email</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="form.details.length > 0">
+                      <tr v-for="(item, index) in form.details" :key="index">
+                        <td class="text-center">{{ item.description }}</td>
+                        <td class="text-center">
+                          <br />
+                          <v-text-field
+                            counter
+                            outlined
+                            v-model="item.nit"
+                            type="text"
+                            label="número de NIT"
+                            data-vv-scope="reservar"
+                            :data-vv-name="'número de NIT' + index"
+                            v-validate="'required'"
+                          ></v-text-field>
+                          <FormError
+                            :attribute_name="'reservar.número de NIT' + index"
+                            :errors_form="errors"
+                          ></FormError>
+                        </td>
+                        <td class="text-center">
+                          <br />
+                          <v-text-field
+                            counter
+                            outlined
+                            v-model="item.name"
+                            type="text"
+                            label="nombre del cliente"
+                            data-vv-scope="reservar"
+                            :data-vv-name="'nombre del cliente' + index"
+                            v-validate="'required|max:100'"
+                          ></v-text-field>
+                          <FormError
+                            :attribute_name="
+                              'reservar.nombre del cliente' + index
+                            "
+                            :errors_form="errors"
+                          ></FormError>
+                        </td>
+                        <td class="text-center">
+                          <br />
+                          <v-text-field
+                            counter
+                            outlined
+                            v-model="item.email"
+                            type="text"
+                            label="Correo electrónico"
+                            data-vv-scope="reservar"
+                            :data-vv-name="'correo' + index"
+                            v-validate="'email|max:75'"
+                            @input="item.email = $event.toLowerCase()"
+                          ></v-text-field>
+                          <FormError
+                            :attribute_name="'reservar.correo' + index"
+                            :errors_form="errors"
+                          ></FormError>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
               </v-col>
             </v-row>
           </v-container>
@@ -431,8 +627,12 @@ export default {
       form: {
         id: 0,
         nit: null,
+        email: null,
         name: null,
+        business: false,
         ubication: null,
+        municipality_id: null,
+        event: false,
         arrival_date: null,
         departure_date: null,
         client_id: null,
@@ -441,6 +641,7 @@ export default {
         hora: null,
         cantidad: null,
       },
+      municipios: [],
     };
   },
 
@@ -456,6 +657,7 @@ export default {
 
   created() {
     this.getServicios();
+    this.getMunicipios();
   },
 
   methods: {
@@ -492,9 +694,6 @@ export default {
       this.bloquear = false;
 
       this.form.id = 0;
-      this.form.nit = null;
-      this.form.name = null;
-      this.form.ubication = null;
       this.form.arrival_date = null;
       this.form.departure_date = null;
       this.form.client_id = null;
@@ -512,6 +711,14 @@ export default {
       this.seleccionados = [];
       this.servicios = [];
 
+      this.form.nit = null;
+      this.form.email = null;
+      this.form.name = null;
+      this.form.business = null;
+      this.form.ubication = null;
+      this.form.municipality_id = null;
+      this.form.event = null;
+
       this.$validator.reset();
       this.$validator.reset();
     },
@@ -526,7 +733,9 @@ export default {
             : this.form.arrival_date;
           objeto.hora = this.form.hora;
           objeto.servicios = this.servicios ? this.servicios : null;
-          this.form.cantidad = objeto.cantidad = this.cantidad ? this.cantidad : null;
+          this.form.cantidad = objeto.cantidad = this.cantidad
+            ? this.cantidad
+            : null;
 
           this.loading = true;
           this.$store.state.services.reservationService
@@ -573,7 +782,13 @@ export default {
           this.seleccionados.forEach((element) => {
             if (element.id == item.id) {
               objecto.price = element.sf_price;
-              objecto.description = element.name;
+              objecto.description = element.description;
+              objecto.minutos = element.minutos;
+              objecto.coin_id = element.coin_id;
+              this.form.coin_id = element.coin_id;
+              objecto.name = null;
+              objecto.nit = null;
+              objecto.email = null;
             }
           });
 
@@ -598,8 +813,6 @@ export default {
           } else {
             this.form.details.push(objecto);
           }
-
-          this.form.coin_id = item.coin_id;
 
           this.bloquear = true;
           item.esconder = true;
@@ -695,6 +908,11 @@ export default {
     },
 
     guardar_reservacion() {
+      if (this.form.details.length == 0) {
+        this.$toastr.error("No ha seleccionado ningún servicio para la reservación.", "Error");
+        return 0;
+      }
+
       this.$swal({
         title: "Guardar Reservación",
         text: "¿Está seguro de realizar esta acción?",
@@ -702,13 +920,6 @@ export default {
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.form.nit = this.form.client_id.nit;
-          this.form.name = this.form.client_id.full_name;
-          this.form.ubication =
-            this.form.client_id.municipality.full_name +
-            ", " +
-            this.form.client_id.ubication;
-
           this.loading = true;
           this.$store.state.services.reservationService
             .store(this.form)
@@ -769,14 +980,16 @@ export default {
         });
     },
 
-    seleccionar_precio(item) {
+    seleccionar_precio(item, servicio) {
       this.loading = true;
       if (this.seleccionados.length > 0) {
         this.seleccionados.forEach((element) => {
           if (element.id == item.id) {
             element.id = item.id;
-            element.description = item.name;
+            element.description = servicio.name + " / " + item.name;
             element.sf_price = item.sf_price;
+            element.minutos = item.minutos;
+            element.coin_id = item.coin_id;
 
             this.loading = false;
             return 0;
@@ -786,6 +999,7 @@ export default {
         this.seleccionados.push(item);
         this.loading = false;
       } else {
+        item.description = servicio.name + " / " + item.name;
         this.seleccionados.push(item);
         this.loading = false;
       }
@@ -796,6 +1010,15 @@ export default {
         .index()
         .then((r) => {
           this.listar_servicios = r.data.data;
+        })
+        .catch((r) => {});
+    },
+
+    getMunicipios() {
+      this.$store.state.services.municipalityService
+        .index()
+        .then((r) => {
+          this.municipios = r.data.data;
         })
         .catch((r) => {});
     },

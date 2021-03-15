@@ -2,9 +2,10 @@
 
 namespace App\Models\V1\Principal;
 
+use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\TypeCharge;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RoomPrice extends Model
 {
@@ -27,7 +28,8 @@ class RoomPrice extends Model
         'default',
         'type_charge_id',
         'room_id',
-        'web'
+        'web',
+        'coin_id'
     ];
 
     /**
@@ -49,6 +51,24 @@ class RoomPrice extends Model
      */
     protected $dates = ['created_at', 'updated_at'];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['monto'];
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getMontoAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format($this->price, 2, '.', ',');
+    }
+    
     /**
      * Get the type_charge associated with the rooms.
      *

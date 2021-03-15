@@ -3,9 +3,13 @@
 namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Coin;
+use App\Models\V1\Principal\Room;
 use App\Models\V1\Catalogo\Status;
+use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\V1\Principal\Reservation;
+use App\Models\V1\Principal\ReservationOfert;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReservationDetail extends Model
@@ -37,7 +41,9 @@ class ReservationDetail extends Model
         'description',
         'type_service_id',
         'status_id',
-        'quote'
+        'quote',
+        'client_id',
+        'guest'
     ];
 
     /**
@@ -116,5 +122,15 @@ class ReservationDetail extends Model
     public function type_service()
     {
         return $this->belongsTo(TypeService::class, 'type_service_id', 'id');
+    }
+
+    /**
+     * Get the client associated with the reservations.
+     *
+     * @return object
+     */
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id', 'id');
     }
 }

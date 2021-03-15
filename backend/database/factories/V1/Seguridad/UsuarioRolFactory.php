@@ -28,8 +28,8 @@ class UsuarioRolFactory extends Factory
 
         if(is_null(UsuarioRol::where('user_id', $usuario)->where('rol_id', $rol)->first())) {
             return [
-                'user_id' => $usuario,
-                'rol_id' => $rol
+                'user_id' => 1,
+                'rol_id' => 1
             ];
         } else {
             return [];

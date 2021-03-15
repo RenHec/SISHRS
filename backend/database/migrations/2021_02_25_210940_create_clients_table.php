@@ -15,12 +15,10 @@ class CreateClientsTable extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->string('nit', 15)->unique();
-            $table->string('first_name', 50);
-            $table->string('second_name', 50)->nullable();
-            $table->string('surname', 50);
-            $table->string('second_surname', 50)->nullable();
-            $table->string('email', 75)->unique();
+            $table->string('nit', 15);
+            $table->string('name', 150);
+            $table->boolean('business')->default(false);
+            $table->string('email', 75)->nullable();
             $table->string('ubication', 100)->nullable();
 
             $table->foreignId('departament_id')->constrained('departaments');

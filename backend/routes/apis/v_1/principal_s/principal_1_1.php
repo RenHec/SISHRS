@@ -26,6 +26,12 @@ Route::resource('client_phone', 'Client\ClientPhoneController')->only('show', 'u
 //rutas para RoomController
 Route::resource('room', 'Room\RoomController')->except('create', 'show', 'edit');
 
+//rutas para RoomMassageController
+Route::resource('massage', 'Room\RoomMassageController')->only('update');
+
+//rutas para RoomPriceController
+Route::resource('price', 'Room\RoomPriceController')->only('update', 'destroy');
+
 //rutas para PictureRoomController
 Route::resource('picture_room', 'Room\PictureRoomController')->only('store', 'show', 'update', 'destroy');
 Route::name('picture_room.view')->get('picture_room/view/{picture_room}', 'Room\PictureRoomController@view');

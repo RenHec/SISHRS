@@ -31,11 +31,9 @@ class Room extends Model
         'name',
         'amount_people',
         'amount_bed',
-        'price',
         'description',
         'type_bed_id',
         'type_room_id',
-        'coin_id',
         'pets',
         'type_service_id',
         'number_adults',
@@ -81,16 +79,6 @@ class Room extends Model
     public function type_room()
     {
         return $this->belongsTo(TypeRoom::class, 'type_room_id', 'id');
-    }
-
-    /**
-     * Get the coin associated with the rooms.
-     *
-     * @return object
-     */
-    public function coin()
-    {
-        return $this->belongsTo(Coin::class, 'coin_id', 'id');
     }
 
     /**

@@ -229,11 +229,9 @@ class ClientController extends ApiController
 
         try {
             $client->nit = $request->nit;
-            $client->first_name = $request->first_name;
-            $client->second_name = $request->second_name;
-            $client->surname = $request->surname;
-            $client->second_surname = $request->second_surname;
+            $client->name = $request->name;
             $client->email = $request->email;
+            $client->business = $request->business;
             $client->ubication = $request->ubication;
             $client->municipality_id = $request->municipality_id['id'];
             $client->departament_id = Municipio::find($request->municipality_id['id'])->departament_id;
@@ -310,12 +308,9 @@ class ClientController extends ApiController
     public function rules($id = null)
     {
         $validar = is_null($id) ? [
-            'nit' => is_null($id) ? 'required|numeric|digits_between:5,15|unique:clients,nit' : "required|numeric|digits_between:13,15|unique:clients,nit,{$id}",
-            'first_name' => 'required|max:50',
-            'second_name' => 'nullable|max:50',
-            'surname' => 'required|max:50',
-            'second_surname' => 'nullable|max:50',
-            'email' => is_null($id) ? 'required|email|max:75|unique:clients,email' : "required|email|max:75|unique:clients,email,{$id}",
+            'nit' => 'required|numeric|digits_between:5,15',
+            'name' => 'required|max:150',
+            'email' => 'nullable|email|max:75',
             'ubication' => 'nullable|max:100',
             'municipality_id.id' => 'required|integer|exists:municipalities,id',
 
@@ -324,14 +319,11 @@ class ClientController extends ApiController
             'phones.*.country' => 'required|max:75',
             'phones.*.url' => 'required|max:100'
         ] : [
-            'nit' => is_null($id) ? 'required|numeric|digits_between:5,15|unique:clients,nit' : "required|numeric|digits_between:5,15|unique:clients,nit,{$id}",
-            'first_name' => 'required|max:50',
-            'second_name' => 'nullable|max:50',
-            'surname' => 'required|max:50',
-            'second_surname' => 'nullable|max:50',
-            'email' => is_null($id) ? 'required|email|max:75|unique:clients,email' : "required|email|max:75|unique:clients,email,{$id}",
+            'nit' => 'required|numeric|digits_between:5,15',
+            'name' => 'required|max:150',
+            'email' => 'nullable|email|max:75',
             'ubication' => 'nullable|max:100',
-            'municipality_id.id' => 'required|integer|exists:municipalities,id'
+            'municipality_id.id' => 'required|integer|exists:municipalities,id',
         ];
 
         return $validar;
