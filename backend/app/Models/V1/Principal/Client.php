@@ -39,7 +39,8 @@ class Client extends Model
      */
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
-        'updated_at' => 'datetime:d/m/Y h:i:s a'
+        'updated_at' => 'datetime:d/m/Y h:i:s a',
+        'business' => 'boolean'
     ];
 
     /**

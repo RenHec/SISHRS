@@ -79,7 +79,7 @@ class ReservationController extends ApiController
             ->whereIn('reservations.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
             ->distinct('reservations.id')
             ->get();
-        
+
         return $this->showAll($data);
     }
 
@@ -277,7 +277,7 @@ class ReservationController extends ApiController
             $data['client_id'] = $cliente->id;
             $data['nit'] = $cliente->nit;
             $data['name'] = $cliente->name;
-            $data['ubication'] = $cliente->getFullNameAttribute().', '.$cliente->ubication;
+            $data['ubication'] = $municipio->getFullNameAttribute() . ', ' . $cliente->ubication;
             $data['user_id'] = $user;
             $data['status_id'] = Status::CONFIRMADO;
             $data['coin_id'] = $request->coin_id;
@@ -286,12 +286,12 @@ class ReservationController extends ApiController
             $multiplicar = !is_null($request->cantidad) ? $request->cantidad : 1;
 
             $start = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->arrival_date) : date('Y-m-d H:i:s', strtotime($request->arrival_date . ' ' . $request->hora));
-            $end = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->departure_date) : date('Y-m-d H:i:s', strtotime($request->departure_date . ' ' . $request->hora));
+            $end = is_null($request->hora) ? Carbon::createFromFormat('Y-m-d', $request->departure_date) : date('Y-m-d H:i:s', strtotime($request->arrival_date . ' ' . $request->hora));
             $accommodation = is_null($request->hora) ? $start->diffInDays($end) : 0;
 
             foreach ($request->details as $value) {
 
-                if($reservation->event) {
+                if ($reservation->event) {
                     $cliente = Client::firstOrCreate(
                         ['name' => $value['name']],
                         [
@@ -306,7 +306,7 @@ class ReservationController extends ApiController
                 }
 
                 $room = Room::find($value['room_id']);
-                $minute = "+{$value['minutos']} minute"; 
+                $minute = "+{$value['minutos']} minute";
                 $detail = ReservationDetail::create(
                     [
                         'price' => floatval($value['price']),
@@ -328,7 +328,7 @@ class ReservationController extends ApiController
                 );
 
                 $room->resta += $multiplicar;
-                if(!is_null($request->cantidad)) {
+                if (!is_null($request->cantidad)) {
                     $room->save();
                 }
 
@@ -376,7 +376,7 @@ class ReservationController extends ApiController
             ->join('clients', 'reservations.client_id', 'clients.id')
             ->join('coins', 'reservations_details.coin_id', 'coins.id')
             ->select(
-                'reservations_details.id AS id',
+                'reservations.id AS id',
                 DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
                 'reservations_details.description',
                 'reservations_details.accommodation',
@@ -389,7 +389,7 @@ class ReservationController extends ApiController
             ->whereIn('reservations_details.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
             ->where('reservations_details.reservation_id', $reservation->id)
             ->get();
-        
+
         return $this->showAll($data);
     }
 
@@ -416,11 +416,42 @@ class ReservationController extends ApiController
     public function destroy(Reservation $reservation)
     {
         try {
-            $reservation->status_id = Status::ANULADO;
+            DB::beginTransaction();
+            $reservation->status_id = Status::CANCELACION;
             $reservation->save();
+
+            $detalles = ReservationDetail::where('reservation_id', $reservation->id)->get();
+
+            foreach ($detalles as $key => $value) {
+                $value->status_id = Status::CANCELACION;
+                $value->save();
+
+                BinnacleReservation::where('reservation_detail_id', $value->id)
+                    ->update(
+                        [
+                            'active' => false
+                        ]
+                    );
+
+                BinnacleReservation::create(
+                    [
+                        'start' => date('Y-m-d h:i:s'),
+                        'end' => date('Y-m-d h:i:s'),
+                        'days' => 0,
+                        'subtraction' => 0,
+                        'reservation_detail_id' => $value->id,
+                        'movement_id' => Movement::CANCELADA,
+                        'user_id' => Auth::user()->id,
+                        'type_service_id' => $value->type_service_id
+                    ]
+                );
+            }
+
+            DB::commit();
 
             return $this->successResponse('Registro anulado.');
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse('Error en el controlador', 423);
         }
     }

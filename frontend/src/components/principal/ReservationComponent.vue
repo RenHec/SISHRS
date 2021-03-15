@@ -386,6 +386,11 @@
                   :attribute_name="'reservar.número de NIT'"
                   :errors_form="errors"
                 ></FormError>
+                <ul v-for="(item, index) in filteredList" v-bind:key="index">
+                  <li>
+                    <a @click="seleccionar_cliente(item)">{{ item.nit }}</a>
+                  </li>
+                </ul>
               </v-col>
               <v-col cols="12" md="9">
                 <v-text-field
@@ -633,6 +638,18 @@ export default {
     mostrar_masaje() {
       return this.servicios ? (this.servicios.id != 1 ? true : false) : false;
     },
+
+    filteredList() {
+      if (this.form.nit) {
+        return this.clientes.filter((element) => {
+          return element.nit
+            .toUpperCase()
+            .includes(this.form.nit.toUpperCase());
+        });
+      } else {
+        return [];
+      }
+    },
   },
 
   created() {
@@ -694,7 +711,7 @@ export default {
       this.form.nit = null;
       this.form.email = null;
       this.form.name = null;
-      this.form.business = null;
+      this.form.business = false;
       this.form.ubication = null;
       this.form.municipality_id = null;
       this.form.event = null;
@@ -788,7 +805,7 @@ export default {
               }
             });
           }
-          
+
           this.form.details.push(objecto);
 
           this.bloquear = true;
@@ -886,7 +903,10 @@ export default {
 
     guardar_reservacion() {
       if (this.form.details.length == 0) {
-        this.$toastr.error("No ha seleccionado ningún servicio para la reservación.", "Error");
+        this.$toastr.error(
+          "No ha seleccionado ningún servicio para la reservación.",
+          "Error"
+        );
         return 0;
       }
 
@@ -994,6 +1014,15 @@ export default {
         })
         .catch((r) => {});
     },
+
+    seleccionar_cliente(item){
+      this.form.nit = item.nit
+      this.form.business = item.business
+      this.form.municipality_id = item.municipality
+      this.form.email = item.email
+      this.form.name = item.name
+      this.form.ubication = item.ubication
+    }
   },
 };
 </script>

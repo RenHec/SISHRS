@@ -246,14 +246,14 @@ export default {
     },
     cancelar_reservacion(data) {
       this.$swal({
-        title: "Cancelar Reservación No. \n"+data.code,
+        title: "Cancelar Reservación No. \n"+data.name,
         text: "¿Está seguro de realizar esta acción?",
         type: "error",
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
           this.loading = true;
-          this.$store.state.services.binnacleReservationService
+          this.$store.state.services.reservationService
             .destroy(data)
             .then((r) => {
               if (r.response) {
@@ -277,6 +277,7 @@ export default {
                   this.events.splice(this.events.indexOf(element), 1);
                 }
               })
+              this.selectedOpen = false;
               this.loading = false;
             })
             .catch((r) => {
