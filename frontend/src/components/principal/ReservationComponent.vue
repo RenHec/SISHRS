@@ -106,14 +106,7 @@
                       v-bind="attrs"
                       v-on="on"
                       :disabled="bloquear"
-                      data-vv-scope="create"
-                      data-vv-name="hora"
-                      v-validate="'required'"
                     ></v-text-field>
-                    <FormError
-                      :attribute_name="'create.hora'"
-                      :errors_form="errors"
-                    ></FormError>
                   </template>
                   <v-time-picker
                     v-if="menu_hora"
