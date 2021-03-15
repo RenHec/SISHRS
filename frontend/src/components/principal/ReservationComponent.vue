@@ -377,13 +377,13 @@
                   outlined
                   v-model="form.nit"
                   type="text"
-                  label="número de NIT"
+                  label="NIT"
                   data-vv-scope="reservar"
-                  data-vv-name="número de NIT"
+                  data-vv-name="NIT"
                   v-validate="'required'"
                 ></v-text-field>
                 <FormError
-                  :attribute_name="'reservar.número de NIT'"
+                  :attribute_name="'reservar.NIT'"
                   :errors_form="errors"
                 ></FormError>
                 <ul v-for="(item, index) in filteredList" v-bind:key="index">
@@ -498,13 +498,13 @@
                             outlined
                             v-model="item.nit"
                             type="text"
-                            label="número de NIT"
+                            label="NIT"
                             data-vv-scope="reservar"
-                            :data-vv-name="'número de NIT' + index"
+                            :data-vv-name="'NIT' + index"
                             v-validate="'required'"
                           ></v-text-field>
                           <FormError
-                            :attribute_name="'reservar.número de NIT' + index"
+                            :attribute_name="'reservar.NIT' + index"
                             :errors_form="errors"
                           ></FormError>
                         </td>

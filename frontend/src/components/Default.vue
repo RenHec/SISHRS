@@ -272,9 +272,9 @@ export default {
               }
 
               this.$toastr.success(r.data, "Mensaje");
-              this.events.forEach(element => {
+              this.events.forEach((element, index) => {
                 if(element.id == data.id) {
-                  this.events.splice(this.events.indexOf(element), 1);
+                  this.events.splice(this.events.indexOf(index), 1);
                 }
               })
               this.selectedOpen = false;
