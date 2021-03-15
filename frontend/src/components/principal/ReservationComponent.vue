@@ -110,19 +110,6 @@
                       data-vv-name="hora"
                       v-validate="'required'"
                     ></v-text-field>
-                    <v-text-field
-                      v-model="form.hora"
-                      label="Hora"
-                      persistent-hint
-                      counter
-                      outlined
-                      :disabled="bloquear"
-                      v-bind="attrs"
-                      v-on="on"
-                      data-vv-scope="create"
-                      data-vv-name="hora"
-                      v-validate="'required'"
-                    ></v-text-field>
                     <FormError
                       :attribute_name="'create.hora'"
                       :errors_form="errors"
@@ -803,16 +790,13 @@ export default {
 
           if (this.form.details.length > 0) {
             this.form.details.forEach((element, index) => {
-              if (element.room_id == item.id)
-                this.$toastr.info(
-                  "La reservación ya fue agregada a la lista.",
-                  "Reservación"
-                );
-              else this.form.details.push(objecto);
+              if (element.room_id == item.id) {
+                this.form.details.splice(this.form.details.indexOf(index), 1);
+              }
             });
-          } else {
-            this.form.details.push(objecto);
           }
+          
+          this.form.details.push(objecto);
 
           this.bloquear = true;
           item.esconder = true;
@@ -983,19 +967,14 @@ export default {
     seleccionar_precio(item, servicio) {
       this.loading = true;
       if (this.seleccionados.length > 0) {
-        this.seleccionados.forEach((element) => {
+        this.seleccionados.forEach((element, index) => {
           if (element.id == item.id) {
-            element.id = item.id;
-            element.description = servicio.name + " / " + item.name;
-            element.sf_price = item.sf_price;
-            element.minutos = item.minutos;
-            element.coin_id = item.coin_id;
-
-            this.loading = false;
+            this.seleccionados.splice(this.seleccionados.indexOf(index), 1);
             return 0;
           }
         });
 
+        item.description = servicio.name + " / " + item.name;
         this.seleccionados.push(item);
         this.loading = false;
       } else {

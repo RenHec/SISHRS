@@ -77,6 +77,7 @@ class ReservationController extends ApiController
                 DB::RAW('TIME(reservations_details.arrival_date) AS tiempo')
             )
             ->whereIn('reservations.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
+            ->distinct('reservations.id')
             ->get();
         
         return $this->showAll($data);

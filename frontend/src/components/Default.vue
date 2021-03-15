@@ -85,12 +85,12 @@
 
                 <hr>
                 <h3>Servicios</h3>
-                <ul>
-                  <li style="color: black;" v-if="selectedEvent.accommodation != 0">
-                    {{ selectedEvent.accommodation }} X {{ selectedEvent.description }} - {{ selectedEvent.guest }} = {{ selectedEvent.sub }}
+                <ul v-for="(item, index) in selectedEvent.servicios" v-bind:key="index">
+                  <li style="color: black;" v-if="item.accommodation != 0">
+                    {{ item.accommodation }} X {{ item.description }} - {{ item.guest }} = {{ item.sub }}
                   </li>
                   <li style="color: black;" v-else>
-                    {{ selectedEvent.quote }} X {{ selectedEvent.description }} - {{ selectedEvent.guest }} = {{ selectedEvent.sub }}
+                    {{ item.quote }} X {{ item.description }} - {{ item.guest }} = {{ item.sub }}
                   </li>
                 </ul>
 
@@ -178,9 +178,13 @@ export default {
               return;
             }
 
-            this.selectedEvent =
-              r.data.data.length != 0 ? r.data.data[0] : null;
-            this.selectedOpen = this.selectedEvent ? true : false;
+            let objeto = new Object;
+            objeto.id = r.data.data.length != 0 ? r.data.data[0].id : null;
+            objeto.name = r.data.data.length != 0 ? r.data.data[0].name : null;
+            objeto.servicios = r.data.data;
+
+            this.selectedEvent = objeto
+            this.selectedOpen = true;
             this.selectedElement = nativeEvent.target;
             this.loading = false;
           })
