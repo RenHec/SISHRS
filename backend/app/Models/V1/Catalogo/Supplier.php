@@ -5,24 +5,16 @@ namespace App\Models\V1\Catalogo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Status extends Model
+class Supplier extends Model
 {
     use HasFactory;
-
-    const PENDIENTE = 1;
-    const EN_PROCESO = 2;
-    const DESOCUPADO = 3;
-    const ANULADO = 4;
-    const CANCELACION = 5;
-    const CONFIRMADO = 6;
-    const VENTA = 7;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'status';
+    protected $table = 'supplier';
 
     /**
      * The attributes that are mass assignable.

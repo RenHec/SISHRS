@@ -6,6 +6,7 @@ use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Principal\Room;
 use App\Models\V1\Catalogo\Status;
 use App\Models\V1\Principal\Client;
+use Illuminate\Support\Facades\Crypt;
 use App\Models\V1\Catalogo\TypeService;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\V1\Principal\Reservation;
@@ -29,22 +30,33 @@ class ReservationDetail extends Model
      * @var array
      */
     protected $fillable = [
-        'price',
-        'ofert',
-        'reservation_id',
-        'room_id',
-        'coin_id',
-        'sub',
         'arrival_date',
         'departure_date',
         'accommodation',
-        'description',
-        'type_service_id',
-        'status_id',
         'quote',
+        'authorization_code',
+        'price',
+        'sub',
+        'ofert',
+        'guest',
+        'description',
+        'reservation_id',
+        'room_id',
+        'coin_id',
         'client_id',
-        'guest'
+        'type_service_id',
+        'status_id'
     ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'authorization_code'
+    ];
+
 
     /**
      * The attributes that should be cast to native types.
@@ -53,7 +65,10 @@ class ReservationDetail extends Model
      */
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
-        'updated_at' => 'datetime:d/m/Y h:i:s a'
+        'updated_at' => 'datetime:d/m/Y h:i:s a',
+        'arrival_date' => 'datetime:d/m/Y h:i:s a',
+        'departure_date' => 'datetime:d/m/Y h:i:s a',
+        'ofert' => 'boolean'
     ];
 
     /**
@@ -62,6 +77,17 @@ class ReservationDetail extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * Set the reservation_deatils authorization_code.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setAuthorizationCodeAttribute($value)
+    {
+        $this->attributes['authorization_code'] = Crypt::encryptString($value);
+    }
 
     /**
      * Get the room associated with the reservations_details.

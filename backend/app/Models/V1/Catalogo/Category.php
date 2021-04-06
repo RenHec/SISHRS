@@ -4,25 +4,18 @@ namespace App\Models\V1\Catalogo;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Status extends Model
+class Category extends Model
 {
-    use HasFactory;
-
-    const PENDIENTE = 1;
-    const EN_PROCESO = 2;
-    const DESOCUPADO = 3;
-    const ANULADO = 4;
-    const CANCELACION = 5;
-    const CONFIRMADO = 6;
-    const VENTA = 7;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'status';
+    protected $table = 'categories';
 
     /**
      * The attributes that are mass assignable.
@@ -40,7 +33,8 @@ class Status extends Model
      */
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
-        'updated_at' => 'datetime:d/m/Y h:i:s a'
+        'updated_at' => 'datetime:d/m/Y h:i:s a',
+        'deleted_at' => 'datetime:d/m/Y h:i:s a'
     ];
 
     /**
@@ -48,5 +42,15 @@ class Status extends Model
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * Get the sub_category associated with the category.
+     *
+     * @return array
+     */
+    public function sub_category()
+    {
+        return $this->hasMany(SubCategory::class, 'category_id', 'id');
+    }
 }

@@ -43,3 +43,18 @@ Route::resource('type_message', 'TypeMessage\TypeMessageController')->except('cr
 
 //rutas para TypeServiceController
 Route::resource('type_service', 'TypeService\TypeServiceController')->only('index');
+
+//rutas para CategoryController
+Route::resource('category', 'Category\CategoryController')->except('create', 'show', 'edit');
+
+//rutas para CategoryController
+Route::resource('category', 'Category\CategoryController')->except('create', 'show', 'edit');
+
+//rutas para SubCategoryController
+Route::resource('sub_category', 'SubCategory\SubCategoryController')->except('create', 'show', 'edit');
+
+//rutas para KardexStatusController
+Route::resource('kardex_status', 'KardexStatus\KardexStatusController')->only('index');
+
+//rutas para SupplierController
+Route::resource('supplier', 'Supplier\SupplierController')->except('create', 'show', 'edit');

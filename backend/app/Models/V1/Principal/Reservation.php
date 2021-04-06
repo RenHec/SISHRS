@@ -34,7 +34,11 @@ class Reservation extends Model
         'name',
         'ubication',
         'total',
+        'total_reservation',
+        'total_product',
         'event',
+        'responsable',
+        'reserva',
         
         'client_id',
         'user_id',
@@ -50,7 +54,8 @@ class Reservation extends Model
     protected $casts = [
         'created_at' => 'datetime:Y-m-d h:i:s a',
         'updated_at' => 'datetime:Y-m-d h:i:s a',
-        'event' => 'boolean'
+        'event' => 'boolean',
+        'reserva' => 'boolean'
     ];
 
     /**
@@ -146,5 +151,15 @@ class Reservation extends Model
     public function binnacle()
     {
         return $this->hasMany(BinnacleReservation::class, 'reservation_id', 'id');
+    }
+
+    /**
+     * Get the products associated with the reservation.
+     *
+     * @return array
+     */
+    public function products()
+    {
+        return $this->hasMany(ReservationProduct::class, 'reservation_id', 'id');
     }
 }

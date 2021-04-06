@@ -5,24 +5,20 @@ namespace App\Models\V1\Catalogo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Status extends Model
+class KardexStatus extends Model
 {
     use HasFactory;
 
-    const PENDIENTE = 1;
-    const EN_PROCESO = 2;
-    const DESOCUPADO = 3;
-    const ANULADO = 4;
-    const CANCELACION = 5;
-    const CONFIRMADO = 6;
-    const VENTA = 7;
+    const ALTA = 1;
+    const ALERTA = 2;
+    const BAJA = 3;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'status';
+    protected $table = 'kardex_status';
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +26,8 @@ class Status extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
+        'color'
     ];
 
     /**
@@ -49,4 +46,14 @@ class Status extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * Get the kardex associated with the status.
+     *
+     * @return array
+     */
+    public function kardex()
+    {
+        return $this->hasMany(Kardex::class, 'kardex_status_id', 'id');
+    }
 }

@@ -9,6 +9,7 @@ use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\Status;
 use Illuminate\Support\Facades\DB;
 use App\Imports\DepartamentoImport;
+use App\Models\V1\Catalogo\KardexStatus;
 use App\Models\V1\Catalogo\TypeBed;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\Movement;
@@ -60,6 +61,9 @@ class DatabaseSeeder extends Seeder
         $insert->save();
         $insert = new Status();
         $insert->name = 'confirmado';
+        $insert->save();
+        $insert = new Status();
+        $insert->name = 'venta';
         $insert->save();
 
         $insert = new TypeBed();
@@ -222,5 +226,20 @@ class DatabaseSeeder extends Seeder
         DB::table('oauth_clients')
             ->where('id', 2)
             ->update(['secret' => 'fb8QYHjGOBKEL4S8CMDNkXW44lSHGmM6lrvoxwO1']);
+
+        $insert = new KardexStatus();
+        $insert->name = 'Alta';
+        $insert->color = '#50c736';
+        $insert->save();
+
+        $insert = new KardexStatus();
+        $insert->name = 'Alerta';
+        $insert->color = '#ffcb52';
+        $insert->save();
+
+        $insert = new KardexStatus();
+        $insert->name = 'Baja';
+        $insert->color = '#ff5252';
+        $insert->save();
     }
 }

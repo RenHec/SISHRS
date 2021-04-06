@@ -43,9 +43,10 @@ Route::resource('ofert_room', 'Room\OfertRoomController')->except('create', 'sho
 
 //rutas para ReservationController
 Route::resource('reservation', 'Reservation\ReservationController')->except('create', 'edit');
+Route::name('reservation.confirmado')->get('reservation_confirmado', 'Reservation\ReservationController@confirmado');
 Route::name('reservation.pendiente')->get('reservation_pendiente', 'Reservation\ReservationController@pendiente');
 Route::name('reservation.promocion')->get('reservation_promocion/{room}', 'Reservation\ReservationController@promocion');
-Route::name('reservation.calendario')->get('reservation_calendario', 'Reservation\ReservationController@calendario');
+Route::name('reservation.calendario')->get('reservation_calendario/{status}', 'Reservation\ReservationController@calendario');
 Route::name('reservation.precios')->get('reservation_precios/{room}', 'Reservation\ReservationController@precios');
 Route::name('reservation.buscar_habitaciones')->post('reservation_buscar_habitaciones', 'Reservation\ReservationController@buscar_habitaciones');
 
@@ -54,3 +55,27 @@ Route::resource('reservation_detail', 'Reservation\ReservationDetailController')
 
 //rutas para ReservationServiceController
 Route::resource('reservation_service', 'Reservation\ReservationServiceController')->only('show', 'update', 'destroy');
+
+//rutas para IncomesController
+Route::resource('income', 'Kardex\IncomesController')->only('index', 'store');
+
+//rutas para SaleController
+Route::resource('sale', 'Kardex\SaleController')->only('index');
+
+//rutas para KardexController
+Route::resource('kardex', 'Kardex\KardexController')->only('index');
+
+//rutas para KardexController
+Route::resource('change_price', 'ChangePriceController\ChangePriceController')->only('index');
+
+//rutas para ProductController
+Route::resource('product', 'Product\ProductController')->except('create', 'show', 'edit');
+
+//rutas para PictureProductController
+Route::resource('picture_product', 'Product\PictureProductController')->only('store', 'show', 'update', 'destroy');
+Route::name('picture_product.view')->get('picture_product/view/{picture_product}', 'Product\PictureProductController@view');
+Route::name('picture_product.up')->get('picture_product/up/{picture_product}', 'Product\PictureProductController@up');
+Route::name('picture_product.down')->get('picture_product/down/{picture_product}', 'Product\PictureProductController@down');
+
+//rutas para ReservationProductController
+Route::resource('reservation_product', 'Reservation\ReservationProductController')->only('show', 'update', 'destroy');

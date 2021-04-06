@@ -20,8 +20,12 @@ class CreateReservationsTable extends Migration
             $table->string('name', 200);
             $table->string('ubication', 350)->nullable();
             $table->boolean('event')->default(false);
+            $table->string('responsable', 200)->nullable();
+            $table->boolean('reserva')->default(1);
 
             $table->decimal('total', 11, 2);
+            $table->decimal('total_reservation', 11, 2)->default(0);
+            $table->decimal('total_product', 11, 2)->default(0);
             
             $table->foreignId('client_id')->constrained('clients');
             $table->foreignId('user_id')->constrained('users');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V1\Principal\Reservation;
 
-use DateTime;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\V1\Principal\Room;
@@ -28,7 +28,24 @@ class ReservationController extends ApiController
 
     public function index()
     {
-        $data = Reservation::with('client.phones', 'user', 'status')->where('status_id', '!=', Status::ANULADO)->get();
+        $data = Reservation::with('client.phones', 'user', 'status')->where('status_id', '!=', Status::ANULADO)->where('reserva', true)->get();
+        return $this->showAll($data);
+    }
+
+    public function confirmado()
+    {
+        $data = DB::table('reservations')
+            ->join('clients', 'reservations.client_id', 'clients.id')
+            ->join('coins', 'reservations.coin_id', 'coins.id')
+            ->select(
+                'reservations.id AS id',
+                'reservations.code AS code',
+                DB::RAW('CONCAT(reservations.code," | ",clients.first_name," ",clients.surname) AS name')
+            )
+            ->where('reservations.status_id', Status::CONFIRMADO)
+            ->where('reservations.reserva', true)
+            ->get();
+
         return $this->showAll($data);
     }
 
@@ -43,12 +60,13 @@ class ReservationController extends ApiController
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total,2)) AS total')
             )
             ->where('reservations.status_id', Status::PENDIENTE)
+            ->where('reservations.reserva', true)
             ->get();
 
         return $this->showAll($data);
     }
 
-    public function promocion(Room $room)
+    public function promocion(Room $room) //Pendiente
     {
         $data = DB::table('oferts_rooms')
             ->join('coins', 'oferts_rooms.coin_id', 'coins.id')
@@ -64,7 +82,7 @@ class ReservationController extends ApiController
         return $this->showAll($data);
     }
 
-    public function calendario()
+    public function calendario(Status $status)
     {
         $data = DB::table('reservations')
             ->join('clients', 'reservations.client_id', 'clients.id')
@@ -76,7 +94,8 @@ class ReservationController extends ApiController
                 'reservations_details.departure_date AS departure_date',
                 DB::RAW('TIME(reservations_details.arrival_date) AS tiempo')
             )
-            ->whereIn('reservations.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
+            ->wheere('reservations.status_id', $status->id)
+            ->where('reservations.reserva', true)
             ->distinct('reservations.id')
             ->get();
 
@@ -102,7 +121,8 @@ class ReservationController extends ApiController
                 'type_rooms.name AS type_room',
                 DB::RAW('CONCAT(rooms.amount_bed," ",type_beds.name) AS type_bed'),
                 'rooms.description AS description',
-                'rooms.type_service_id AS type_service_id'
+                'rooms.type_service_id AS type_service_id',
+                'rooms.resta AS espacio'
             )
             ->when($inicio && $fin && !$hora, function ($query) use ($inicio, $fin) {
                 $query->whereNotExists(function ($subquery) use ($inicio, $fin) {
@@ -260,9 +280,9 @@ class ReservationController extends ApiController
             $municipio = Municipio::find($request->municipality_id['id']);
 
             $cliente = Client::firstOrCreate(
-                ['name' => $request->name],
+                ['nit' => $request->nit],
                 [
-                    'nit' => $request->nit,
+                    'name' => $request->name,
                     'email' => $request->email,
                     'business' => $request->business,
                     'ubication' => $request->ubication,
@@ -273,13 +293,18 @@ class ReservationController extends ApiController
 
             $data = $request->all();
             $data['code'] = $this->generadorCodigo($generar);
-            $data['total'] = 0;
-            $data['client_id'] = $cliente->id;
             $data['nit'] = $cliente->nit;
             $data['name'] = $cliente->name;
             $data['ubication'] = $municipio->getFullNameAttribute() . ', ' . $cliente->ubication;
+            $data['total'] = 0;
+            $data['total_reservation'] = 0;
+            $data['total_product'] = 0;
+            $data['reserva'] = true;
+            $data['responsable'] = $request->event ? $request->responsable : null;
+
+            $data['client_id'] = $cliente->id;
             $data['user_id'] = $user;
-            $data['status_id'] = Status::CONFIRMADO;
+            $data['status_id'] = Status::PENDIENTE;
             $data['coin_id'] = $request->coin_id;
 
             $reservation = Reservation::create($data);
@@ -293,9 +318,9 @@ class ReservationController extends ApiController
 
                 if ($reservation->event) {
                     $cliente = Client::firstOrCreate(
-                        ['name' => $value['name']],
+                        ['nit' => $request->nit],
                         [
-                            'nit' => $value['nit'],
+                            'name' => $request->name,
                             'email' => $value['email'],
                             'business' => false,
                             'ubication' => null,
@@ -309,21 +334,22 @@ class ReservationController extends ApiController
                 $minute = "+{$value['minutos']} minute";
                 $detail = ReservationDetail::create(
                     [
-                        'price' => floatval($value['price']),
-                        'ofert' => is_null($value['ofert']) ? false : true,
-                        'reservation_id' => $reservation->id,
-                        'room_id' => $value['room_id'],
-                        'coin_id' => $value['coin_id'],
-                        'sub' => intval($accommodation) == 0 ? $multiplicar * floatval($value['price']) : intval($accommodation) * floatval($value['price']),
                         'arrival_date' => $start,
                         'departure_date' => is_null($request->hora) ? $end : date('Y-m-d H:i:s', strtotime($minute, strtotime($end))),
                         'accommodation' => $accommodation,
-                        'description' => $value['description'],
-                        'type_service_id' => $room->type_service_id,
-                        'status_id' => Status::CONFIRMADO,
                         'quote' => !is_null($request->cantidad) ? $request->cantidad : 0,
+                        'authorization_code' => 'code',
+                        'price' => $value['price'],
+                        'sub' => intval($accommodation) == 0 ? $multiplicar * $value['price'] : intval($accommodation) * $value['price'],
+                        'ofert' => false,
+                        'guest' => $cliente->name,
+                        'description' => $value['description'],
+                        'reservation_id' => $reservation->id,
+                        'room_id' => $value['room_id'],
+                        'coin_id' => $reservation->coin_id,
                         'client_id' => $cliente->id,
-                        'guest' => $cliente->name
+                        'type_service_id' => $room->type_service_id,
+                        'status_id' => Status::PENDIENTE
                     ]
                 );
 
@@ -332,7 +358,7 @@ class ReservationController extends ApiController
                     $room->save();
                 }
 
-                if (!is_null($value['ofert'])) {
+                /*if (!is_null($value['ofert'])) {
                     ReservationOfert::create(
                         [
                             'reservation_id' => $reservation->id,
@@ -340,7 +366,7 @@ class ReservationController extends ApiController
                             'ofert_room_id' => $value['ofert']
                         ]
                     );
-                }
+                }*/
 
                 BinnacleReservation::create(
                     [
@@ -354,11 +380,13 @@ class ReservationController extends ApiController
                     ]
                 );
 
-                $reservation->total += floatval($detail->sub);
+                $reservation->total_reservation += $detail->sub;
             }
 
-            if ($reservation->total > 0)
+            if ($reservation->total_reservation > 0) {
+                $reservation->total = $reservation->total_reservation;
                 $reservation->save();
+            }
 
             DB::commit();
 
@@ -386,7 +414,6 @@ class ReservationController extends ApiController
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.sub,2)) AS sub'),
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total,2)) AS total')
             )
-            ->whereIn('reservations_details.status_id', [Status::CONFIRMADO, Status::EN_PROCESO])
             ->where('reservations_details.reservation_id', $reservation->id)
             ->get();
 
@@ -401,6 +428,7 @@ class ReservationController extends ApiController
             $reservation->nit = $request->nit;
             $reservation->name = $request->name;
             $reservation->ubication = $request->ubication;
+            $reservation->responsable = $request->responsable;
 
             if (!$reservation->isDirty())
                 return $this->errorResponse('No hay datos para actualizar', 423);
