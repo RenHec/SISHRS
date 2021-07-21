@@ -22,9 +22,9 @@ class ReservationService {
     return self.axios.get(`${self.baseUrl}_promocion/${item.id}`);
   }
 
-  calendario() {
+  calendario(status) {
     let self = this;
-    return self.axios.get(`${self.baseUrl}_calendario`);
+    return self.axios.get(`${self.baseUrl}_calendario/${status}`);
   }
 
   precios(item) {

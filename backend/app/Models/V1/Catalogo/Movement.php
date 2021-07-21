@@ -12,6 +12,8 @@ class Movement extends Model
     const PROGRAMADA = 1;
     const REUBICADA = 2;
     const CANCELADA = 3;
+    const CHECK_IN = 4;
+    const CHECK_OUT = 5;
 
     /**
      * The table associated with the model.

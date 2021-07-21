@@ -37,4 +37,7 @@ return [
         'client_secret' => env('PASSWORD_CLIENT_SECRET'),
     ],
 
+    'restaurant' => [
+        'base_url' => env('URL_RESTAURANT')
+    ],
 ];

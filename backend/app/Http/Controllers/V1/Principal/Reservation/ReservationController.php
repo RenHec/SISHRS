@@ -11,13 +11,16 @@ use Illuminate\Support\Facades\DB;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\Movement;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\ApiController;
 use App\Models\V1\Catalogo\Municipio;
+use Intervention\Image\Facades\Image;
+use App\Http\Controllers\ApiController;
+use Illuminate\Support\Facades\Storage;
 use App\Models\V1\Principal\PictureRoom;
 use App\Models\V1\Principal\Reservation;
 use App\Models\V1\Principal\ReservationOfert;
 use App\Models\V1\Principal\ReservationDetail;
 use App\Models\V1\Principal\BinnacleReservation;
+use GuzzleHttp\Client as GuzzleHttpClient;
 
 class ReservationController extends ApiController
 {
@@ -82,22 +85,42 @@ class ReservationController extends ApiController
         return $this->showAll($data);
     }
 
-    public function calendario(Status $status)
+    public function calendario($status)
     {
-        $data = DB::table('reservations')
-            ->join('clients', 'reservations.client_id', 'clients.id')
-            ->join('reservations_details', 'reservations.id', 'reservations_details.reservation_id')
-            ->select(
-                'reservations.id AS id',
-                DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
-                'reservations_details.arrival_date AS arrival_date',
-                'reservations_details.departure_date AS departure_date',
-                DB::RAW('TIME(reservations_details.arrival_date) AS tiempo')
-            )
-            ->wheere('reservations.status_id', $status->id)
-            ->where('reservations.reserva', true)
-            ->distinct('reservations.id')
-            ->get();
+        if ($status == 0) {
+            $data = DB::table('reservations')
+                ->join('clients', 'reservations.client_id', 'clients.id')
+                ->join('reservations_details', 'reservations.id', 'reservations_details.reservation_id')
+                ->select(
+                    'reservations.id AS id',
+                    DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
+                    'reservations_details.arrival_date AS arrival_date',
+                    'reservations_details.departure_date AS departure_date',
+                    DB::RAW('TIME(reservations_details.arrival_date) AS tiempo')
+                )
+                ->whereIn('reservations.status_id', [Status::PENDIENTE, Status::EN_PROCESO])
+                ->where('reservations.reserva', true)
+                ->distinct('reservations.id')
+                ->get();
+        } else {
+            $data = DB::table('reservations')
+                ->join('clients', 'reservations.client_id', 'clients.id')
+                ->join('reservations_details', 'reservations.id', 'reservations_details.reservation_id')
+                ->select(
+                    'reservations.id AS id',
+                    DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
+                    'reservations_details.arrival_date AS arrival_date',
+                    'reservations_details.departure_date AS departure_date',
+                    DB::RAW('TIME(reservations_details.arrival_date) AS tiempo'),
+                    DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%d/%m/%Y %h:%i:%s") AS start'),
+                    DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%d/%m/%Y %h:%i:%s") AS end')
+                )
+                ->where('reservations.status_id', $status)
+                ->where('reservations.reserva', true)
+                ->distinct('reservations.id')
+                ->get();
+        }
+
 
         return $this->showAll($data);
     }
@@ -331,6 +354,7 @@ class ReservationController extends ApiController
                 }
 
                 $room = Room::find($value['room_id']);
+                $reservation->no_mesa = $room->number;
                 $minute = "+{$value['minutos']} minute";
                 $detail = ReservationDetail::create(
                     [
@@ -385,8 +409,9 @@ class ReservationController extends ApiController
 
             if ($reservation->total_reservation > 0) {
                 $reservation->total = $reservation->total_reservation;
-                $reservation->save();
             }
+
+            $reservation->save();
 
             DB::commit();
 
@@ -405,19 +430,60 @@ class ReservationController extends ApiController
             ->join('coins', 'reservations_details.coin_id', 'coins.id')
             ->select(
                 'reservations.id AS id',
-                DB::RAW('CONCAT(reservations.code," - ",clients.name) AS name'),
+                'reservations.name AS client',
+                'reservations.nit AS nit',
+                'reservations.code AS name',
+                'reservations.ubication AS ubication',
                 'reservations_details.description',
                 'reservations_details.accommodation',
                 'reservations_details.quote',
                 'reservations_details.guest',
+                DB::RAW('DATE_FORMAT(reservations_details.arrival_date, "%d/%m/%Y %h:%i:%s") AS start'),
+                DB::RAW('DATE_FORMAT(reservations_details.departure_date, "%d/%m/%Y %h:%i:%s") AS end'),
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.price,2)) AS precio'),
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.sub,2)) AS sub'),
-                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total,2)) AS total')
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total_reservation,2)) AS total'),
+                'reservations.total_reservation AS total_sf',
+                'reservations.status_id AS status'
             )
             ->where('reservations_details.reservation_id', $reservation->id)
             ->get();
 
-        return $this->showAll($data);
+        $restaurante = null;
+        $total_restaurant_sf = 0;
+        $total_restaurant = "";
+        $total = $reservation->total;
+        if ($reservation->Status::EN_PROCESO) {
+            $http = new GuzzleHttpClient(
+                [
+                    'verify' => false
+                ]
+            );
+
+            $fecha_inicio = null;
+            $fecha_fin = null;
+            $numero_habitacion = $reservation->no_mesa;
+
+            $fecha_inicio = count($reservation->detail) > 0 ? date('Y-m-d', strtotime($reservation->detail[0]->arrival_date)) : date('Y-m-d');
+            $fecha_fin = count($reservation->detail) > 0 ? date('Y-m-d', strtotime($reservation->detail[0]->departure_date)) : date('Y-m-d');
+
+            $cadena = base64_encode("{$fecha_inicio},{$fecha_fin},{$numero_habitacion}");
+            $base = config('services.restaurant.base_url');
+            $response = $http->get("{$base}{$cadena}");
+
+            $restaurante = json_decode($response->getBody());
+            $restaurante = mb_strtolower($restaurante->status) == "success" ? $restaurante->data : [];
+
+            foreach ($restaurante as $key => $value) {
+                $total_restaurant_sf += $value->totalamount;
+            }
+
+            $total_restaurant = "Q " . number_format($total_restaurant_sf, 2, ".", ",");
+            $total += $total_restaurant_sf;
+            $total = "Q " . number_format($total, 2, ".", ",");
+        }
+
+        return response()->json(['data' => $data, 'restaurante' => $restaurante, 'total_restaurant' => $total_restaurant, 'total' => $total, 'total_restaurant_sf' => $total_restaurant_sf], 200);
     }
 
     public function update(Request $request, Reservation $reservation)
@@ -425,19 +491,92 @@ class ReservationController extends ApiController
         //$this->validate($request, $this->rules($reservation->id), $this->messages());
 
         try {
-            $reservation->nit = $request->nit;
-            $reservation->name = $request->name;
-            $reservation->ubication = $request->ubication;
-            $reservation->responsable = $request->responsable;
+            $user = Auth::user()->id;
+            DB::beginTransaction();
+
+            if (Status::EN_PROCESO == $request->status_id) {
+                if (isset($request->document) && !is_null($request->document)) {
+                    $img = $this->getB64Image($request->document);
+                    $image = Image::make($img);
+                    $image->encode('jpg', 70);
+                    $path = "{$reservation->code}.jpg";
+                    Storage::disk('document')->put($path, $image);
+
+                    $reservation->document = $path;
+                    $reservation->status_id = Status::EN_PROCESO;
+
+                    $details = ReservationDetail::where('reservation_id', $reservation->id)->get();
+                    foreach ($details as $value) {
+                        $value->status_id = $reservation->status_id;
+                        $value->save();
+
+                        BinnacleReservation::where('reservation_detail_id', $value->id)
+                            ->update(
+                                [
+                                    'active' => false
+                                ]
+                            );
+
+                        BinnacleReservation::create(
+                            [
+                                'start' => $value->arrival_date,
+                                'end' => $value->departure_date,
+                                'days' => 60,
+                                'reservation_detail_id' => $value->id,
+                                'movement_id' => Movement::CHECK_IN,
+                                'user_id' => $user,
+                                'type_service_id' => $value->type_service_id
+                            ]
+                        );
+                    }
+                }
+            } elseif (Status::DESOCUPADO == $request->status_id) {
+                $reservation->nit = $request->nit;
+                $reservation->name = $request->name;
+                $reservation->ubication = $request->ubication;
+                $reservation->payment = true;
+                $reservation->status_id = Status::DESOCUPADO;
+                $reservation->way_to_pay = $request->way_to_pay['id'];
+                $reservation->total_restaurant = $request->total_restaurant_sf;
+                $reservation->total = $reservation->total_reservation + $reservation->total_restaurant;
+
+                $details = ReservationDetail::where('reservation_id', $reservation->id)->get();
+                foreach ($details as $value) {
+                    $value->status_id = $reservation->status_id;
+                    $value->save();
+
+                    BinnacleReservation::where('reservation_detail_id', $value->id)
+                        ->update(
+                            [
+                                'active' => false
+                            ]
+                        );
+
+                    BinnacleReservation::create(
+                        [
+                            'start' => $value->arrival_date,
+                            'end' => $value->departure_date,
+                            'days' => 60,
+                            'reservation_detail_id' => $value->id,
+                            'movement_id' => Movement::CHECK_OUT,
+                            'user_id' => $user,
+                            'type_service_id' => $value->type_service_id
+                        ]
+                    );
+                }
+            }
 
             if (!$reservation->isDirty())
                 return $this->errorResponse('No hay datos para actualizar', 423);
 
             $reservation->save();
 
+            DB::commit();
+
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error en el controlador', 423);
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage(), 423);
         }
     }
 

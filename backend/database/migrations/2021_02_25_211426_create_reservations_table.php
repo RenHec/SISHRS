@@ -26,11 +26,19 @@ class CreateReservationsTable extends Migration
             $table->decimal('total', 11, 2);
             $table->decimal('total_reservation', 11, 2)->default(0);
             $table->decimal('total_product', 11, 2)->default(0);
-            
+            $table->decimal('total_restaurant', 11, 2)->default(0);
+
+            $table->integer('no_mesa')->default(0);
+
+            $table->string('document', 100)->nullable(); //Guardaremos la imagen en el local storage
+
             $table->foreignId('client_id')->constrained('clients');
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('coin_id')->constrained('coins');
             $table->foreignId('status_id')->constrained('status');
+
+            $table->boolean('payment')->default(0);
+            $table->string('way_to_pay', 25)->nullable();
 
             $table->timestamps();
         });

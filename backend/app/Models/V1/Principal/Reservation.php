@@ -7,6 +7,7 @@ use App\Models\V1\Catalogo\Status;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Seguridad\Usuario;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use App\Models\V1\Principal\ReservationDetail;
 use App\Models\V1\Principal\ReservationService;
 use App\Models\V1\Principal\BinnacleReservation;
@@ -39,7 +40,14 @@ class Reservation extends Model
         'event',
         'responsable',
         'reserva',
-        
+
+        'no_mesa',
+
+        'document',
+        'payment',
+        'total_restaurant',
+        'way_to_pay',
+
         'client_id',
         'user_id',
         'status_id',
@@ -55,7 +63,8 @@ class Reservation extends Model
         'created_at' => 'datetime:Y-m-d h:i:s a',
         'updated_at' => 'datetime:Y-m-d h:i:s a',
         'event' => 'boolean',
-        'reserva' => 'boolean'
+        'reserva' => 'boolean',
+        'payment' => 'boolean'
     ];
 
     /**
@@ -70,7 +79,7 @@ class Reservation extends Model
      *
      * @var array
      */
-    protected $appends = ['monto'];
+    protected $appends = ['monto', 'picture'];
 
     /**
      * Get the clients full name.
@@ -81,6 +90,23 @@ class Reservation extends Model
     {
         $moneda = Coin::find($this->coin_id)->symbol;
         return "{$moneda} " . number_format($this->total, 2, '.', ',');
+    }
+
+    /**
+     * Get the pictures documents link base64 photo.
+     *
+     * @return string
+     */
+    public function getPictureAttribute()
+    {
+        $imagen = Storage::disk('document')->exists($this->photo); //Preguntamos si la imagen existe creada local
+
+        if (!$imagen) { //Si la imagen no existe
+            return null;
+        }
+
+        $imagen = Storage::disk('document')->get($this->photo); //Seleccionar la imagen
+        return "data:application/jpg;base64," . base64_encode($imagen);
     }
 
     /**

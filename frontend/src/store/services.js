@@ -96,14 +96,14 @@ instance.interceptors.response.use(response => {
 });
 
 export default {
-//Seguridad
+  //Seguridad
   loginService: new loginService(Axios, baseUrl),
   menuService: new menuService(Axios, baseUrl),
   rolMenuService: new rolMenuService(Axios, baseUrl),
   rolService: new rolService(Axios, baseUrl),
   userRolService: new userRolService(Axios, baseUrl),
   userService: new userService(Axios, baseUrl),
-//Catalogo
+  //Catalogo
   departamentService: new departamentService(Axios, baseUrl),
   municipalityService: new municipalityService(Axios, baseUrl),
   coinService: new coinService(Axios, baseUrl),
@@ -114,7 +114,7 @@ export default {
   typeChargeService: new typeChargeService(Axios, baseUrl),
   typeMessageService: new typeMessageService(Axios, baseUrl),
   typeServiceService: new typeServiceService(Axios, baseUrl),
-//Principal
+  //Principal
   binnacleReservationService: new binnacleReservationService(Axios, baseUrl),
   clientService: new clientService(Axios, baseUrl),
   clientPhoneService: new clientPhoneService(Axios, baseUrl),

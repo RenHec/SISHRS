@@ -208,6 +208,12 @@ class DatabaseSeeder extends Seeder
         $insert = new Movement();
         $insert->name = 'Cancelada';
         $insert->save();
+        $insert = new Movement();
+        $insert->name = 'CheckIn';
+        $insert->save();
+        $insert = new Movement();
+        $insert->name = 'CheckOut';
+        $insert->save();
 
         $insert = new Client();
         $insert->nit = '765894';
@@ -217,10 +223,10 @@ class DatabaseSeeder extends Seeder
         $insert->departament_id = 1;
         $insert->municipality_id = 1;
         $insert->save();
-        
+
         Usuario::factory(1)->create();
-        UsuarioRol::factory(1)->create();    
-        
+        UsuarioRol::factory(1)->create();
+
         Artisan::call('passport:install');
 
         DB::table('oauth_clients')
