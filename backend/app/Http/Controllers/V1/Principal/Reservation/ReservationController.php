@@ -474,7 +474,9 @@ class ReservationController extends ApiController
                 $response = $http->get("{$base}{$cadena}");
 
                 $response = json_decode($response->getBody());
-                mb_strtolower($response->status) == "success" ? array_push($restaurante, $response->data) : null;
+                if (mb_strtolower($response->status) == "success") {
+                    count($response->data) > 0 ? array_push($restaurante, $response->data) : null;
+                }
             }
 
             foreach ($restaurante as $value) {
