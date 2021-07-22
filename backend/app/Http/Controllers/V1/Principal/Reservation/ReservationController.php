@@ -480,7 +480,9 @@ class ReservationController extends ApiController
             }
 
             foreach ($restaurante as $value) {
-                $total_restaurant_sf += $value["totalamount"];
+                foreach ($value as $value2) {
+                    $total_restaurant_sf += $value2["totalamount"];
+                }
             }
 
             $total_restaurant = "Q " . number_format($total_restaurant_sf, 2, ".", ",");
