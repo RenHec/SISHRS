@@ -481,7 +481,7 @@ class ReservationController extends ApiController
 
             foreach ($restaurante as $value) {
                 foreach ($value as $value2) {
-                    $total_restaurant_sf += $value2["totalamount"];
+                    $total_restaurant_sf += $value2->totalamount;
                 }
             }
 
