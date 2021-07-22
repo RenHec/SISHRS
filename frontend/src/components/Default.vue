@@ -315,36 +315,40 @@
                   </div>
                 </v-timeline-item>
               </v-timeline>
-              <hr v-if="checkOut.restaurant.length > 0" />
-              <div
-                class="font-weight-bold ml-8 mb-2"
-                v-if="checkOut.restaurant.length > 0"
-              >
-                Detalle de consumo en restaurante
-              </div>
+              <template v-if="checkOut.restaurant.length > 0">
+                <hr />
+                <div class="font-weight-bold ml-8 mb-2">
+                  Detalle de consumo en restaurante
+                </div>
 
-              <v-timeline align-top dense v-if="checkOut.restaurant.length > 0">
-                <v-timeline-item
-                  v-for="(item, index) in checkOut.restaurant"
-                  :key="index"
-                  small
-                  color="green"
+                <v-timeline
+                  align-top
+                  dense
+                  v-for="(grupo, index) in checkOut.restaurant"
+                  v-bind:key="index"
                 >
-                  <v-row class="pt-1">
-                    <v-col cols="3">
-                      <strong>No. Orden - {{ item.order_id }}</strong>
-                    </v-col>
-                    <v-col>
-                      <strong>
-                        {{ item.order_date }} {{ item.order_time }}
-                      </strong>
-                      <div class="text-caption">
-                        Total Q {{ item.totalamount }}
-                      </div>
-                    </v-col>
-                  </v-row>
-                </v-timeline-item>
-              </v-timeline>
+                  <v-timeline-item
+                    v-for="(item, index_item) in grupo"
+                    :key="index_item"
+                    small
+                    color="green"
+                  >
+                    <v-row class="pt-1">
+                      <v-col cols="3">
+                        <strong>No. Orden - {{ item.order_id }}</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>
+                          {{ item.order_date }} {{ item.order_time }}
+                        </strong>
+                        <div class="text-caption">
+                          Total Q {{ item.totalamount }}
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-timeline-item>
+                </v-timeline>
+              </template>
               <hr />
               <v-row>
                 <v-col
