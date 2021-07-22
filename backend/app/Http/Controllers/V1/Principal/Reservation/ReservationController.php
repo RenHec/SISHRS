@@ -467,7 +467,7 @@ class ReservationController extends ApiController
             foreach ($reservation->detail as $value) {
                 $fecha_inicio = date('Y-m-d', strtotime($value->arrival_date));
                 $fecha_fin = date('Y-m-d', strtotime($value->departure_date));
-                array_push($numero_habitacion, $value->room->number);
+                array_push($number_room, $value->room->number);
 
                 $cadena = base64_encode("{$fecha_inicio},{$fecha_fin},{$value->room->number}");
                 $base = config('services.restaurant.base_url');
