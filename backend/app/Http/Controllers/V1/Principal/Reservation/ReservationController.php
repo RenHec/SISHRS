@@ -449,11 +449,11 @@ class ReservationController extends ApiController
             ->where('reservations_details.reservation_id', $reservation->id)
             ->get();
 
-        $restaurante = null;
+        $restaurante = [];
         $total_restaurant_sf = 0;
         $total_restaurant = "";
         $total = $reservation->total;
-        $number_room = count($reservation->detail) > 0 ? $reservation->detail[0]->room->number : 0;
+        $number_room = [];
         if ($reservation->Status::EN_PROCESO) {
             $http = new GuzzleHttpClient(
                 [
@@ -463,19 +463,21 @@ class ReservationController extends ApiController
 
             $fecha_inicio = null;
             $fecha_fin = null;
-            $numero_habitacion = $reservation->no_mesa;
 
-            $fecha_inicio = count($reservation->detail) > 0 ? date('Y-m-d', strtotime($reservation->detail[0]->arrival_date)) : date('Y-m-d');
-            $fecha_fin = count($reservation->detail) > 0 ? date('Y-m-d', strtotime($reservation->detail[0]->departure_date)) : date('Y-m-d');
+            foreach ($reservation->detail as $value) {
+                $fecha_inicio = date('Y-m-d', strtotime($value->arrival_date));
+                $fecha_fin = date('Y-m-d', strtotime($value->departure_date));
+                array_push($numero_habitacion, $value->room->number);
 
-            $cadena = base64_encode("{$fecha_inicio},{$fecha_fin},{$numero_habitacion}");
-            $base = config('services.restaurant.base_url');
-            $response = $http->get("{$base}{$cadena}");
+                $cadena = base64_encode("{$fecha_inicio},{$fecha_fin},{$value->room->number}");
+                $base = config('services.restaurant.base_url');
+                $response = $http->get("{$base}{$cadena}");
 
-            $restaurante = json_decode($response->getBody());
-            $restaurante = mb_strtolower($restaurante->status) == "success" ? $restaurante->data : [];
+                $response = json_decode($response->getBody());
+                mb_strtolower($response->status) == "success" ? array_push($restaurante, $response->data) : null;
+            }
 
-            foreach ($restaurante as $key => $value) {
+            foreach ($restaurante as $value) {
                 $total_restaurant_sf += $value->totalamount;
             }
 

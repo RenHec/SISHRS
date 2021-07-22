@@ -174,9 +174,12 @@
                   NIT: {{ checkIn.information.nit }}
                 </v-list-item-subtitle>
               </v-list-item>
-              <v-list-item>
+              <v-list-item
+                v-for="(item, index) in checkIn.number_room"
+                :key="index"
+              >
                 <v-list-item-subtitle>
-                  Número de habitación: {{ checkOut.number_room }}
+                  Número de habitación: {{ item }}
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
@@ -272,8 +275,13 @@
                 <v-col class="text-h7 text-left" cols="12">
                   Dirección: {{ checkOut.information.ubication }}
                 </v-col>
-                <v-col class="text-h7 text-left" cols="12">
-                  Número de habitación: {{ checkOut.number_room }}
+                <v-col
+                  class="text-h7 text-left"
+                  cols="12"
+                  v-for="(item, index) in checkOut.number_room"
+                  v-bind:key="index"
+                >
+                  Número de habitación: {{ item }}
                 </v-col>
                 <v-col class="text-h7 text-left" cols="6">
                   Inicio: {{ checkOut.information.start }}
@@ -506,7 +514,7 @@ export default {
         status_id: 2,
         document: null,
         information: null,
-        number_room: 0,
+        number_room: [],
       },
       checkOut: {
         id: null,
@@ -520,7 +528,7 @@ export default {
         total_restaurant: '',
         total: '',
         total_restaurant_sf: 0,
-        number_room: 0,
+        number_room: [],
       },
       temp: null,
       accept: ['image/png', 'image/jpeg', 'image/jpg'],
