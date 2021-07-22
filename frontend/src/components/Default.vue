@@ -284,7 +284,7 @@
               </v-row>
               <hr />
               <div class="font-weight-bold ml-8 mb-2">
-                Detalle de la reservación número {{ checkOut.number_room }}
+                Detalle de la reservación
               </div>
 
               <v-timeline align-top dense>
