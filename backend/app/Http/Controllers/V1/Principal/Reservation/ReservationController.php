@@ -98,7 +98,7 @@ class ReservationController extends ApiController
                     'reservations_details.departure_date AS departure_date',
                     DB::RAW('TIME(reservations_details.arrival_date) AS tiempo')
                 )
-                ->whereIn('reservations.status_id', [Status::PENDIENTE])
+                ->whereIn('reservations.status_id', [Status::PENDIENTE, Status::EN_PROCESO])
                 ->where('reservations.reserva', true)
                 ->distinct('reservations.id')
                 ->get();
