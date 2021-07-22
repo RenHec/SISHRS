@@ -101,7 +101,7 @@
               </v-list-item>
               <hr />
               <div class="font-weight-bold ml-8 mb-2" style="color: black;">
-                Detalle de la reservación número {{ selectedEvent.number_room }}
+                Detalle de la reservación
               </div>
 
               <v-timeline align-top dense>
@@ -176,6 +176,11 @@
               </v-list-item>
               <v-list-item>
                 <v-list-item-subtitle>
+                  Número de habitación: {{ checkOut.number_room }}
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-subtitle>
                   Inicio: {{ checkIn.information.start }}
                 </v-list-item-subtitle>
               </v-list-item>
@@ -192,7 +197,7 @@
 
               <hr />
               <div class="font-weight-bold ml-8 mb-2">
-                Detalle de la reservación número {{ checkIn.number_room }}
+                Detalle de la reservación
               </div>
 
               <v-timeline align-top dense>
@@ -266,6 +271,9 @@
                 </v-col>
                 <v-col class="text-h7 text-left" cols="12">
                   Dirección: {{ checkOut.information.ubication }}
+                </v-col>
+                <v-col class="text-h7 text-left" cols="12">
+                  Número de habitación: {{ checkOut.number_room }}
                 </v-col>
                 <v-col class="text-h7 text-left" cols="6">
                   Inicio: {{ checkOut.information.start }}
