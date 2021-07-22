@@ -101,7 +101,7 @@
               </v-list-item>
               <hr />
               <div class="font-weight-bold ml-8 mb-2" style="color: black;">
-                Detalle de la reservación
+                Detalle de la reservación número {{ selectedEvent.number_room }}
               </div>
 
               <v-timeline align-top dense>
@@ -192,7 +192,7 @@
 
               <hr />
               <div class="font-weight-bold ml-8 mb-2">
-                Detalle de la reservación
+                Detalle de la reservación número {{ checkIn.number_room }}
               </div>
 
               <v-timeline align-top dense>
@@ -276,7 +276,7 @@
               </v-row>
               <hr />
               <div class="font-weight-bold ml-8 mb-2">
-                Detalle de la reservación
+                Detalle de la reservación número {{ checkOut.number_room }}
               </div>
 
               <v-timeline align-top dense>
@@ -498,6 +498,7 @@ export default {
         status_id: 2,
         document: null,
         information: null,
+        number_room: 0,
       },
       checkOut: {
         id: null,
@@ -511,6 +512,7 @@ export default {
         total_restaurant: '',
         total: '',
         total_restaurant_sf: 0,
+        number_room: 0,
       },
       temp: null,
       accept: ['image/png', 'image/jpeg', 'image/jpg'],
@@ -598,6 +600,7 @@ export default {
             objeto.total_restaurant = r.data.total_restaurant
             objeto.total_general = r.data.total
             objeto.total_restaurant_sf = r.data.total_restaurant_sf
+            objeto.number_room = r.data.number_room
 
             this.selectedEvent = objeto
             this.selectedOpen = true
@@ -669,6 +672,7 @@ export default {
       this.checkIn.document = null
       this.checkIn.id = item.id
       this.checkIn.information = item
+      this.checkIn.number_room = item.number_room
       this.dialog_checkIn = true
     },
 
@@ -778,6 +782,7 @@ export default {
       this.checkOut.total_restaurant = item.total_restaurant
       this.checkOut.total = item.total_general
       this.checkOut.total_restaurant_sf = item.total_restaurant_sf
+      this.checkOut.number_room = item.number_room
       this.dialog_checkOut = true
     },
 

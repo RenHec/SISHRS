@@ -453,6 +453,7 @@ class ReservationController extends ApiController
         $total_restaurant_sf = 0;
         $total_restaurant = "";
         $total = $reservation->total;
+        $number_room = count($reservation->detail) > 0 ? $reservation->detail[0]->room->number : 0;
         if ($reservation->Status::EN_PROCESO) {
             $http = new GuzzleHttpClient(
                 [
@@ -483,7 +484,7 @@ class ReservationController extends ApiController
             $total = "Q " . number_format($total, 2, ".", ",");
         }
 
-        return response()->json(['data' => $data, 'restaurante' => $restaurante, 'total_restaurant' => $total_restaurant, 'total' => $total, 'total_restaurant_sf' => $total_restaurant_sf], 200);
+        return response()->json(['data' => $data, 'restaurante' => $restaurante, 'total_restaurant' => $total_restaurant, 'total' => $total, 'total_restaurant_sf' => $total_restaurant_sf, 'number_room' => $number_room], 200);
     }
 
     public function update(Request $request, Reservation $reservation)
