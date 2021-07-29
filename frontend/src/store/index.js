@@ -20,7 +20,7 @@ const state = {
 
   /* ::::::::::::::::::::: DESARROLLO ::::::::::::::::::::::::: */
   base_url: 'http://64.225.43.65/',
-  //base_url: 'http://localhost:8001/SISHRS/backend/public/',
+  base_url: 'http://localhost:8001/SISHRS/backend/public/',
   client_id: 2,
   client_secret: 'fb8QYHjGOBKEL4S8CMDNkXW44lSHGmM6lrvoxwO1'
 }

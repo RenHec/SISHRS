@@ -14,6 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'link_contract' => env('LINK_CONTRACT', 'http://localhost:8080/#/terminos/condiciones/'),
 
     /*
     |--------------------------------------------------------------------------

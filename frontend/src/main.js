@@ -132,3 +132,5 @@ Vue.use(VueQuillEditor, {
 })
 
 import '../static/style.css'
+import '../static/cleave.min.js'
+//import '../static/main-bac.js'

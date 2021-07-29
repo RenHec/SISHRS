@@ -18,7 +18,7 @@ return [
     'paths' => [
         'service/passport/*',
         'service/rest/v1/security/*',
-        'service/rest/v1/catalogo/*', 
+        'service/rest/v1/catalogo/*',
         'service/rest/v1/principal/*'
     ],
 

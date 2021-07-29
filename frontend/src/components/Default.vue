@@ -445,13 +445,13 @@
                 <v-col cols="12" md="6">
                   <v-autocomplete
                     v-model="checkOut.way_to_pay"
-                    :items="way_to_pays"
+                    :items="way_to_pays_r"
                     chips
                     label="Seleccionar el tipo de pago"
                     outlined
                     :clearable="true"
                     :deletable-chips="true"
-                    item-text="id"
+                    item-text="name"
                     item-value="id"
                     return-object
                     v-validate="'required'"
@@ -537,7 +537,8 @@ export default {
       temp: null,
       accept: ['image/png', 'image/jpeg', 'image/jpg'],
       clientes: [],
-      way_to_pays: [{ id: 'Efectivo' }, { id: 'Tarjeta' }, { id: 'Cortesía' }],
+      way_to_pays_r: [],
+      way_to_pays_a: [],
     }
   },
   computed: {
@@ -861,6 +862,8 @@ export default {
     llenar_calendario() {
       const events = []
       this.loading = true
+      this.way_to_pays_r = []
+      this.way_to_pays_a = []
 
       this.$store.state.services.reservationService
         .calendario(0)
@@ -876,6 +879,15 @@ export default {
             this.loading = false
             return
           }
+
+          r.data.way_to_pay.forEach((element) => {
+            if (element.reservation) {
+              this.way_to_pays_r.push(element)
+            }
+            if (element.reservation) {
+              this.way_to_pays_a.push(element)
+            }
+          })
 
           r.data.data.forEach((element) => {
             events.push({

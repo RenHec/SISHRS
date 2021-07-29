@@ -246,7 +246,7 @@ class PictureRoomController extends ApiController
             $arriba = $picture_room->position + 1;
 
             $posicion_baja = PictureRoom::where('room_id', $picture_room->room_id)->where('position', $arriba)->first();
-            if(!is_null($posicion_baja)) {
+            if (!is_null($posicion_baja)) {
                 $posicion_baja->position = $picture_room->position;
                 $posicion_baja->save();
             }
@@ -399,7 +399,7 @@ class PictureRoomController extends ApiController
                     PictureRoom::create(
                         [
                             'photo' => $path,
-                            'position' => $key+1,
+                            'position' => $key + 1,
                             'view' => true,
                             'room_id' => $picture_room->id
                         ]

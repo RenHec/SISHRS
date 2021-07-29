@@ -4,6 +4,7 @@ namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Municipio;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\V1\Catalogo\Departamento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Client extends Model
@@ -49,7 +50,7 @@ class Client extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-    
+
     /**
      * The accessors to append to the model's array form.
      *

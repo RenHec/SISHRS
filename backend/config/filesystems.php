@@ -63,6 +63,20 @@ return [
             'visibility' => 'public',
         ],
 
+        'firm' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/pictures_firms'),
+            'url' => env('APP_URL') . '/storage',
+            'visibility' => 'public',
+        ],
+
+        'advance_price_document' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/advance_price_document'),
+            'url' => env('APP_URL') . '/storage',
+            'visibility' => 'public',
+        ],
+
         'product' => [
             'driver' => 'local',
             'root' => storage_path('app/public/pictures_products'),

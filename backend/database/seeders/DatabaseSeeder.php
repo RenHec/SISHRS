@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\V1\Catalogo\TypeCharge;
 use App\Models\V1\Catalogo\TypeMessage;
 use App\Models\V1\Catalogo\TypeService;
+use App\Models\V1\Catalogo\WayToPay;
 use App\Models\V1\Seguridad\UsuarioRol;
 use Illuminate\Support\Facades\Artisan;
 
@@ -246,6 +247,36 @@ class DatabaseSeeder extends Seeder
         $insert = new KardexStatus();
         $insert->name = 'Baja';
         $insert->color = '#ff5252';
+        $insert->save();
+
+        $insert = new WayToPay();
+        $insert->name = 'Efectivo';
+        $insert->reservation = true;
+        $insert->advance = false;
+        $insert->save();
+
+        $insert = new WayToPay();
+        $insert->name = 'Tarjeta Crédito o Débito';
+        $insert->reservation = true;
+        $insert->advance = false;
+        $insert->save();
+
+        $insert = new WayToPay();
+        $insert->name = 'Cortesía';
+        $insert->reservation = true;
+        $insert->advance = false;
+        $insert->save();
+
+        $insert = new WayToPay();
+        $insert->name = 'Depósito';
+        $insert->reservation = false;
+        $insert->advance = true;
+        $insert->save();
+
+        $insert = new WayToPay();
+        $insert->name = 'Link';
+        $insert->reservation = false;
+        $insert->advance = true;
         $insert->save();
     }
 }

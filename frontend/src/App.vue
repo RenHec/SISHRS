@@ -4,8 +4,15 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-navigation-drawer v-show="isLogin" v-model="drawer" v-if="drawer" app clipped width="300">
-      <v-img :aspect-ratio="16/10" :src="logo"></v-img>
+    <v-navigation-drawer
+      v-show="isLogin"
+      v-model="drawer"
+      v-if="drawer"
+      app
+      clipped
+      width="300"
+    >
+      <v-img :aspect-ratio="16 / 10" :src="logo"></v-img>
       <v-list dense>
         <v-list-item @click="redirect('/')" link>
           <v-list-item-action>
@@ -16,7 +23,12 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-group v-for="item in getMenu" :key="item.text" :prepend-icon="item.icon" no-action>
+        <v-list-group
+          v-for="item in getMenu"
+          :key="item.text"
+          :prepend-icon="item.icon"
+          no-action
+        >
           <template v-slot:activator>
             <v-list-item-content>
               <v-list-item-title v-text="item.text"></v-list-item-title>
@@ -30,7 +42,7 @@
             @click="redirect(subItem.path)"
           >
             <v-list-item-icon>
-              <v-icon>{{subItem.icon}}</v-icon>
+              <v-icon>{{ subItem.icon }}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title v-text="subItem.text"></v-list-item-title>
@@ -40,11 +52,24 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar v-show="isLogin" app :clipped-left="$vuetify.breakpoint.lgAndUp" dense>
+    <v-app-bar
+      v-show="isLogin"
+      app
+      v-if="isLogin"
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      dense
+    >
       <v-app-bar-nav-icon @click="mostar"></v-app-bar-nav-icon>
-      <v-btn small @click="cambiar_password" outlined color="green">{{ userName }}</v-btn>
+      <v-btn small @click="cambiar_password" outlined color="green">
+        {{ userName }}
+      </v-btn>
 
-      <v-dialog v-model="dialog_password" width="35%" persistent color="primary">
+      <v-dialog
+        v-model="dialog_password"
+        width="35%"
+        persistent
+        color="primary"
+      >
         <v-card>
           <v-overlay :value="loading">
             <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -68,7 +93,10 @@
                     data-vv-name="contraseña"
                     v-validate="'required|min:6'"
                   ></v-text-field>
-                  <FormError :attribute_name="'crear_password.contraseña'" :errors_form="errors"></FormError>
+                  <FormError
+                    :attribute_name="'crear_password.contraseña'"
+                    :errors_form="errors"
+                  ></FormError>
                 </v-col>
               </v-row>
             </v-container>
@@ -76,11 +104,15 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" @click="dialog_password = false">Cancelar</v-btn>
+            <v-btn color="blue darken-1" @click="dialog_password = false">
+              Cancelar
+            </v-btn>
             <v-btn
               color="blue darken-1"
               @click="validar_formulario_password('crear_password')"
-            >Guardar</v-btn>
+            >
+              Guardar
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -93,7 +125,16 @@
     </v-app-bar>
 
     <v-main>
-      <v-container class="fill-height" fluid>
+      <v-container
+        class="fill-height"
+        fluid
+        style="
+          background-image: url('https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg');
+          background-size: cover;
+          background-position: top center;
+          align-items: center;
+        "
+      >
         <router-view></router-view>
       </v-container>
     </v-main>
@@ -101,11 +142,11 @@
 </template>
 
 <script>
-import FormError from "./components/shared/FormError";
+import FormError from './components/shared/FormError'
 
 export default {
   components: {
-    FormError
+    FormError,
   },
   data() {
     return {
@@ -115,43 +156,43 @@ export default {
       menu: false,
       form: {
         id: 0,
-        password: null
-      }
-    };
+        password: null,
+      },
+    }
   },
   created() {},
   methods: {
     logout() {
-      let self = this;
-      self.loading = true;
+      let self = this
+      self.loading = true
       self.$store.state.services.loginService
         .logout()
         .then((r) => {
-          self.$store.dispatch("logout");
-          self.$router.push("/login");
-          self.drawer = null;
-          self.$store.state.is_login = false;
-          self.loading = false;
+          self.$store.dispatch('logout')
+          self.$router.push('/login')
+          self.drawer = null
+          self.$store.state.is_login = false
+          self.loading = false
         })
-        .catch((e) => {});
+        .catch((e) => {})
     },
 
     redirect(item) {
-      this.$router.push({ path: item });
+      this.$router.push({ path: item })
     },
 
     mostar() {
-      let self = this;
-      self.drawer = self.drawer ? false : true;
+      let self = this
+      self.drawer = self.drawer ? false : true
     },
 
     cambiar_password() {
       this.loading = true
-      this.form.id = this.$store.state.usuario.id;
+      this.form.id = this.$store.state.usuario.id
       this.dialog_password = true
       this.loading = false
     },
-    
+
     validar_formulario_password(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result) {
@@ -203,25 +244,25 @@ export default {
             }
           });*/
         }
-      });
+      })
     },
   },
   computed: {
     isLogin() {
-      let self = this;
+      let self = this
 
       if (self.$store.state.is_login) {
-        this.drawer = true;
-        this.$vuetify.theme.dark = true;
+        this.drawer = true
+        this.$vuetify.theme.dark = true
       } else {
-        this.$vuetify.theme.dark = false;
+        this.$vuetify.theme.dark = false
       }
 
-      return self.$store.state.is_login;
+      return self.$store.state.is_login
     },
 
     userName() {
-      let self = this;
+      let self = this
       /*var user = self.$store.state.usuario;
       if (!_.isEmpty(user)) {
         return (
@@ -230,26 +271,26 @@ export default {
           self.$store.state.usuario.people.surnames
         );
       }*/
-      return "";
+      return ''
     },
 
     getMenu() {
-      let self = this;
-      return self.$store.state.menu;
+      let self = this
+      return self.$store.state.menu
     },
 
     getImage() {
-      let self = this;
-      return "";
+      let self = this
+      return ''
     },
 
     logo() {
-      return "";
+      return ''
     },
 
     logo_peque() {
-      return "";
+      return ''
     },
   },
-};
+}
 </script>

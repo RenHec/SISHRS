@@ -5,6 +5,7 @@ import multiguard from 'vue-router-multiguard' //Middelware
 import goTo from 'vuetify/es5/services/goto'
 
 import Default from '@/components/Default'
+import DefaultExterno from '@/components/DefaultExterno'
 import Login from '@/components/login/Index'
 
 //Seguridad
@@ -62,6 +63,9 @@ const routes = [{
   component: Login,
   beforeEnter: multiguard([isLoggedOut])
 },
+
+{ path: '/terminos/condiciones/:token', name: 'DefaultExterno', component: DefaultExterno },
+//{ path: '/terminos/condiciones/:token', name: 'DefaultExterno', component: DefaultExterno, beforeEnter: multiguard([isLoggedOut]) },
 //Seguridad
 {
   path: '/rol',

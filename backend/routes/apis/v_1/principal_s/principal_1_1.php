@@ -66,7 +66,7 @@ Route::resource('sale', 'Kardex\SaleController')->only('index');
 Route::resource('kardex', 'Kardex\KardexController')->only('index');
 
 //rutas para KardexController
-Route::resource('change_price', 'ChangePriceController\ChangePriceController')->only('index');
+//Route::resource('change_price', 'ChangePriceController\ChangePriceController')->only('index');
 
 //rutas para ProductController
 Route::resource('product', 'Product\ProductController')->except('create', 'show', 'edit');
@@ -79,3 +79,10 @@ Route::name('picture_product.down')->get('picture_product/down/{picture_product}
 
 //rutas para ReservationProductController
 Route::resource('reservation_product', 'Reservation\ReservationProductController')->only('show', 'update', 'destroy');
+
+//rutas para ContractController
+Route::get('contract/{link}', 'Reservation\ContractController@validarLink')->name('contract.validarLink');
+Route::put('anticipo/contract/{contract}/reservation/{reservation}', 'Reservation\ContractController@firmaContrato')->name('contract.firmaContrato');
+Route::put('metodo/pago/{contract}/reservation/{reservation}', 'Reservation\ContractController@metodoPago')->name('contract.metodoPago');
+Route::get('metodo/pago/{link}', 'Reservation\ContractController@verficiarLinkBoleta')->name('metodo_pago.verficiarLinkBoleta');
+Route::put('metodo/pago/adjuntar/boleta/{contract}/advance/{advance}', 'Reservation\ContractController@adjuntarBoleta')->name('metodo_pago.adjuntarBoleta');

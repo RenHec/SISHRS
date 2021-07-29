@@ -90,6 +90,24 @@ class ReservationDetail extends Model
     }
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['sub_formato'];
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getSubFormatoAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format($this->sub, 2, '.', ',');
+    }
+
+    /**
      * Get the room associated with the reservations_details.
      *
      * @return object

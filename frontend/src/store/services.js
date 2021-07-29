@@ -43,7 +43,7 @@ import reservationServiceService from '../services/principal/reservation/Reserva
 
 // Para desarrollo
 let baseUrl = 'http://64.225.43.65/'
-//let baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
+baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
 let token_data = $cookies.get('token_data')
 
 // Axios Configuration

@@ -4,6 +4,7 @@ namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\Status;
+use App\Models\V1\Catalogo\WayToPay;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Seguridad\Usuario;
 use Illuminate\Database\Eloquent\Model;
@@ -41,12 +42,12 @@ class Reservation extends Model
         'responsable',
         'reserva',
 
-        'no_mesa',
+        'advance_price',
 
         'document',
         'payment',
         'total_restaurant',
-        'way_to_pay',
+        'way_to_pay_id',
 
         'client_id',
         'user_id',
@@ -79,7 +80,7 @@ class Reservation extends Model
      *
      * @var array
      */
-    protected $appends = ['monto', 'picture'];
+    protected $appends = ['monto', 'picture', 'monto_reservacion', 'monto_anticipo'];
 
     /**
      * Get the clients full name.
@@ -90,6 +91,28 @@ class Reservation extends Model
     {
         $moneda = Coin::find($this->coin_id)->symbol;
         return "{$moneda} " . number_format($this->total, 2, '.', ',');
+    }
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getMontoReservacionAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format($this->total_reservation, 2, '.', ',');
+    }
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getMontoAnticipoAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format(($this->total_reservation * 50) / 100, 2, '.', ',');
     }
 
     /**
@@ -147,6 +170,36 @@ class Reservation extends Model
     public function coin()
     {
         return $this->belongsTo(Coin::class, 'coin_id', 'id');
+    }
+
+    /**
+     * Get the contract associated with the reservations.
+     *
+     * @return object
+     */
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'id', 'reservation_id');
+    }
+
+    /**
+     * Get the way_to_pay associated with the reservations.
+     *
+     * @return object
+     */
+    public function way_to_pay()
+    {
+        return $this->belongsTo(WayToPay::class, 'way_to_pay_id', 'id');
+    }
+
+    /**
+     * Get the advance associated with the reservations.
+     *
+     * @return object
+     */
+    public function advance()
+    {
+        return $this->belongsTo(AdvancePrice::class, 'reservation_id', 'id');
     }
 
     /**

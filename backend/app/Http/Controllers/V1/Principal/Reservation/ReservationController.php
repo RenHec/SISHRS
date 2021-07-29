@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1\Principal\Reservation;
 
 
+use App\Mail\contactEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\V1\Principal\Room;
@@ -10,17 +11,20 @@ use App\Models\V1\Catalogo\Status;
 use Illuminate\Support\Facades\DB;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\Movement;
+use App\Models\V1\Catalogo\WayToPay;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\V1\Catalogo\Municipio;
+use App\Models\V1\Principal\Contract;
 use Intervention\Image\Facades\Image;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Storage;
 use App\Models\V1\Principal\PictureRoom;
 use App\Models\V1\Principal\Reservation;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use App\Models\V1\Principal\ReservationOfert;
 use App\Models\V1\Principal\ReservationDetail;
 use App\Models\V1\Principal\BinnacleReservation;
-use GuzzleHttp\Client as GuzzleHttpClient;
 
 class ReservationController extends ApiController
 {
@@ -121,8 +125,9 @@ class ReservationController extends ApiController
                 ->get();
         }
 
+        $way_to_pay = WayToPay::all();
 
-        return $this->showAll($data);
+        return response()->json(['data' => $data, 'way_to_pay' => $way_to_pay], 200);
     }
 
     public function buscar_habitaciones(Request $request)
@@ -302,17 +307,20 @@ class ReservationController extends ApiController
 
             $municipio = Municipio::find($request->municipality_id['id']);
 
-            $cliente = Client::firstOrCreate(
-                ['nit' => $request->nit],
-                [
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'business' => $request->business,
-                    'ubication' => $request->ubication,
-                    'departament_id' => $municipio->departament_id,
-                    'municipality_id' => $municipio->id
-                ]
-            );
+            $cliente = Client::where('nit', $request->nit)->first();
+
+            if (is_null($cliente)) {
+                $cliente = new Client();
+            }
+
+            $cliente->nit = $request->nit;
+            $cliente->name = $request->name;
+            $cliente->email = $request->email;
+            $cliente->business = $request->business;
+            $cliente->ubication = $request->ubication;
+            $cliente->departament_id = $municipio->departament_id;
+            $cliente->municipality_id = $municipio->id;
+            $cliente->save();
 
             $data = $request->all();
             $data['code'] = $this->generadorCodigo($generar);
@@ -329,6 +337,7 @@ class ReservationController extends ApiController
             $data['user_id'] = $user;
             $data['status_id'] = Status::PENDIENTE;
             $data['coin_id'] = $request->coin_id;
+            $data['way_to_pay_id'] =  1;
 
             $reservation = Reservation::create($data);
             $multiplicar = !is_null($request->cantidad) ? $request->cantidad : 1;
@@ -354,7 +363,6 @@ class ReservationController extends ApiController
                 }
 
                 $room = Room::find($value['room_id']);
-                $reservation->no_mesa = $room->number;
                 $minute = "+{$value['minutos']} minute";
                 $detail = ReservationDetail::create(
                     [
@@ -413,7 +421,20 @@ class ReservationController extends ApiController
 
             $reservation->save();
 
+            $parse = str_replace('/', '@', bcrypt("{$reservation->code}-{$reservation->name}-{$start}-{$end}"));
+
+            Contract::create(
+                [
+                    'firm' => 'null',
+                    'answer' => Contract::PENDIENTE,
+                    'reservation_id' => $reservation->id,
+                    'url' => $parse
+                ]
+            );
+
             DB::commit();
+
+            Mail::to($reservation->client->email)->locale('es')->send(new contactEmail($reservation, $reservation->client->email));
 
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
@@ -443,7 +464,9 @@ class ReservationController extends ApiController
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.price,2)) AS precio'),
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations_details.sub,2)) AS sub'),
                 DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.total_reservation,2)) AS total'),
+                DB::RAW('CONCAT(coins.symbol," ",FORMAT(reservations.advance_price,2)) AS anticipo'),
                 'reservations.total_reservation AS total_sf',
+                'reservations.advance_price AS anticipo_sf',
                 'reservations.status_id AS status'
             )
             ->where('reservations_details.reservation_id', $reservation->id)
@@ -543,7 +566,7 @@ class ReservationController extends ApiController
                 $reservation->ubication = $request->ubication;
                 $reservation->payment = true;
                 $reservation->status_id = Status::DESOCUPADO;
-                $reservation->way_to_pay = $request->way_to_pay['id'];
+                $reservation->way_to_pay_id = $request->way_to_pay['id'];
                 $reservation->total_restaurant = $request->total_restaurant_sf;
                 $reservation->total = $reservation->total_reservation + $reservation->total_restaurant;
 

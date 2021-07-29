@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::name('bac_payment.paymentData')->get('bac_payment/{paymentData}', 'V1\Principal\Reservation\BacPaymentController@getPaymentScreen');
+Route::name('bac_payment.completeData')->get('bac_payment/{paymentData}/completado', 'V1\Principal\Reservation\BacPaymentController@getPaymentScreen');
+Route::name('bac_payment.post')->post('bac_payment', 'V1\Principal\Reservation\BacPaymentController@amexPay');
