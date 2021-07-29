@@ -453,7 +453,7 @@
                                 "
                               >
                                 <img
-                                  src="{{ asset('img/logo_sf.svg') }}"
+                                  src="{{ asset('img/logo_sf.png') }}"
                                   width="750"
                                   height="366"
                                   editable="true"
@@ -720,7 +720,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/cama_peque.svg') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/cama_peque.png') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:20px; line-height:18px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_32">
                                                                                                     <strong>Tipo de Cama</strong>
@@ -741,7 +741,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/habitacion.svg') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/habitacion.png') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:20px; line-height:18px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_31">
                                                                                                     <strong>Tipo de Habitación</strong>
@@ -775,7 +775,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/cama_adulto.svg') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/cama_adulto.png') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:26px; line-height:22px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_32">
                                                                                                     <strong>Camas</strong>
@@ -796,7 +796,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/personas.svg') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/personas.png') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:26px; line-height:22px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_31">
                                                                                                     <strong>Personas</strong>
@@ -830,7 +830,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/adulto.svg') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/adulto.png') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:20px; line-height:22px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_32">
                                                                                                     <strong>Cantidad de Adultos</strong>
@@ -851,7 +851,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/ninos.svg') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/ninos.png') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:20px; line-height:22px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_31">
                                                                                                     <strong>Cantidad de Niños</strong>
@@ -885,7 +885,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/mascota.svg') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="75" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/mascota.png') }}" width="54" height="48" mc:edit="image_20" style="max-width:54px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:20px; line-height:18px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_32">
                                                                                                     <strong>Mascotas</strong>
@@ -906,7 +906,7 @@
                                                                                 <td class="box" style="padding:45px 30px; border:1px solid #5a5a5a;">
                                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                                         <tr>
-                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/cantidad_mascota.svg') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
+                                                                                            <td class="img" width="90" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="{{ asset('img/cantidad_mascota.png') }}" width="70" height="48" mc:edit="image_19" style="max-width:70px;" border="0" alt="" /></td>
                                                                                             <td class="h5-4 left" style="color:#020202; font-family:'Playfair Display', Georgia, serif; font-size:20px; line-height:18px; text-transform:uppercase; text-align:left;">
                                                                                                 <div mc:edit="text_31">
                                                                                                     <strong>Cantidad de Mascotas</strong>

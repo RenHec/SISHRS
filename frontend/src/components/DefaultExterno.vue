@@ -403,11 +403,8 @@ export default {
 
   computed: {
     logo() {
-      return `${this.$store.state.base_url}img/logo.svg`
-    },
-    credit() {
-      return `${this.$store.state.base_url}img/credit-card-logos.png`
-    },
+      return `${this.$store.state.base_url}img/logo.png`
+    }
   },
 
   created() {

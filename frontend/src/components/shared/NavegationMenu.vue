@@ -1,7 +1,15 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app :clipped="$vuetify.breakpoint.lgAndUp" width="300">
-      <v-img :aspect-ratio="16/9" src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg">
+    <v-navigation-drawer
+      v-model="drawer"
+      app
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      width="300"
+    >
+      <v-img
+        :aspect-ratio="16 / 9"
+        src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg"
+      >
         <v-row align="end" class="lightbox white--text pa-2 fill-height">
           <v-col>
             <v-list-item-avatar>
@@ -15,14 +23,19 @@
         </v-row>
       </v-img>
       <v-list dense>
-        <v-list-group v-for="item in getMenu" :key="item.text" prepend-icon="mdi-youtube" no-action>
+        <v-list-group
+          v-for="item in getMenu"
+          :key="item.text"
+          prepend-icon="mdi-youtube"
+          no-action
+        >
           <template v-slot:activator>
             <v-list-item-content>
               <v-list-item-title v-text="item.text"></v-list-item-title>
             </v-list-item-content>
           </template>
 
-          <v-list-item v-for="subItem in item.childrens" :key="subItem.text" @click>
+          <v-list-item v-for="subItem in item.childrens" :key="subItem.text">
             <v-list-item-content>
               <v-list-item-title v-text="subItem.text"></v-list-item-title>
             </v-list-item-content>
@@ -35,7 +48,10 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title class="mr-12 align-center">
         <v-avatar size="32px">
-          <v-img src="https://cdn.vuetifyjs.com/images/logos/logo.svg" alt="Vuetify"></v-img>
+          <v-img
+            src="https://cdn.vuetifyjs.com/images/logos/logo.png"
+            alt="Vuetify"
+          ></v-img>
         </v-avatar>
         <span class="title">Sistema MRM</span>
       </v-toolbar-title>
@@ -118,48 +134,48 @@
 
 <script>
 export default {
-  name: "NavegationMenu",
+  name: 'NavegationMenu',
   data: () => ({
     drawer: null,
   }),
 
   methods: {
     redirect(path) {
-      if (path === undefined) return;
-      this.$router.push(path);
+      if (path === undefined) return
+      this.$router.push(path)
     },
   },
 
   mounted() {
-    let self = this;
-    $("body").resize();
+    let self = this
+    $('body').resize()
   },
 
   computed: {
     userName() {
-      let self = this;
-      var user = self.$store.state.usuario;
+      let self = this
+      var user = self.$store.state.usuario
       if (!_.isEmpty(user)) {
         return (
           self.$store.state.usuario.people.name_one +
-          " " +
+          ' ' +
           self.$store.state.usuario.people.last_name_one
-        );
+        )
       }
-      return "";
+      return ''
     },
 
     getMenu() {
-      let self = this;
-      return self.$store.state.menu;
+      let self = this
+      return self.$store.state.menu
     },
 
     getImage() {
-      let self = this;
-      return self.$store.state.base_url + "img/user_empty.jpg";
+      let self = this
+      return self.$store.state.base_url + 'img/user_empty.jpg'
     },
   },
-};
+}
 </script>
 <style scoped>
 .brand-image {

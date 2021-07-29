@@ -5,6 +5,9 @@
     </v-overlay>
     <v-col cols="12" md="1"></v-col>
     <v-col cols="12" md="10">
+      <v-btn color="primary" @click="llenar_calendario()">
+        Actualizar Calendario
+      </v-btn>
       <v-sheet height="64">
         <v-toolbar flat>
           <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">

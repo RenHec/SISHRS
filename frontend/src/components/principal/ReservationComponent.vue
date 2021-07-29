@@ -163,8 +163,9 @@
                   color="warning darken-1"
                   x-large
                   @click="buscar_habitacion('create')"
-                  >Buscar</v-btn
                 >
+                  Buscar
+                </v-btn>
               </v-col>
               <v-col cols="12" :md="!bloquear ? '2' : '3'"></v-col>
             </v-row>
@@ -201,7 +202,7 @@
                     <v-chip-group column>
                       <v-chip>{{ item.type_room }}</v-chip>
 
-                      <v-chip>{{ "Personas: " + item.amount_people }}</v-chip>
+                      <v-chip>{{ 'Personas: ' + item.amount_people }}</v-chip>
 
                       <v-chip>{{ item.type_bed }}</v-chip>
                     </v-chip-group>
@@ -212,9 +213,9 @@
                     v-if="item.type_service_id == 1"
                   ></v-divider>
 
-                  <v-card-title v-if="item.type_service_id == 1"
-                    >Precios</v-card-title
-                  >
+                  <v-card-title v-if="item.type_service_id == 1">
+                    Precios
+                  </v-card-title>
 
                   <v-card-text v-if="item.type_service_id == 1">
                     <v-chip-group
@@ -227,8 +228,9 @@
                           v-bind:key="x"
                           :disabled="item.esconder"
                           @click="seleccionar_precio(room, item)"
-                          >{{ room.name }}</v-chip
                         >
+                          {{ room.name }}
+                        </v-chip>
                       </template>
                     </v-chip-group>
                   </v-card-text>
@@ -238,9 +240,9 @@
                     class="mx-4"
                   ></v-divider>
 
-                  <v-card-title v-if="item.type_service_id != 1"
-                    >Masajes</v-card-title
-                  >
+                  <v-card-title v-if="item.type_service_id != 1">
+                    Masajes
+                  </v-card-title>
 
                   <v-card-text v-if="item.type_service_id != 1">
                     <v-chip-group
@@ -253,8 +255,9 @@
                           :disabled="item.esconder"
                           @click="seleccionar_precio(masaje, item)"
                           v-bind:key="x"
-                          >{{ masaje.name }}</v-chip
                         >
+                          {{ masaje.name }}
+                        </v-chip>
                       </template>
                     </v-chip-group>
                   </v-card-text>
@@ -331,9 +334,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="blue darken-1" @click="aplicar_promocion('promo')"
-            >Aplicar</v-btn
-          >
+          <v-btn color="blue darken-1" @click="aplicar_promocion('promo')">
+            Aplicar
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -556,12 +559,12 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" @click="dialog_cliente = false"
-            >Cancelar</v-btn
-          >
-          <v-btn color="blue darken-1" @click="guardar_reservacion('reservar')"
-            >Aplicar</v-btn
-          >
+          <v-btn color="blue darken-1" @click="dialog_cliente = false">
+            Cancelar
+          </v-btn>
+          <v-btn color="blue darken-1" @click="guardar_reservacion('reservar')">
+            Aplicar
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -577,11 +580,11 @@
 </style>
 
 <script>
-import FormError from "../shared/FormError";
-import moment from "moment";
+import FormError from '../shared/FormError'
+import moment from 'moment'
 
 export default {
-  name: "Reservation",
+  name: 'Reservation',
   components: {
     FormError,
     moment,
@@ -627,227 +630,225 @@ export default {
         cantidad: null,
       },
       municipios: [],
-    };
+    }
   },
 
   computed: {
     formTitle() {
-      return !this.editedIndex ? "Agregar Reservación" : "Editar Reservación";
+      return !this.editedIndex ? 'Agregar Reservación' : 'Editar Reservación'
     },
 
     mostrar_masaje() {
-      return this.servicios ? (this.servicios.id != 1 ? true : false) : false;
+      return this.servicios ? (this.servicios.id != 1 ? true : false) : false
     },
 
     filteredList() {
       if (this.form.nit) {
         return this.clientes.filter((element) => {
-          return element.nit
-            .toUpperCase()
-            .includes(this.form.nit.toUpperCase());
-        });
+          return element.nit.toUpperCase().includes(this.form.nit.toUpperCase())
+        })
       } else {
-        return [];
+        return []
       }
     },
   },
 
   created() {
-    this.getServicios();
-    this.getMunicipios();
+    this.getServicios()
+    this.getMunicipios()
   },
 
   methods: {
     reiniciar() {
-      this.form.arrival_date = null;
-      this.form.departure_date = null;
-      this.form.hora = null;
-      this.form.cantidad = null;
+      this.form.arrival_date = null
+      this.form.departure_date = null
+      this.form.hora = null
+      this.form.cantidad = null
     },
 
     //formato de fecha
     formatear_fecha_inicio(date) {
-      if (!date) return null;
+      if (!date) return null
 
-      const [month, day, year] = date.split("/");
+      const [month, day, year] = date.split('/')
       this.form.arrival_date = `${year}-${month.padStart(
         2,
-        "0"
-      )}-${day.padStart(2, "0")}`;
+        '0',
+      )}-${day.padStart(2, '0')}`
     },
 
     formatear_fecha_fin(date) {
-      if (!date) return null;
+      if (!date) return null
 
-      const [month, day, year] = date.split("/");
+      const [month, day, year] = date.split('/')
       this.form.departure_date = `${year}-${month.padStart(
         2,
-        "0"
-      )}-${day.padStart(2, "0")}`;
+        '0',
+      )}-${day.padStart(2, '0')}`
     },
 
     limpiar() {
-      this.editedIndex = false;
-      this.bloquear = false;
+      this.editedIndex = false
+      this.bloquear = false
 
-      this.form.id = 0;
-      this.form.arrival_date = null;
-      this.form.departure_date = null;
-      this.form.client_id = null;
-      this.form.coin_id = null;
-      this.form.details = [];
-      this.form.hora = null;
-      this.form.cantidad = null;
-      this.cantidad = null;
+      this.form.id = 0
+      this.form.arrival_date = null
+      this.form.departure_date = null
+      this.form.client_id = null
+      this.form.coin_id = null
+      this.form.details = []
+      this.form.hora = null
+      this.form.cantidad = null
+      this.cantidad = null
 
-      this.dialog = false;
-      this.dialog_cliente = false;
-      this.habitaciones = [];
-      this.todos_precios = [];
-      this.todos_masajes = [];
-      this.seleccionados = [];
-      this.servicios = [];
+      this.dialog = false
+      this.dialog_cliente = false
+      this.habitaciones = []
+      this.todos_precios = []
+      this.todos_masajes = []
+      this.seleccionados = []
+      this.servicios = []
 
-      this.form.nit = null;
-      this.form.email = null;
-      this.form.name = null;
-      this.form.business = false;
-      this.form.ubication = null;
-      this.form.municipality_id = null;
-      this.form.event = null;
+      this.form.nit = null
+      this.form.email = null
+      this.form.name = null
+      this.form.business = false
+      this.form.ubication = null
+      this.form.municipality_id = null
+      this.form.event = false
 
-      this.$validator.reset();
-      this.$validator.reset();
+      this.$validator.reset()
+      this.$validator.reset()
     },
 
     buscar_habitacion(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result) {
-          let objeto = new Object();
-          objeto.inicio = this.form.arrival_date;
+          let objeto = new Object()
+          objeto.inicio = this.form.arrival_date
           objeto.fin = this.form.departure_date
             ? this.form.departure_date
-            : this.form.arrival_date;
-          objeto.hora = this.form.hora;
-          objeto.servicios = this.servicios ? this.servicios : null;
+            : this.form.arrival_date
+          objeto.hora = this.form.hora
+          objeto.servicios = this.servicios ? this.servicios : null
           this.form.cantidad = objeto.cantidad = this.cantidad
             ? this.cantidad
-            : null;
+            : null
 
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.reservationService
             .buscar_habitaciones(objeto)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.habitaciones = r.data.habitaciones;
-              this.todos_precios = r.data.precios;
-              this.todos_masajes = r.data.masajes;
+              this.habitaciones = r.data.habitaciones
+              this.todos_precios = r.data.precios
+              this.todos_masajes = r.data.masajes
             })
-            .catch((r) => {});
+            .catch((r) => {})
         }
-      });
+      })
     },
 
     reservar(item) {
       this.$swal({
-        title: "Reservar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "info",
+        title: 'Reservar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'info',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading_room = true;
-          let objecto = new Object();
-          objecto.price = null;
+          this.loading_room = true
+          let objecto = new Object()
+          objecto.price = null
 
           this.seleccionados.forEach((element) => {
             if (element.id == item.id) {
-              objecto.price = element.sf_price;
-              objecto.description = element.description;
-              objecto.minutos = element.minutos;
-              objecto.coin_id = element.coin_id;
-              this.form.coin_id = element.coin_id;
-              objecto.name = null;
-              objecto.nit = null;
-              objecto.email = null;
+              objecto.price = element.sf_price
+              objecto.description = element.description
+              objecto.minutos = element.minutos
+              objecto.coin_id = element.coin_id
+              this.form.coin_id = element.coin_id
+              objecto.name = null
+              objecto.nit = null
+              objecto.email = null
             }
-          });
+          })
 
           if (!objecto.price) {
-            this.$toastr.error("El precio no fue seleccionado.", "Error");
-            this.loading_room = false;
-            return 0;
+            this.$toastr.error('El precio no fue seleccionado.', 'Error')
+            this.loading_room = false
+            return 0
           }
 
-          objecto.room_id = item.id;
-          objecto.ofert = null;
+          objecto.room_id = item.id
+          objecto.ofert = null
 
           if (this.form.details.length > 0) {
             this.form.details.forEach((element, index) => {
               if (element.room_id == item.id) {
-                this.form.details.splice(this.form.details.indexOf(index), 1);
+                this.form.details.splice(this.form.details.indexOf(index), 1)
               }
-            });
+            })
           }
 
-          this.form.details.push(objecto);
+          this.form.details.push(objecto)
 
-          this.bloquear = true;
-          item.esconder = true;
-          this.loading_room = false;
+          this.bloquear = true
+          item.esconder = true
+          this.loading_room = false
         }
-      });
+      })
     },
 
     eliminar_reservacion(item) {
       this.$swal({
-        title: "Eliminar reservación",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "error",
+        title: 'Eliminar reservación',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'error',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading_room = true;
+          this.loading_room = true
 
           this.form.details.forEach((element, index) => {
             if (element.room_id == item.id)
-              this.form.details.splice(this.form.details.indexOf(index), 1);
-          });
+              this.form.details.splice(this.form.details.indexOf(index), 1)
+          })
 
-          this.bloquear = this.form.details.length == 0 ? false : true;
-          item.esconder = false;
-          this.loading_room = false;
+          this.bloquear = this.form.details.length == 0 ? false : true
+          item.esconder = false
+          this.loading_room = false
         }
-      });
+      })
     },
 
     promociones(item, index) {
-      this.promocion = null;
-      this.promociones = null;
+      this.promocion = null
+      this.promociones = null
       this.$store.state.services.reservationService
         .promocion(item)
         .then((r) => {
-          this.data_promociones = r.data.data;
-          this.dialog = true;
-          this.index = index;
+          this.data_promociones = r.data.data
+          this.dialog = true
+          this.index = index
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
 
     aplicar_promocion(scope) {
@@ -856,144 +857,144 @@ export default {
           this.form.details.forEach((element, index) => {
             if (this.promocion.id == element.room_id && element.ofert != null) {
               element.price =
-                parseFloat(element.price) - parseFloat(this.promocion.sf_price);
-              element.ofert = this.promocion.id;
+                parseFloat(element.price) - parseFloat(this.promocion.sf_price)
+              element.ofert = this.promocion.id
 
-              this.$toastr.success("La fue aplicada.", "Promoción");
+              this.$toastr.success('La fue aplicada.', 'Promoción')
             }
-          });
+          })
 
-          this.promocion = null;
-          this.promociones = null;
-          this.dialog = false;
+          this.promocion = null
+          this.promociones = null
+          this.dialog = false
         } else {
-          this.promocion = null;
-          this.promociones = null;
-          this.dialog = false;
+          this.promocion = null
+          this.promociones = null
+          this.dialog = false
         }
-      });
+      })
     },
 
     agregar() {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.clientService
         .index()
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
 
-          this.clientes = r.data.data;
-          this.dialog_cliente = true;
-          this.loading = false;
+          this.clientes = r.data.data
+          this.dialog_cliente = true
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
 
     guardar_reservacion() {
       if (this.form.details.length == 0) {
         this.$toastr.error(
-          "No ha seleccionado ningún servicio para la reservación.",
-          "Error"
-        );
-        return 0;
+          'No ha seleccionado ningún servicio para la reservación.',
+          'Error',
+        )
+        return 0
       }
 
       this.$swal({
-        title: "Guardar Reservación",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Guardar Reservación',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.reservationService
             .store(this.form)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.limpiar();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.limpiar()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     traer_precios(item) {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.reservationService
         .precios(item)
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
 
-          this.loading = false;
-          return r.data.data;
+          this.loading = false
+          return r.data.data
         })
         .catch((r) => {
-          this.loading = false;
-          return [];
-        });
+          this.loading = false
+          return []
+        })
     },
 
     seleccionar_precio(item, servicio) {
-      this.loading = true;
+      this.loading = true
       if (this.seleccionados.length > 0) {
         this.seleccionados.forEach((element, index) => {
           if (element.id == item.id) {
-            this.seleccionados.splice(this.seleccionados.indexOf(index), 1);
-            return 0;
+            this.seleccionados.splice(this.seleccionados.indexOf(index), 1)
+            return 0
           }
-        });
+        })
 
-        item.description = servicio.name + " / " + item.name;
-        this.seleccionados.push(item);
-        this.loading = false;
+        item.description = servicio.name + ' / ' + item.name
+        this.seleccionados.push(item)
+        this.loading = false
       } else {
-        item.description = servicio.name + " / " + item.name;
-        this.seleccionados.push(item);
-        this.loading = false;
+        item.description = servicio.name + ' / ' + item.name
+        this.seleccionados.push(item)
+        this.loading = false
       }
     },
 
@@ -1001,28 +1002,28 @@ export default {
       this.$store.state.services.typeServiceService
         .index()
         .then((r) => {
-          this.listar_servicios = r.data.data;
+          this.listar_servicios = r.data.data
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
 
     getMunicipios() {
       this.$store.state.services.municipalityService
         .index()
         .then((r) => {
-          this.municipios = r.data.data;
+          this.municipios = r.data.data
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
 
-    seleccionar_cliente(item){
+    seleccionar_cliente(item) {
       this.form.nit = item.nit
       this.form.business = item.business
       this.form.municipality_id = item.municipality
       this.form.email = item.email
       this.form.name = item.name
       this.form.ubication = item.ubication
-    }
+    },
   },
-};
+}
 </script>
