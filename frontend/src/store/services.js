@@ -42,8 +42,8 @@ import reservationServiceService from '../services/principal/reservation/Reserva
 
 
 // Para desarrollo
-let baseUrl = 'http://64.225.43.65/'
-baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
+let baseUrl = 'https://api.hotelspa.app/'
+//baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
 let token_data = $cookies.get('token_data')
 
 // Axios Configuration
