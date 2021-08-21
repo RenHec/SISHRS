@@ -3,8 +3,10 @@
 namespace App\Models\V1\Principal;
 
 use App\Models\V1\Catalogo\Coin;
+use App\Models\V1\Catalogo\Category;
 use App\Models\V1\Catalogo\SubCategory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\V1\Principal\ChangePrice;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -98,6 +100,16 @@ class Product extends Model
     public function coin()
     {
         return $this->belongsTo(Coin::class, 'coin_id', 'id');
+    }
+
+    /**
+     * Get the kardex associated with the products.
+     *
+     * @return object
+     */
+    public function kardex()
+    {
+        return $this->belongsTo(Kardex::class, 'id', 'product_id');
     }
 
     /**

@@ -7,19 +7,29 @@ class ReservationServiceService {
     this.baseUrl = baseUrl + 'service/rest/v1/principal/reservation_service'
   }
 
-  show(data) {
+  index() {
     let self = this;
-    return self.axios.get(`${self.baseUrl}/${data.id}`);
+    return self.axios.get(`${self.baseUrl}`);
   }
 
-  update(data) {
-    let self = this;
-    return self.axios.put(`${self.baseUrl}/${data.id}`, data);
+  store(data) {
+    let self = this
+    return self.axios.post(`${self.baseUrl}`, data)
   }
 
-  destroy(data) {
+  call_services(data) {
     let self = this;
-    return self.axios.delete(`${self.baseUrl}/${data.id}`);
+    return self.axios.get(`${self.baseUrl}/call_services/${data.id}`);
+  }
+
+  start(data) {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}/start/${data.id}`);
+  }
+
+  end(data) {
+    let self = this;
+    return self.axios.get(`${self.baseUrl}/end/${data.id}`);
   }
 }
 

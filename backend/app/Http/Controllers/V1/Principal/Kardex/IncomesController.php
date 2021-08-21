@@ -97,7 +97,7 @@ class IncomesController extends ApiController
      */
     public function store(Request $request)
     {
-        $this->validate($request, $this->rules(), $this->messages());
+        //$this->validate($request, $this->rules(), $this->messages());
 
         try {
             DB::beginTransaction();
@@ -112,7 +112,7 @@ class IncomesController extends ApiController
 
                 $income = Incomes::create(
                     [
-                        'codigo' => $value['codigo'],
+                        'codigo' => $request->codigo,
                         'cost' => $value['cost'],
                         'new_incomes' => $value['new_incomes'],
                         'stock_current' => $kardex->stock,

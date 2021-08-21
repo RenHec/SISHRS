@@ -112,15 +112,12 @@ class RoomController extends ApiController
 
             $room = Room::create($data);
 
-            foreach($request->pictures as $key => $value) {
-                if(isset($value['photo']) && !is_null($value['photo']) && !empty($value['photo'])) {
+            foreach ($request->pictures as $key => $value) {
+                if (isset($value['photo']) && !is_null($value['photo']) && !empty($value['photo'])) {
                     $picture_name = Str::random(10);
 
                     $img = $this->getB64Image($value['photo']);
                     $image = Image::make($img);
-                    $image->fit(870, 620, function ($constraint) {
-                        $constraint->upsize();
-                    });
                     $image->encode('jpg', 70);
                     $path = "{$room->id}/{$picture_name}.jpg";
                     Storage::disk('room')->put($path, $image);
@@ -128,7 +125,7 @@ class RoomController extends ApiController
                     PictureRoom::create(
                         [
                             'photo' => $path,
-                            'position' => $key+1,
+                            'position' => $key + 1,
                             'view' => true,
                             'room_id' => $room->id
                         ]
@@ -227,9 +224,9 @@ class RoomController extends ApiController
             $room->description = $request->description;
             $room->pets = $request->amount_pets > 0 ? true : false;
 
-            if(!$room->isDirty())
+            if (!$room->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);
-            
+
             $room->save();
 
             return $this->successResponse('Registro actualizado.');

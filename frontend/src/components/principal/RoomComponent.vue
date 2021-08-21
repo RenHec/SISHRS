@@ -183,6 +183,7 @@
                   outlined
                   :show-size="1000"
                   @change="cargaMasiva($event)"
+                  ref="fileupload"
                 >
                   <template v-slot:selection="{ index, text }">
                     <v-chip
@@ -391,6 +392,9 @@
               single-line
               hide-details
             ></v-text-field>
+            <v-btn class="ma-2" color="primary" @click="initialize">
+              Actualizar
+            </v-btn>
           </v-toolbar>
         </template>
         <template v-slot:item.description="{ item }">
@@ -892,6 +896,8 @@ export default {
       this.price_uno.type_charge_id = null
 
       this.precios_seleccionados = []
+      this.masiva_image = []
+      this.$refs.fileupload.value = null
 
       this.$validator.reset()
       this.$validator.reset()
@@ -914,7 +920,6 @@ export default {
             this.loading = false
             return
           }
-          console.log(r.data.data)
           this.desserts = r.data.data
           this.limpiar()
           this.loading = false

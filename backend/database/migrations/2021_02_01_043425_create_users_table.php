@@ -31,6 +31,7 @@ class CreateUsersTable extends Migration
             $table->string('observation', 500)->nullable();
             $table->string('ubication', 100)->nullable();
             $table->string('phone', 25)->nullable();
+            $table->boolean('occupied')->default(false);
 
             $table->foreignId('departament_id')->constrained('departaments');
             $table->foreignId('municipality_id')->constrained('municipalities');

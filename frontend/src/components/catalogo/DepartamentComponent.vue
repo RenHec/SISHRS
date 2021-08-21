@@ -25,6 +25,9 @@
               single-line
               hide-details
             ></v-text-field>
+            <v-btn class="ma-2" color="primary" @click="initialize">
+              Actualizar
+            </v-btn>
           </v-toolbar>
         </template>
         <template v-slot:no-data>
@@ -38,64 +41,60 @@
 
 <script>
 export default {
-  name: "Departament",
+  name: 'Departament',
   data() {
     return {
       loading: false,
       dialog: false,
-      search: "",
+      search: '',
       headers: [
         {
-          text: "Nombre",
-          align: "start",
-          value: "name",
+          text: 'Nombre',
+          align: 'start',
+          value: 'name',
         },
       ],
       footer: {
         showFirstLastPage: true,
-        firstIcon: "mdi-arrow-collapse-left",
-        lastIcon: "mdi-arrow-collapse-right",
-        prevIcon: "mdi-minus",
-        nextIcon: "mdi-plus",
+        firstIcon: 'mdi-arrow-collapse-left',
+        lastIcon: 'mdi-arrow-collapse-right',
+        prevIcon: 'mdi-minus',
+        nextIcon: 'mdi-plus',
       },
-      desserts: []
-    };
+      desserts: [],
+    }
   },
 
   created() {
-    this.initialize();
+    this.initialize()
   },
 
   methods: {
-
     initialize() {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.departamentService
         .index()
         .then((r) => {
-
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
-          
-          this.desserts = r.data.data;
-          this.loading = false;
+
+          this.desserts = r.data.data
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
-
   },
-};
+}
 </script>
-

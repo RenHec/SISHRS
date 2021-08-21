@@ -2,8 +2,9 @@
 
 namespace App\Models\V1\Catalogo;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\V1\Principal\Kardex;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class KardexStatus extends Model
 {

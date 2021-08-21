@@ -34,7 +34,8 @@ class ReservationProduct extends Model
         'product_id',
         'coin_id',
         'user_id',
-        'client_id'
+        'client_id',
+        'pagado'
     ];
 
     /**
@@ -45,7 +46,8 @@ class ReservationProduct extends Model
     protected $casts = [
         'created_at' => 'datetime:d/m/Y h:i:s a',
         'updated_at' => 'datetime:d/m/Y h:i:s a',
-        'deleted_at' => 'datetime:d/m/Y h:i:s a'
+        'deleted_at' => 'datetime:d/m/Y h:i:s a',
+        'pagado' => 'boolean'
     ];
 
     /**
@@ -60,7 +62,7 @@ class ReservationProduct extends Model
      *
      * @var array
      */
-    protected $appends = ['monto_precio', 'monto_sub'];
+    protected $appends = ['monto_precio', 'monto_sub', 'monto_descuento'];
 
     /**
      * Get the monto format.
@@ -82,6 +84,17 @@ class ReservationProduct extends Model
     {
         $moneda = Coin::find($this->coin_id)->symbol;
         return "{$moneda} " . number_format($this->sub_total, 2, '.', ',');
+    }
+
+    /**
+     * Get the monto format.
+     *
+     * @return string
+     */
+    public function getMontoDescuentoAttribute()
+    {
+        $moneda = Coin::find($this->coin_id)->symbol;
+        return "{$moneda} " . number_format($this->discount, 2, '.', ',');
     }
 
     /**
@@ -132,5 +145,15 @@ class ReservationProduct extends Model
     public function user()
     {
         return $this->belongsTo(Usuario::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the reservation associated with the incomes.
+     *
+     * @return object
+     */
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
     }
 }

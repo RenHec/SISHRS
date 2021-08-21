@@ -2,9 +2,16 @@
 
 namespace App\Models\V1\Principal;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\V1\Catalogo\Coin;
+use App\Models\V1\Principal\Client;
+use App\Models\V1\Principal\Kardex;
+use App\Models\V1\Principal\Incomes;
+use App\Models\V1\Principal\Product;
+use App\Models\V1\Seguridad\Usuario;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\V1\Principal\ReservationProduct;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Sale extends Model
 {
@@ -58,6 +65,23 @@ class Sale extends Model
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['ganancia'];
+
+    /**
+     * Get the monto format.
+     *
+     * @return string
+     */
+    public function getGananciaAttribute()
+    {
+        return number_format(($this->price_sub - $this->cost_sub), 2, '.', ',');
+    }
+
+    /**
      * Get the reservation associated with the sales.
      *
      * @return object
@@ -74,7 +98,7 @@ class Sale extends Model
      */
     public function kardex()
     {
-        return $this->belongsTo(Kardex::class, 'kardex_id', 'id');
+        return $this->belongsTo(Kardex::class, 'id', 'kardex_id');
     }
 
     /**
@@ -94,7 +118,7 @@ class Sale extends Model
      */
     public function coin()
     {
-        return $this->belongsTo(Coin::class, 'coin_id', 'id');
+        return $this->belongsTo(Coin::class, 'id', 'coin_id');
     }
 
     /**
@@ -124,6 +148,6 @@ class Sale extends Model
      */
     public function income()
     {
-        return $this->belongsTo(Incomes::class, 'income_id', 'id');
+        return $this->belongsTo(Incomes::class, 'id', 'income_id');
     }
 }

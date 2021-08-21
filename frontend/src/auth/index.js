@@ -15,7 +15,7 @@ export default {
     var token_data = $cookies.get('token_data')
     this.data_refresh_token.refresh_token = token_data.refresh_token
     this.data_refresh_token.client_id = store.state.client_id,
-    this.data_refresh_token.client_secret = store.state.client_secret
+      this.data_refresh_token.client_secret = store.state.client_secret
 
     return this.data_refresh_token
   },
@@ -32,10 +32,16 @@ export default {
   getUser() {
     store.state.services.loginService.me()
       .then(r => {
-        store.dispatch('setUser', r.data)
-        this.getMenus(r.data)
+        let objeto = new Object
+        objeto.usuario = r.data.user
+        objeto.roles = r.data.roles
+        store.dispatch('setUser', objeto)
+        this.getMenus(r.data.user)
       }).catch(e => {
-
+        store.dispatch('logout')
+        router.push('/login')
+        store.state.is_login = false
+        store.state.drawer = null
       })
   },
 
@@ -77,7 +83,7 @@ export default {
             object.childrens.push(object2)
           }
         });
-        
+
         object.childrens.length > 0 ? menu.push(object) : null
       }
     })

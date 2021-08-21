@@ -9,10 +9,14 @@ use App\Models\V1\Catalogo\Coin;
 use App\Models\V1\Catalogo\Status;
 use Illuminate\Support\Facades\DB;
 use App\Imports\DepartamentoImport;
+use App\Imports\ProductImport;
+use App\Models\V1\Catalogo\Category;
 use App\Models\V1\Catalogo\KardexStatus;
 use App\Models\V1\Catalogo\TypeBed;
 use App\Models\V1\Principal\Client;
 use App\Models\V1\Catalogo\Movement;
+use App\Models\V1\Catalogo\SubCategory;
+use App\Models\V1\Catalogo\Supplier;
 use App\Models\V1\Catalogo\TypeRoom;
 use App\Models\V1\Seguridad\Usuario;
 use Maatwebsite\Excel\Facades\Excel;
@@ -215,6 +219,37 @@ class DatabaseSeeder extends Seeder
         $insert = new Movement();
         $insert->name = 'CheckOut';
         $insert->save();
+        $insert = new Movement();
+        $insert->name = 'Asignada';
+        $insert->save();
+        $insert = new Movement();
+        $insert->name = 'Iniciado';
+        $insert->save();
+        $insert = new Movement();
+        $insert->name = 'Finalizado';
+        $insert->save();
+
+        $insert = new Category();
+        $insert->name = "Categoria 1";
+        $insert->save();
+
+        $insert1 = new SubCategory();
+        $insert1->name = "Sub Categoria 1";
+        $insert1->category_id = $insert->id;
+        $insert1->save();
+
+        $insert1 = new SubCategory();
+        $insert1->name = "Sub Categoria 2";
+        $insert1->category_id = $insert->id;
+        $insert1->save();
+
+        $insert = new Supplier();
+        $insert->name = "Proveedor 1";
+        $insert->save();
+
+        $insert = new Supplier();
+        $insert->name = "Proveedor 2";
+        $insert->save();
 
         $insert = new Client();
         $insert->nit = '765894';
@@ -278,5 +313,7 @@ class DatabaseSeeder extends Seeder
         $insert->reservation = false;
         $insert->advance = true;
         $insert->save();
+
+        Excel::import(new ProductImport, 'database/seeders/Catalogos/Productos.xlsx');
     }
 }

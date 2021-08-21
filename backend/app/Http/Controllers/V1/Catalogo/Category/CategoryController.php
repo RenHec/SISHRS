@@ -12,7 +12,7 @@ class CategoryController extends ApiController
     {
         parent::__construct();
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +20,7 @@ class CategoryController extends ApiController
      */
     public function index()
     {
-        $data = Category::withoutTrashed()->get();
+        $data = Category::with('sub_category')->withTrashed()->get();
         return $this->showAll($data);
     }
 

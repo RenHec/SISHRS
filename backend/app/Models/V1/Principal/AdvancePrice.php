@@ -68,7 +68,7 @@ class AdvancePrice extends Model
      *
      * @var array
      */
-    protected $appends = ['monto', 'picture'];
+    protected $appends = ['monto', 'picture', 'pagado'];
 
     /**
      * Get the pictures documents link base64 photo.
@@ -98,6 +98,16 @@ class AdvancePrice extends Model
     {
         $moneda = Coin::find($this->coin_id)->symbol;
         return "{$moneda} " . number_format($this->amount, 2, '.', ',');
+    }
+
+    /**
+     * Get the clients full name.
+     *
+     * @return string
+     */
+    public function getPagadoAttribute()
+    {
+        return $this->pay ? 'SI' : 'NO';
     }
 
     /**

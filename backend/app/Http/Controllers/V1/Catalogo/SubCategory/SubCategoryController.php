@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1\Catalogo\SubCategory;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
+use App\Models\V1\Catalogo\Category;
 use App\Models\V1\Catalogo\SubCategory;
 
 class SubCategoryController extends ApiController
@@ -12,15 +13,15 @@ class SubCategoryController extends ApiController
     {
         parent::__construct();
     }
-    
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function show(Category $sub_category)
     {
-        $data = SubCategory::withoutTrashed()->get();
+        $data = SubCategory::where('category_id', $sub_category->id)->get();
         return $this->showAll($data);
     }
 
@@ -36,12 +37,16 @@ class SubCategoryController extends ApiController
 
         try {
 
-            SubCategory::firstOrCreate(
-                [
-                    'name' => $request->name,
-                    'category_id' => $request->category_id['id']
-                ]
-            );
+            $sub = SubCategory::where('name', $request->name)->where('category_id', $request->category_id)->first();
+
+            if (is_null($sub)) {
+                $sub = new SubCategory();
+            }
+
+            $sub->name = $request->name;
+            $sub->category_id = $request->category_id;
+            $sub->deleted_at = null;
+            $sub->save();
 
             return $this->successResponse('Registro agregado.');
         } catch (\Exception $e) {
@@ -62,7 +67,7 @@ class SubCategoryController extends ApiController
 
         try {
             $sub_category->name = $request->name;
-            $sub_category->category_id = $request->category_id['id'];
+            $sub_category->category_id = $request->category_id;
 
             if (!$sub_category->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);
@@ -99,8 +104,8 @@ class SubCategoryController extends ApiController
     public function rules($id = null)
     {
         $validar = [
-            'name' => is_null($id) ? 'required|max:50|unique:sub_categories,name' : "required|max:50|unique:sub_categories,name,{$id}",
-            'category_id.id' => 'required|integer|exists:categories,id'
+            'name' => 'required|max:20',
+            'category_id' => 'required|integer|exists:categories,id'
         ];
 
         return $validar;
@@ -114,9 +119,9 @@ class SubCategoryController extends ApiController
             'name.max'  => 'El nombre de la sub categoría debe tener menos de :max carácteres.',
             'name.unique'  => 'El nombre de la sub categoría ingresado ya existe en el sistema.',
 
-            'category_id.id.required' => 'La categoría es obligatorio',
-            'category_id.id.integer' => 'La categoría no es un número',
-            'category_id.id.exists' => 'La categoría no existe en la base de datos'
+            'category_id.required' => 'La categoría es obligatorio',
+            'category_id.integer' => 'La categoría no es un número',
+            'category_id.exists' => 'La categoría no existe en la base de datos'
         ];
     }
 }

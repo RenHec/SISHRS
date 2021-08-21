@@ -49,6 +49,7 @@
                   outlined
                   :show-size="1000"
                   @change="cargaMasiva($event)"
+                  ref="fileupload"
                 >
                   <template v-slot:selection="{ index, text }">
                     <v-chip
@@ -57,14 +58,16 @@
                       dark
                       label
                       small
-                      >{{ text }}</v-chip
                     >
+                      {{ text }}
+                    </v-chip>
 
                     <span
                       v-else-if="index === 2"
                       class="overline grey--text text--darken-3 mx-2"
-                      >+{{ masiva_image.length - 2 }} File(s)</span
                     >
+                      +{{ masiva_image.length - 2 }} File(s)
+                    </span>
                   </template>
                 </v-file-input>
               </v-col>
@@ -74,16 +77,17 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="habitacion = null"
-            >Cancelar</v-btn
-          >
+          <v-btn color="blue darken-1" text @click="habitacion = null">
+            Cancelar
+          </v-btn>
           <v-btn
             color="blue darken-1"
             text
             v-if="form.id > 0"
             @click="validar_formulario('create')"
-            >Guardar</v-btn
           >
+            Guardar
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -100,7 +104,9 @@
           <v-container>
             <v-row>
               <v-col cols="12" md="12" class="text-center">
-                <v-btn x-large dark color="success" @click="update_masive">Aplicar cambios</v-btn>
+                <v-btn x-large dark color="success" @click="update_masive">
+                  Aplicar cambios
+                </v-btn>
               </v-col>
               <v-col
                 class="text-center"
@@ -114,7 +120,7 @@
                     <v-row justify="space-between">
                       <v-col cols="auto">
                         <v-img
-                          style="width: 225px; height: 225px"
+                          style="width: 225px; height: 225px;"
                           :src="item.picture"
                           :alt="'habitacion' + item.id"
                         ></v-img>
@@ -126,11 +132,7 @@
                           justify="center"
                         >
                           <v-col class="px-0">
-                            <v-btn
-                              color="primary"
-                              @click="up_image(item)"
-                              icon
-                            >
+                            <v-btn color="primary" @click="up_image(item)" icon>
                               <v-icon>mdi-thumb-up</v-icon>
                             </v-btn>
                           </v-col>
@@ -196,10 +198,10 @@
 </style>
 
 <script>
-import FormError from "../shared/FormError";
+import FormError from '../shared/FormError'
 
 export default {
-  name: "TypeRoom",
+  name: 'PictureRoom',
   components: {
     FormError,
   },
@@ -214,326 +216,333 @@ export default {
         id: 0,
         pictures: [],
       },
-    };
+    }
   },
 
   created() {
-    this.getHabitacion();
+    this.getHabitacion()
   },
 
   methods: {
     limpiar() {
-      this.form.pictures = [];
+      this.form.pictures = []
+      this.masiva_image = []
+      this.$refs.fileupload.value = null
 
-      this.$validator.reset();
-      this.$validator.reset();
+      this.$validator.reset()
+      this.$validator.reset()
     },
 
     initialize(item) {
       if (item) {
-        this.loading = true;
-        this.form.id = item.id;
+        this.loading = true
+        this.form.id = item.id
 
         this.$store.state.services.pictureRoomService
           .show(item)
           .then((r) => {
             if (r.response) {
               if (r.response.data.code === 423) {
-                this.$toastr.error(r.response.data.error, "Mensaje");
+                this.$toastr.error(r.response.data.error, 'Mensaje')
               } else {
                 for (let value of Object.values(r.response.data.error)) {
-                  this.$toastr.error(value, "Mensaje");
+                  this.$toastr.error(value, 'Mensaje')
                 }
               }
-              this.loading = false;
-              return;
+              this.loading = false
+              return
             }
 
-            this.desserts = r.data.data;
-            this.loading = false;
+            this.desserts = r.data.data
+            this.form.pictures = []
+            this.masiva_image = []
+            this.$refs.fileupload.value = null
+            this.loading = false
           })
           .catch((r) => {
-            this.loading = false;
-          });
+            this.loading = false
+          })
       } else {
-        this.desserts = [];
-        this.form.id = 0;
+        this.desserts = []
+        this.form.id = 0
         this.limpiar()
       }
     },
 
     validar_formulario(scope) {
       this.$validator.validateAll(scope).then((result) => {
-        if (result) this.update(this.form);
-      });
+        if (result) this.update(this.form)
+      })
     },
 
     destroy(data) {
-      let title = !data.deleted_at ? "Desactivar" : "Activar";
-      let type = !data.deleted_at ? "error" : "success";
+      let title = !data.deleted_at ? 'Desactivar' : 'Activar'
+      let type = !data.deleted_at ? 'error' : 'success'
       this.$swal({
         title: title,
-        text: "¿Está seguro de realizar esta acción?",
+        text: '¿Está seguro de realizar esta acción?',
         type: type,
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.pictureRoomService
             .destroy(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize(this.habitacion);
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize(this.habitacion)
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.limpiar()
         }
-      });
+      })
     },
 
     update(data) {
       this.$swal({
-        title: "Modificar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "warning",
+        title: 'Modificar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'warning',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.pictureRoomService
             .update(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize(this.habitacion);
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize(this.habitacion)
             })
             .catch((r) => {
-              this.loading = false;
-            });
-        } else {
-          this.close();
+              this.loading = false
+            })
         }
-      });
+      })
     },
 
     update_masive() {
-      let data = new Object();
-      data.pictures = this.desserts;
+      let data = new Object()
+      data.pictures = this.desserts
       this.$swal({
-        title: "Actualizar las posiciones",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Actualizar las posiciones',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
-          this.$store.state.services.pictureRoomService.masive(data)
+          this.loading = true
+          this.$store.state.services.pictureRoomService
+            .masive(data)
             .then((r) => {
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  this.loading = false;
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  this.loading = false
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  this.loading = false;
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  this.loading = false
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                this.loading = false;
-                return;
+                this.loading = false
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize(this.habitacion);
-              this.loading = false;
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize(this.habitacion)
+              this.loading = false
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.limpiar()
         }
-      });
+      })
     },
 
     up_image(data) {
       this.$swal({
-        title: "Subir",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Subir',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
-          this.$store.state.services.pictureRoomService.up(data)
+          this.loading = true
+          this.$store.state.services.pictureRoomService
+            .up(data)
             .then((r) => {
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  this.loading = false;
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  this.loading = false
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  this.loading = false;
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  this.loading = false
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                this.loading = false;
-                return;
+                this.loading = false
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize(this.habitacion);
-              this.loading = false;
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize(this.habitacion)
+              this.loading = false
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.limpiar()
         }
-      });
+      })
     },
 
     image_active(item) {
-      this.loading = true;
+      this.loading = true
 
-      this.$store.state.services.pictureRoomService.view(item)
+      this.$store.state.services.pictureRoomService
+        .view(item)
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 404) {
-              this.$toastr.warning(r.response.data.error, "Advertencia");
-              this.loading = false;
-              return;
+              this.$toastr.warning(r.response.data.error, 'Advertencia')
+              this.loading = false
+              return
             } else if (r.response.data.code === 423) {
-              this.$toastr.warning(r.response.data.error, "Advertencia");
-              this.loading = false;
-              return;
+              this.$toastr.warning(r.response.data.error, 'Advertencia')
+              this.loading = false
+              return
             } else {
               for (let value of Object.values(r.response.data)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
 
-          this.$toastr.success(r.data, "Mensaje");
-          this.initialize(this.habitacion);
-          this.loading = false;
+          this.$toastr.success(r.data, 'Mensaje')
+          this.initialize(this.habitacion)
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
 
     down_image(data) {
       this.$swal({
-        title: "Bajar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Bajar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
-          this.$store.state.services.pictureRoomService.down(data)
+          this.loading = true
+          this.$store.state.services.pictureRoomService
+            .down(data)
             .then((r) => {
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  this.loading = false;
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  this.loading = false
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  this.loading = false;
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  this.loading = false
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                this.loading = false;
-                return;
+                this.loading = false
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize(this.habitacion);
-              this.loading = false;
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize(this.habitacion)
+              this.loading = false
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.limpiar()
         }
-      });
-    },    
-    
+      })
+    },
+
     change_order(num, index) {
-      this.desserts[index].position = num;
+      this.desserts[index].position = num
     },
 
     //Carga masiva de fotografias
     cargaMasiva(e) {
-      this.form.pictures = [];
+      this.form.pictures = []
       e.forEach((file) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => this.form.pictures.push({ photo: reader.result });
-      });
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => this.form.pictures.push({ photo: reader.result })
+      })
     },
 
     getHabitacion() {
       this.$store.state.services.roomService
         .index()
         .then((r) => {
-          this.habitaciones = r.data.data;
+          this.habitaciones = r.data.data
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
   },
-};
+}
 </script>

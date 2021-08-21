@@ -16,18 +16,21 @@ const state = {
   is_login: false,
   token_expired: null,
   menu: [],
+  roles: [],
   permissions: [],
+  drawer: false,
 
   /* ::::::::::::::::::::: DESARROLLO ::::::::::::::::::::::::: */
-  base_url: 'https://api.hotelspa.app/',
-  //base_url: 'http://localhost:8001/SISHRS/backend/public/',
+  //base_url: 'https://api.hotelspa.app/',
+  base_url: 'http://localhost:8001/SISHRS/backend/public/',
   client_id: 2,
   client_secret: 'fb8QYHjGOBKEL4S8CMDNkXW44lSHGmM6lrvoxwO1'
 }
 
 const mutations = {
-  setUser(state, usuario) {
-    state.usuario = usuario
+  setUser(state, objeto) {
+    state.usuario = objeto.usuario
+    state.roles = objeto.roles
   },
 
   setMenu(state, menu) {

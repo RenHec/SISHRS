@@ -66,8 +66,9 @@
             color="blue darken-1"
             text
             @click="validar_formulario('create_rol')"
-            >Guardar</v-btn
           >
+            Guardar
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -93,8 +94,9 @@
               single-line
               hide-details
             ></v-text-field>
-            <v-spacer></v-spacer>
-
+            <v-btn class="ma-2" color="primary" @click="initialize">
+              Actualizar
+            </v-btn>
             <v-dialog
               v-model="dialog"
               color="primary"
@@ -117,9 +119,12 @@
                     <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-toolbar-items>
-                      <v-btn text @click="validar_formulario('create_menu_rol')"
-                        >Guardar</v-btn
+                      <v-btn
+                        text
+                        @click="validar_formulario('create_menu_rol')"
                       >
+                        Guardar
+                      </v-btn>
                     </v-toolbar-items>
                   </v-toolbar>
                 </v-card-title>
@@ -229,10 +234,10 @@
 </template>
 
 <script>
-import FormError from "../shared/FormError";
+import FormError from '../shared/FormError'
 
 export default {
-  name: "Rol",
+  name: 'Rol',
   components: {
     FormError,
   },
@@ -240,106 +245,106 @@ export default {
     return {
       loading: false,
       dialog: false,
-      search: "",
+      search: '',
       headers: [
         {
-          text: "Nombre",
-          align: "start",
-          value: "name",
+          text: 'Nombre',
+          align: 'start',
+          value: 'name',
         },
-        { text: "Opciones", value: "actions", sortable: false },
+        { text: 'Opciones', value: 'actions', sortable: false },
       ],
       footer: {
         showFirstLastPage: true,
-        firstIcon: "mdi-arrow-collapse-left",
-        lastIcon: "mdi-arrow-collapse-right",
-        prevIcon: "mdi-minus",
-        nextIcon: "mdi-plus",
+        firstIcon: 'mdi-arrow-collapse-left',
+        lastIcon: 'mdi-arrow-collapse-right',
+        prevIcon: 'mdi-minus',
+        nextIcon: 'mdi-plus',
       },
       desserts: [],
       editedIndex: false,
       form: {
         id: 0,
-        name: "",
+        name: '',
         menus: [],
         menus_id: [],
       },
       delete_masivo: [],
       menus: [],
       menus_rol: [],
-    };
+    }
   },
   computed: {
     formTitle() {
-      return !this.editedIndex ? "Agregar rol" : "Administrar menu del rol";
+      return !this.editedIndex ? 'Agregar rol' : 'Administrar menu del rol'
     },
   },
 
   watch: {
     dialog(val) {
-      val || this.close();
+      val || this.close()
     },
   },
 
   created() {
-    this.initialize();
-    this.getMenu();
+    this.initialize()
+    this.getMenu()
   },
 
   methods: {
     limpiar() {
-      this.form.id = 0;
-      this.form.name = null;
-      this.form.menus = [];
-      this.form.menus_id = [];
-      this.editedIndex = false;
-      this.delete_masivo = [];
+      this.form.id = 0
+      this.form.name = null
+      this.form.menus = []
+      this.form.menus_id = []
+      this.editedIndex = false
+      this.delete_masivo = []
 
-      this.$validator.reset();
-      this.$validator.reset();
+      this.$validator.reset()
+      this.$validator.reset()
     },
 
     initialize() {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.rolService
         .index()
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
-          this.desserts = r.data.data;
-          this.close();
-          this.loading = false;
+          this.desserts = r.data.data
+          this.close()
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
 
     mapear(item) {
-      this.form.id = item.id;
-      this.form.name = item.name;
-      this.form.menus = item.rols_menus;
+      this.form.id = item.id
+      this.form.name = item.name
+      this.form.menus = item.rols_menus
 
-      this.getMenusRol(this.form.menus);
+      this.getMenusRol(this.form.menus)
 
-      this.editedIndex = true;
-      this.dialog = true;
+      this.editedIndex = true
+      this.dialog = true
     },
 
     close() {
-      this.limpiar();
-      this.getMenu();
-      this.dialog = false;
+      this.limpiar()
+      this.getMenu()
+      this.dialog = false
     },
 
     validar_formulario(scope) {
@@ -347,246 +352,245 @@ export default {
         if (result)
           this.editedIndex
             ? this.store_menu_rol(this.form)
-            : this.store(this.form);
-      });
+            : this.store(this.form)
+      })
     },
 
     destroy(data) {
-      let title = !data.deleted_at ? "Desactivar" : "Activar";
-      let type = !data.deleted_at ? "error" : "success";
+      let title = !data.deleted_at ? 'Desactivar' : 'Activar'
+      let type = !data.deleted_at ? 'error' : 'success'
       this.$swal({
         title: title,
-        text: "¿Está seguro de realizar esta acción?",
+        text: '¿Está seguro de realizar esta acción?',
         type: type,
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.rolService
             .destroy(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     destroy_menu_rol(data) {
-      let set = {};
-      let title = "Desactivar";
-      let type = "error";
-      set.eliminar = data;
+      let set = {}
+      let title = 'Desactivar'
+      let type = 'error'
+      set.eliminar = data
 
       this.$swal({
         title: title,
-        text: "¿Está seguro de realizar esta acción?",
+        text: '¿Está seguro de realizar esta acción?',
         type: type,
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.rolMenuService
             .eliminar_masivo(set)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     store(data) {
       this.$swal({
-        title: "Agregar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Agregar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.rolService
             .store(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     store_menu_rol(data) {
       this.$swal({
-        title: "Agregar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Agregar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.rolMenuService
             .store(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     //necesarios
     getMenu() {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.menuService
         .index()
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
 
-          this.menus = r.data.data;
-          this.loading = false;
+          this.menus = r.data.data
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
 
     getMenusRol(items) {
-      let temporal = [];
-      this.loading = true;
-      this.menus_rol = [];
+      let temporal = []
+      this.loading = true
+      this.menus_rol = []
 
       items.forEach((element_x) => {
         this.menus.forEach((element_y) => {
           element_x.menu_id == element_y.id
             ? this.menus.splice(this.menus.indexOf(element_y), 1)
-            : null;
-        });
-      });
+            : null
+        })
+      })
 
       items.forEach(function (item) {
         if (item.menu.father == 0 && !item.menu.hide) {
-          var object = new Object();
-          object.id = item.id;
-          object.name = item.menu.name;
-          object.children = [];
+          var object = new Object()
+          object.id = item.id
+          object.name = item.menu.name
+          object.children = []
           items.forEach(function (child, i) {
             if (item.menu.id == child.menu.father && !child.menu.hide) {
-              var object2 = new Object();
-              object2.id = child.id;
-              object2.name = child.menu.name;
+              var object2 = new Object()
+              object2.id = child.id
+              object2.name = child.menu.name
 
-              object.children.push(object2);
+              object.children.push(object2)
             }
-          });
-          
-          object.children.length > 0 ? temporal.push(object) : null;
-        }
-      });
+          })
 
-      this.menus_rol = this.menus;
-      this.form.menus = temporal;
-      this.loading = false;
+          object.children.length > 0 ? temporal.push(object) : null
+        }
+      })
+
+      this.menus_rol = this.menus
+      this.form.menus = temporal
+      this.loading = false
     },
   },
-};
+}
 </script>
-

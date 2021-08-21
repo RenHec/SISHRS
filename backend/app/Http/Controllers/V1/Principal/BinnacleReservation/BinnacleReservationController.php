@@ -23,6 +23,47 @@ class BinnacleReservationController extends ApiController
 
     /**
      * @OA\Get(
+     *      path="/service/rest/v1/principal/binnacle_reservation",
+     *      operationId="getBinnacle",
+     *      tags={"Binnacle Reservation"},
+     *      security={
+     *          {"passport": {}},
+     *      },
+     *      summary="Muestra los movimientos realizados en las reservaciones.",
+     *      description="Retorna un array de información.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Respuesta correcta",
+     *          @OA\MediaType(
+     *           mediaType="application/json",
+     *      )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="No autenticado",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Permisos denegados"
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Solicitud incorrecta"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Servicio no encontrado"
+     *      ),
+     *  )
+     */
+    public function index()
+    {
+        $data = BinnacleReservation::with('movement', 'reservation_detail.room', 'user', 'type_service')->get();
+        return $this->showAll($data);
+    }
+
+    /**
+     * @OA\Get(
      *      path="/service/rest/v1/principal/binnacle_reservation/{binnacle_reservation}",
      *      operationId="findBinnacleReservationbyId",
      *      tags={"Binnacle Reservation"},
@@ -68,8 +109,9 @@ class BinnacleReservationController extends ApiController
      */
     public function show(Reservation $binnacle_reservation)
     {
-        $binnacle_reservation->binnacle;
-        return $this->showOne($binnacle_reservation);
+        $ids = ReservationDetail::where('reservation_id', $binnacle_reservation->id)->pluck('id');
+        $data = BinnacleReservation::with('movement', 'reservation_detail.room', 'user', 'type_service')->whereIn('reservation_detail_id', $ids)->get();
+        return $this->showAll($data);
     }
 
     /**

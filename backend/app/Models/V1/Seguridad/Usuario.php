@@ -47,7 +47,8 @@ class Usuario extends Authenticatable
         'departament_id',
         'municipality_id',
         'password',
-        'photo'
+        'photo',
+        'occupied'
     ];
 
     /**
@@ -58,7 +59,7 @@ class Usuario extends Authenticatable
     protected $hidden = [
         'email_verified_at',
         'password',
-        'remember_token', 
+        'remember_token',
         'photo'
     ];
 
@@ -71,7 +72,8 @@ class Usuario extends Authenticatable
         'email_verified_at' => 'datetime:d/m/Y h:i:s a',
         'created_at' => 'datetime:d/m/Y h:i:s a',
         'updated_at' => 'datetime:d/m/Y h:i:s a',
-        'deleted_at' => 'datetime:d/m/Y h:i:s a'
+        'deleted_at' => 'datetime:d/m/Y h:i:s a',
+        'occupied' => 'boolean'
     ];
 
     /**
@@ -116,7 +118,7 @@ class Usuario extends Authenticatable
     public function getPictureAttribute()
     {
         $imagen = Storage::disk('user')->exists($this->photo); //Preguntamos si la imagen existe creada local
-        
+
         if (!$imagen) { //Si la imagen no existe
             return null;
         }

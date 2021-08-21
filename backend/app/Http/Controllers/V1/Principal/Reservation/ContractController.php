@@ -82,11 +82,16 @@ class ContractController extends ApiController
             DB::beginTransaction();
             $insert = new AdvancePrice();
             $insert->id = $contract->id;
-            $insert->amount = $request->pay == "COMPLETO" ? $reservation->total_reservation : ($reservation->total_reservation * 50) / 100;
+            if (isset($request->pay) && !is_null($request->pay)) {
+                $insert->amount = $request->pay == "COMPLETO" ? $reservation->total_reservation : ($reservation->total_reservation * 50) / 100;
+                $insert->payment_percentage = $request->pay;
+            } else {
+                $insert->amount = $reservation->total_reservation;
+                $insert->payment_percentage = "COMPLETO";
+            }
             $insert->link = mb_strtolower($request->way_to_pay['name']) == 'link' ? route('bac_payment.paymentData', $contract->url) : null;
             $insert->document = null;
             $insert->authorization_link = null;
-            $insert->payment_percentage = $request->pay;
             $insert->status = null;
             $insert->contract_id = $contract->id;
             $insert->reservation_id = $reservation->id;
@@ -113,50 +118,6 @@ class ContractController extends ApiController
             }
 
             return $this->successResponse('Método de pago creado.');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return $this->errorResponse('Ocurrio un problema.', 500);
-        }
-    }
-
-    public function verficiarLinkBoleta($link)
-    {
-        try {
-            $contract = Contract::where('url', $link)->first();
-            $advance = AdvancePrice::where('contract_id', $contract->id)->first();
-
-            if (is_null($contract)) {
-                return $this->errorResponse('El link de validación es incorrecto.', 404);
-            }
-            if (is_null($advance)) {
-                return $this->errorResponse('No existe ningún método de pago para esta reservación.', 404);
-            }
-
-            return response()->json(['contract' => $link, 'advance' => $advance], 200);
-        } catch (\Throwable $th) {
-            return $this->errorResponse('Ocurrio un problema.', 500);
-        }
-    }
-
-    public function adjuntarBoleta(Request $request, Contract $contract, AdvancePrice $advance)
-    {
-        try {
-            if (!is_null($request->document)) {
-                $img = $this->getB64Image($request->document);
-                $image = Image::make($img);
-                $image->fit(870, 620, function ($constraint) {
-                    $constraint->upsize();
-                });
-                $image->encode('jpg', 70);
-                Storage::disk('advance_price_document')->put($contract->firm, $image);
-
-                $advance->document = $contract->firm;
-                $advance->save();
-            } else {
-                return $this->errorResponse('Es obligatorio adjuntar el documento.', 500);
-            }
-
-            return $this->successResponse('El documento fue presentado exitosamente, espere para su confirmación.');
         } catch (\Throwable $th) {
             DB::rollBack();
             return $this->errorResponse('Ocurrio un problema.', 500);

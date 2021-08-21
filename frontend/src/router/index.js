@@ -20,6 +20,9 @@ import Movement from '@/components/catalogo/MovementComponent'
 import Municipality from '@/components/catalogo/MunicipalityComponent'
 import Departament from '@/components/catalogo/DepartamentComponent'
 import TypeService from '@/components/catalogo/TypeServiceComponent'
+import Category from '@/components/catalogo/CategoryComponent'
+import Supplier from '@/components/catalogo/SupplierComponent'
+import KardexStatus from '@/components/catalogo/KardexStatusComponent'
 
 //Principal
 import PictureRoom from '@/components/principal/PictureRoomComponent'
@@ -30,6 +33,19 @@ import Ofert from '@/components/principal/OfertComponent'
 import Reservation from '@/components/principal/ReservationComponent'
 import TypeCharge from '@/components/principal/TypeChargeComponent'
 import TypeMessage from '@/components/principal/TypeMessageComponent'
+
+//Gestiones
+import ListReservation from '@/components/gestiones/ListReservationComponent'
+import ListAdvancePrice from '@/components/gestiones/ListAdvancePriceComponent'
+import AsignService from '@/components/gestiones/AsignServiceComponent'
+
+//Comercio
+import Product from '@/components/comercio/ProductComponent'
+import PictureProduct from '@/components/comercio/PictureProductComponent'
+import Income from '@/components/comercio/IncomeComponent'
+import Kardex from '@/components/comercio/KardexComponent'
+import SaleCodeUser from '@/components/comercio/SaleCodeUserComponent'
+import Sale from '@/components/comercio/SaleComponent'
 
 Vue.use(Router)
 
@@ -64,8 +80,8 @@ const routes = [{
   beforeEnter: multiguard([isLoggedOut])
 },
 
-{ path: '/terminos/condiciones/:token', name: 'DefaultExterno', component: DefaultExterno },
-//{ path: '/terminos/condiciones/:token', name: 'DefaultExterno', component: DefaultExterno, beforeEnter: multiguard([isLoggedOut]) },
+{ path: '/terminos/condiciones/:token', name: 'DefaultExterno', component: DefaultExterno, beforeEnter: multiguard([isLoggedOut]) },
+
 //Seguridad
 {
   path: '/rol',
@@ -114,6 +130,21 @@ const routes = [{
   name: 'TypeService',
   component: TypeService,
   beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/category',
+  name: 'Category',
+  component: Category,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/supplier',
+  name: 'Supplier',
+  component: Supplier,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/kardex_status',
+  name: 'KardexStatus',
+  component: KardexStatus,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
 },
 //Principal
 {
@@ -155,6 +186,55 @@ const routes = [{
   path: '/type_massage',
   name: 'TypeMessage',
   component: TypeMessage,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+},
+//Gestiones
+{
+  path: '/list_reservations',
+  name: 'ListReservation',
+  component: ListReservation,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/list_advance_price',
+  name: 'ListAdvancePrice',
+  component: ListAdvancePrice,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/asign_service',
+  name: 'AsignService',
+  component: AsignService,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+},
+//Comercio
+{
+  path: '/product',
+  name: 'Product',
+  component: Product,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/pictures_products',
+  name: 'PictureProduct',
+  component: PictureProduct,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/income',
+  name: 'Income',
+  component: Income,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/kardex',
+  name: 'Kardex',
+  component: Kardex,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/sale_code_users',
+  name: 'SaleCodeUser',
+  component: SaleCodeUser,
+  beforeEnter: multiguard([isLoggedIn, permissionsValidations])
+}, {
+  path: '/sale',
+  name: 'Sale',
+  component: Sale,
   beforeEnter: multiguard([isLoggedIn, permissionsValidations])
 }
 ]

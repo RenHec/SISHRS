@@ -50,6 +50,18 @@ Vue.use(require('vue-moment'), {
   moment
 })
 
+import VueCurrencyFilter from 'vue-currency-filter'
+Vue.use(VueCurrencyFilter,
+  {
+    symbol: null,
+    thousandsSeparator: ',',
+    fractionCount: 2,
+    fractionSeparator: '.',
+    symbolPosition: 'front',
+    symbolSpacing: true,
+    avoidEmptyDecimals: undefined,
+  })
+
 import VueSweetalert2 from 'vue-sweetalert2'
 const options = {
   confirmButtonColor: '#41b882',

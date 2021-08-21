@@ -27,6 +27,7 @@
     "vue": "^2.6.12",
     "vue-advanced-cropper": "^0.16.10",
     "vue-cookies": "^1.5.13",
+    "vue-currency-filter": "^4.0.3",
     "vue-moment": "^3.2.0",
     "vue-phone-number-input": "^1.1.10",
     "vue-quill-editor": "^3.0.6",

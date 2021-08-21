@@ -59,7 +59,7 @@ class ProductController extends ApiController
      */
     public function index()
     {
-        $data = Product::with('category', 'sub_category', 'coin', 'prices')->withTrashed()->orderByDesc('id')->get();
+        $data = Product::with('category', 'sub_category', 'coin', 'prices', 'kardex')->withTrashed()->orderByDesc('id')->get();
         return $this->showAll($data);
     }
 
@@ -118,9 +118,6 @@ class ProductController extends ApiController
 
                     $img = $this->getB64Image($value['photo']);
                     $image = Image::make($img);
-                    $image->fit(870, 620, function ($constraint) {
-                        $constraint->upsize();
-                    });
                     $image->encode('jpg', 70);
                     $path = "{$product->id}/{$picture_name}.jpg";
                     Storage::disk('product')->put($path, $image);
@@ -135,7 +132,7 @@ class ProductController extends ApiController
                     );
                 }
             }
-            
+
             ChangePrice::create(
                 [
                     'price' => $product->price,
@@ -215,7 +212,7 @@ class ProductController extends ApiController
      */
     public function update(Request $request, Product $product)
     {
-        $this->validate($request, $this->rules($product->id), $this->messages());
+        //$this->validate($request, $this->rules($product->id), $this->messages());
 
         try {
 
@@ -236,9 +233,8 @@ class ProductController extends ApiController
 
             $product->name = $request->name;
             $product->description = $request->description;
-            $product->category_id = SubCategory::find($request->sub_category_id['id'])->category_id;
+            $product->category_id = $request->category_id['id'];
             $product->sub_category_id = $request->sub_category_id['id'];
-            $product->coin_id = $request->coin_id['id'];
 
             if (!$product->isDirty())
                 $this->errorResponse('No hay datos para actualizar', 423);
@@ -343,9 +339,6 @@ class ProductController extends ApiController
             'discount.between' => 'El descueto tiene que estar en un rango entre :min y :max.',
 
             'description.required' => 'La descripción del producto es obligatoria.',
-
-            'amount_bed.required' => 'El número de personas por cama es obligatorio.',
-            'amount_bed.between' => 'El número de personas por cama tiene que estar en un rango entre :min y :max.',
 
             'price.required' => 'El precio de la habitación es obligatorio.',
             'price.between' => 'El precio de la habitación tiene que estar en un rango entre :min y :max.',

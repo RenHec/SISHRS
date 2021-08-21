@@ -1,13 +1,17 @@
 <template>
-  <v-row class="fill-height">
+  <v-row align="center" justify="space-around">
     <v-overlay :value="loading">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
-    <v-col cols="12" md="1"></v-col>
-    <v-col cols="12" md="10">
+    <v-col cols="12" md="12" align="center">
+      <v-spacer></v-spacer>
       <v-btn color="primary" @click="llenar_calendario()">
         Actualizar Calendario
       </v-btn>
+      <v-spacer></v-spacer>
+    </v-col>
+
+    <v-col cols="12" md="11">
       <v-sheet height="64">
         <v-toolbar flat>
           <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">
@@ -89,12 +93,12 @@
               </v-list-item>
               <v-list-item>
                 <v-list-item-subtitle style="color: black;">
-                  Inicio: {{ selectedEvent.start }}
+                  Entrada: {{ selectedEvent.start }}
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
                 <v-list-item-subtitle style="color: black;">
-                  Finaliza: {{ selectedEvent.end }}
+                  Salida: {{ selectedEvent.end }}
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
@@ -131,21 +135,27 @@
             <v-card-actions>
               <v-btn
                 color="error"
-                v-if="selectedEvent.status == 1"
+                v-if="
+                  selectedEvent.status == 1 && selectedEvent.anticipo_sf == 0
+                "
                 @click="cancelar_reservacion(selectedEvent)"
               >
                 Cancelar
               </v-btn>
               <v-btn
                 color="info"
-                v-if="selectedEvent.status == 1"
+                v-if="
+                  selectedEvent.status == 1 && selectedEvent.anticipo_sf != 0
+                "
                 @click="checkInFunction(selectedEvent)"
               >
                 Check In
               </v-btn>
               <v-btn
                 color="success"
-                v-if="selectedEvent.status == 2"
+                v-if="
+                  selectedEvent.status == 2 && selectedEvent.anticipo_sf != 0
+                "
                 @click="checkOutFunction(selectedEvent)"
               >
                 Check Out
@@ -155,11 +165,15 @@
         </v-menu>
       </v-sheet>
     </v-col>
-    <v-col cols="12" md="1"></v-col>
 
-    <v-row justify="center" v-if="dialog_checkIn">
-      <v-dialog v-model="dialog_checkIn" persistent max-width="600px">
-        <v-card>
+    <v-col cols="12" md="12" class="text-center" v-if="dialog_checkIn">
+      <v-dialog
+        v-model="dialog_checkIn"
+        persistent
+        class="mx-auto my-12"
+        max-width="600px"
+      >
+        <v-card color="light-blue darken-4">
           <v-card-title>
             <span class="text-h5">
               CheckIn | {{ checkIn.information.name }}
@@ -187,12 +201,12 @@
               </v-list-item>
               <v-list-item>
                 <v-list-item-subtitle>
-                  Inicio: {{ checkIn.information.start }}
+                  Entrada: {{ checkIn.information.start }}
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
                 <v-list-item-subtitle>
-                  Finaliza: {{ checkIn.information.end }}
+                  Salida: {{ checkIn.information.end }}
                 </v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
@@ -256,11 +270,16 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-row>
+    </v-col>
 
-    <v-row justify="center" v-if="dialog_checkOut">
-      <v-dialog v-model="dialog_checkOut" persistent max-width="800px">
-        <v-card>
+    <v-col cols="12" md="12" class="text-center" v-if="dialog_checkOut">
+      <v-dialog
+        v-model="dialog_checkOut"
+        class="mx-auto my-12"
+        persistent
+        max-width="850px"
+      >
+        <v-card color="green darken-4">
           <v-card-title>
             <span class="text-h5">
               CheckOut | {{ checkOut.information.name }}
@@ -287,10 +306,10 @@
                   Número de habitación: {{ item }}
                 </v-col>
                 <v-col class="text-h7 text-left" cols="6">
-                  Inicio: {{ checkOut.information.start }}
+                  Entrada: {{ checkOut.information.start }}
                 </v-col>
                 <v-col class="text-h7 text-right" cols="6">
-                  Finaliza: {{ checkOut.information.end }}
+                  Salida: {{ checkOut.information.end }}
                 </v-col>
               </v-row>
               <hr />
@@ -313,11 +332,46 @@
                       {{ item.sub }}
                     </div>
                     <div v-else>
-                      {{ item.quote }} X {{ item.precio }} = {{ item.sub }}
+                      {{ item.quote == 0 ? '1' : item.quote }} X
+                      {{ item.precio }} = {{ item.sub }}
                     </div>
                   </div>
                 </v-timeline-item>
               </v-timeline>
+              <template v-if="checkOut.productos.length > 0">
+                <hr />
+                <div class="font-weight-bold ml-8 mb-2">
+                  Detalle de venta de producto
+                </div>
+
+                <v-timeline align-top dense>
+                  <v-timeline-item
+                    v-for="(item, index_item) in checkOut.productos"
+                    :key="index_item"
+                    small
+                    color="yellow"
+                  >
+                    <v-row class="pt-1">
+                      <v-col cols="6">
+                        <strong>
+                          <small>
+                            {{ item.amount }} - {{ item.product.name }}
+                          </small>
+                        </strong>
+                      </v-col>
+                      <v-col>
+                        <strong>
+                          Precio: {{ item.monto_precio }} / Descuento:
+                          {{ item.monto_descuento }}
+                        </strong>
+                        <div class="text-caption">
+                          Total Q {{ item.monto_sub }}
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-timeline-item>
+                </v-timeline>
+              </template>
               <template v-if="checkOut.restaurant.length > 0">
                 <hr />
                 <div class="font-weight-bold ml-8 mb-2">
@@ -337,7 +391,7 @@
                     color="green"
                   >
                     <v-row class="pt-1">
-                      <v-col cols="3">
+                      <v-col cols="6">
                         <strong>No. Orden - {{ item.order_id }}</strong>
                       </v-col>
                       <v-col>
@@ -354,39 +408,50 @@
               </template>
               <hr />
               <v-row>
-                <v-col
-                  class="text-h5 text-right"
-                  cols="4"
-                  v-if="checkOut.restaurant.length > 0"
-                >
-                  Total Reservación
+                <v-col class="text-h5 text-right" cols="4">
+                  Total Reservación +
                 </v-col>
-                <v-col
-                  class="text-h2 text-right"
-                  cols="8"
-                  v-if="checkOut.restaurant.length > 0"
-                >
+                <v-col class="text-h3 text-right" cols="8">
                   {{ checkOut.information.total }}
                 </v-col>
+                <v-col class="text-h5 text-right" cols="4">
+                  Total Producto +
+                </v-col>
+                <v-col class="text-h3 text-right" cols="8">
+                  {{ checkOut.information.total_product }}
+                </v-col>
                 <v-col
                   class="text-h5 text-right"
                   cols="4"
                   v-if="checkOut.restaurant.length > 0"
                 >
-                  Total Restaurante
+                  Total Restaurante +
                 </v-col>
                 <v-col
-                  class="text-h2 text-right"
+                  class="text-h3 text-right"
                   cols="8"
                   v-if="checkOut.restaurant.length > 0"
                 >
                   {{ checkOut.total_restaurant }}
                 </v-col>
+                <v-col class="text-h5 text-right" cols="4">
+                  Sub total
+                </v-col>
+                <v-col class="text-h3 text-right" cols="8">
+                  {{ checkOut.total }}
+                </v-col>
+                <v-col class="text-h5 text-right" cols="4">
+                  Anticipo -
+                </v-col>
+                <v-col class="text-h3 text-right" cols="8">
+                  {{ checkOut.anticipo }}
+                </v-col>
+                <v-col class="text-h4 text-right" cols="12"><hr /></v-col>
                 <v-col class="text-h4 text-right" cols="4">
                   Total
                 </v-col>
                 <v-col class="text-h2 text-right" cols="8">
-                  {{ checkOut.total }}
+                  {{ checkOut.resta }}
                 </v-col>
               </v-row>
               <hr />
@@ -480,7 +545,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-row>
+    </v-col>
   </v-row>
 </template>
 
@@ -536,6 +601,9 @@ export default {
         total: '',
         total_restaurant_sf: 0,
         number_room: [],
+        anticipo: null,
+        resta: null,
+        productos: [],
       },
       temp: null,
       accept: ['image/png', 'image/jpeg', 'image/jpg'],
@@ -625,6 +693,12 @@ export default {
             objeto.total_general = r.data.total
             objeto.total_restaurant_sf = r.data.total_restaurant_sf
             objeto.number_room = r.data.number_room
+            objeto.anticipo =
+              r.data.data.length != 0 ? r.data.data[0].anticipo : null
+            objeto.anticipo_sf =
+              r.data.data.length != 0 ? r.data.data[0].anticipo_sf : null
+            objeto.resta = r.data.resta
+            objeto.productos = r.data.productos
 
             this.selectedEvent = objeto
             this.selectedOpen = true
@@ -652,6 +726,7 @@ export default {
     rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
     },
+
     cancelar_reservacion(data) {
       this.$swal({
         title: 'Cancelar Reservación No. \n' + data.name,
@@ -794,8 +869,92 @@ export default {
     },
 
     checkOutFunction(item) {
-      this.getClient()
-      this.checkOut.status_id = 3
+      Promise.all([this.getClient()])
+        .then(() => {
+          this.loading = true
+          this.$store.state.services.reservationService
+            .show(item)
+            .then((r) => {
+              if (r.response) {
+                if (r.response.data.code === 423) {
+                  this.$toastr.error(r.response.data.error, 'Mensaje')
+                } else {
+                  for (let value of Object.values(r.response.data.error)) {
+                    this.$toastr.error(value, 'Mensaje')
+                  }
+                }
+                this.loading = false
+                return
+              }
+
+              let colores = {
+                '1': 'primary',
+                '2': 'success',
+              }
+
+              let objeto = new Object()
+              objeto.id = r.data.data.length != 0 ? r.data.data[0].id : null
+              objeto.name = r.data.data.length != 0 ? r.data.data[0].name : null
+              objeto.ubication =
+                r.data.data.length != 0 ? r.data.data[0].ubication : null
+              objeto.client =
+                r.data.data.length != 0 ? r.data.data[0].client : null
+              objeto.nit = r.data.data.length != 0 ? r.data.data[0].nit : null
+              objeto.start =
+                r.data.data.length != 0 ? r.data.data[0].start : null
+              objeto.end = r.data.data.length != 0 ? r.data.data[0].end : null
+              objeto.total_sf =
+                r.data.data.length != 0 ? r.data.data[0].total_sf : null
+              objeto.total =
+                r.data.data.length != 0 ? r.data.data[0].total : null
+              objeto.total_product =
+                r.data.data.length != 0 ? r.data.data[0].total_product : null
+              objeto.status =
+                r.data.data.length != 0 ? r.data.data[0].status : null
+              objeto.color =
+                r.data.data.length != 0 ? colores[objeto.status] : null
+              objeto.servicios = r.data.data
+              objeto.restaurant = r.data.restaurante
+              objeto.total_restaurant = r.data.total_restaurant
+              objeto.total_general = r.data.total
+              objeto.total_restaurant_sf = r.data.total_restaurant_sf
+              objeto.number_room = r.data.number_room
+              objeto.anticipo =
+                r.data.data.length != 0 ? r.data.data[0].anticipo : null
+              objeto.anticipo_sf =
+                r.data.data.length != 0 ? r.data.data[0].anticipo_sf : null
+              objeto.resta = r.data.resta
+              objeto.productos = r.data.productos
+
+              this.checkOut.status_id = 3
+              this.checkOut.way_to_pay = null
+              this.checkOut.id = objeto.id
+              this.checkOut.nit = objeto.nit
+              this.checkOut.name = objeto.client
+              this.checkOut.ubication = objeto.ubication
+              this.checkOut.information = objeto
+              this.checkOut.restaurant = objeto.restaurant
+              this.checkOut.total_restaurant = objeto.total_restaurant
+              this.checkOut.total = objeto.total_general
+              this.checkOut.total_restaurant_sf = objeto.total_restaurant_sf
+              this.checkOut.number_room = objeto.number_room
+              this.checkOut.anticipo = objeto.anticipo
+              this.checkOut.resta = objeto.resta
+              this.checkOut.productos = objeto.productos
+              this.dialog_checkOut = true
+
+              this.loading = false
+            })
+            .catch((r) => {
+              this.loading = false
+            })
+        })
+        .catch((error) => {
+          this.loading = false
+          this.$toastr.error('Ocurrió un error: ' + error, 'Error')
+        })
+
+      /*this.checkOut.status_id = 3
       this.checkOut.way_to_pay = null
       this.checkOut.id = item.id
       this.checkOut.nit = item.nit
@@ -807,7 +966,9 @@ export default {
       this.checkOut.total = item.total_general
       this.checkOut.total_restaurant_sf = item.total_restaurant_sf
       this.checkOut.number_room = item.number_room
-      this.dialog_checkOut = true
+      this.checkOut.anticipo = item.anticipo
+      this.checkOut.resta = item.resta
+      this.dialog_checkOut = true*/
     },
 
     seleccionar_cliente(item) {

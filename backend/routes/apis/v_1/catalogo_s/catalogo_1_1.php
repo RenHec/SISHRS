@@ -47,11 +47,8 @@ Route::resource('type_service', 'TypeService\TypeServiceController')->only('inde
 //rutas para CategoryController
 Route::resource('category', 'Category\CategoryController')->except('create', 'show', 'edit');
 
-//rutas para CategoryController
-Route::resource('category', 'Category\CategoryController')->except('create', 'show', 'edit');
-
 //rutas para SubCategoryController
-Route::resource('sub_category', 'SubCategory\SubCategoryController')->except('create', 'show', 'edit');
+Route::resource('sub_category', 'SubCategory\SubCategoryController')->except('create', 'index', 'edit');
 
 //rutas para KardexStatusController
 Route::resource('kardex_status', 'KardexStatus\KardexStatusController')->only('index');

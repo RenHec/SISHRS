@@ -49,7 +49,7 @@ class SaleController extends ApiController
      */
     public function index()
     {
-        $data = Sale::with('reservation', 'product', 'user', 'client')->withTrashed()->get();
+        $data = Sale::with('reservation.reservation', 'product', 'user', 'client')->withTrashed()->get();
         return $this->showAll($data);
     }
 }

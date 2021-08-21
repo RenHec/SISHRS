@@ -25,7 +25,9 @@
               single-line
               hide-details
             ></v-text-field>
-            <v-spacer></v-spacer>
+            <v-btn class="ma-2" color="primary" @click="initialize">
+              Actualizar
+            </v-btn>
 
             <v-dialog
               v-model="dialog"
@@ -42,11 +44,12 @@
                   @click="dialog = true"
                   color="primary"
                   dark
-                  class="mb-2"
+                  class="ma-2"
                   v-bind="attrs"
                   v-on="on"
-                  >Agregar</v-btn
                 >
+                  Agregar
+                </v-btn>
               </template>
               <v-card>
                 <v-overlay :value="loading">
@@ -63,9 +66,13 @@
                     <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-toolbar-items>
-                      <v-btn v-if="esconder_boton" text @click="validar_formulario('crear_usuario')"
-                        >Guardar</v-btn
+                      <v-btn
+                        v-if="esconder_boton"
+                        text
+                        @click="validar_formulario('crear_usuario')"
                       >
+                        Guardar
+                      </v-btn>
                     </v-toolbar-items>
                   </v-toolbar>
                 </v-card-title>
@@ -326,15 +333,15 @@
                             color="indigo"
                             @click="crop"
                           >
-                            <v-icon class="material-icons"
-                              >format_shapes</v-icon
-                            >
+                            <v-icon class="material-icons">
+                              format_shapes
+                            </v-icon>
                           </v-btn>
                         </div>
                       </v-col>
                       <v-col cols="12" md="6" class="text-center">
                         <v-list-item-avatar
-                          style="height: 80%; min-width: 80%; width: 80%"
+                          style="height: 80%; min-width: 80%; width: 80%;"
                         >
                           <img :src="form.photo" alt width="80%" height="80%" />
                         </v-list-item-avatar>
@@ -348,7 +355,9 @@
         </template>
         <template v-slot:item.name="{ item }">
           <div class="text-center">
-            <v-list-item-avatar style="height: 40%; min-width: 40%; width: 40%">
+            <v-list-item-avatar
+              style="height: 40%; min-width: 40%; width: 40%;"
+            >
               <img :src="item.picture" />
             </v-list-item-avatar>
             <br />
@@ -453,15 +462,16 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="dialog_rol = false"
-              >Cancelar</v-btn
-            >
+            <v-btn color="blue darken-1" text @click="dialog_rol = false">
+              Cancelar
+            </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="validar_formulario_rol('crear_rol')"
-              >Guardar</v-btn
             >
+              Guardar
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -505,14 +515,15 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" @click="dialog_password = false"
-              >Cancelar</v-btn
-            >
+            <v-btn color="blue darken-1" @click="dialog_password = false">
+              Cancelar
+            </v-btn>
             <v-btn
               color="blue darken-1"
               @click="validar_formulario_password('crear_password')"
-              >Guardar</v-btn
             >
+              Guardar
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -530,10 +541,10 @@
 </style>
 
 <script>
-import FormError from "../shared/FormError";
+import FormError from '../shared/FormError'
 
 export default {
-  name: "Usuario",
+  name: 'Usuario',
   components: {
     FormError,
   },
@@ -545,44 +556,44 @@ export default {
       dialog_rol: false,
       esconder_boton: false,
       editedIndex: false,
-      search: "",
+      search: '',
       imagen_upload: null,
       number: null,
       temp: null,
       headers: [
         {
-          text: "CUI",
-          align: "start",
-          value: "cui",
+          text: 'CUI',
+          align: 'start',
+          value: 'cui',
         },
         {
-          text: "Nombre",
-          align: "start",
-          value: "name",
+          text: 'Nombre',
+          align: 'start',
+          value: 'name',
         },
         {
-          text: "E-mail",
-          align: "start",
-          value: "email",
+          text: 'E-mail',
+          align: 'start',
+          value: 'email',
         },
         {
-          text: "Teléfono",
-          align: "start",
-          value: "phone",
+          text: 'Teléfono',
+          align: 'start',
+          value: 'phone',
         },
         {
-          text: "Rol",
-          align: "start",
-          value: "users_rols",
+          text: 'Rol',
+          align: 'start',
+          value: 'users_rols',
         },
-        { text: "Opciones", value: "actions", sortable: false },
+        { text: 'Opciones', value: 'actions', sortable: false },
       ],
       footer: {
         showFirstLastPage: true,
-        firstIcon: "mdi-arrow-collapse-left",
-        lastIcon: "mdi-arrow-collapse-right",
-        prevIcon: "mdi-minus",
-        nextIcon: "mdi-plus",
+        firstIcon: 'mdi-arrow-collapse-left',
+        lastIcon: 'mdi-arrow-collapse-right',
+        prevIcon: 'mdi-minus',
+        nextIcon: 'mdi-plus',
       },
       desserts: [],
       municipios: [],
@@ -609,412 +620,399 @@ export default {
         roles: [],
       },
       translations: {
-        countrySelectorLabel: "Código de país",
-        countrySelectorError: "Elige un país",
-        phoneNumberLabel: "Número de teléfono",
-        example: "Ejemplo :",
+        countrySelectorLabel: 'Código de país',
+        countrySelectorError: 'Elige un país',
+        phoneNumberLabel: 'Número de teléfono',
+        example: 'Ejemplo :',
       },
-    };
+    }
   },
   computed: {
     formTitle() {
-      return !this.editedIndex ? "Agregar usuario" : "Administrar usuario";
+      return !this.editedIndex ? 'Agregar usuario' : 'Administrar usuario'
     },
   },
 
   watch: {
     dialog(val) {
-      val || this.close();
+      val || this.close()
     },
   },
 
   created() {
-    this.initialize();
-    this.getRoles();
-    this.getMunicipios();
+    this.initialize()
+    this.getRoles()
+    this.getMunicipios()
   },
 
   methods: {
     validar_numero(e) {
-      this.form.phone = e.isValid ? e.phoneNumber : null;
-      this.esconder_boton = this.form.phone ? true : false;
+      this.form.phone = e.isValid ? e.phoneNumber : null
+      this.esconder_boton = this.form.phone ? true : false
     },
 
     limpiar() {
-      this.editedIndex = false;
-      this.imagen_upload = null;
-      this.temp = null;
-      this.number = null;
-      this.esconder_boton = false;
+      this.editedIndex = false
+      this.imagen_upload = null
+      this.temp = null
+      this.number = null
+      this.esconder_boton = false
 
-      this.form.id = 0;
-      this.form.cui = null;
-      this.form.first_name = null;
-      this.form.second_name = null;
-      this.form.surname = null;
-      this.form.second_surname = null;
-      this.form.married_name = null;
-      this.form.photo = null;
-      this.form.email = null;
-      this.form.observation = null;
-      this.form.ubication = null;
-      this.form.phone = null;
-      this.form.municipality_id = null;
-      this.form.roles = [];
-      this.form.password = null;
+      this.form.id = 0
+      this.form.cui = null
+      this.form.first_name = null
+      this.form.second_name = null
+      this.form.surname = null
+      this.form.second_surname = null
+      this.form.married_name = null
+      this.form.photo = null
+      this.form.email = null
+      this.form.observation = null
+      this.form.ubication = null
+      this.form.phone = null
+      this.form.municipality_id = null
+      this.form.roles = []
+      this.form.password = null
 
-      this.$validator.reset();
-      this.$validator.reset();
+      this.$validator.reset()
+      this.$validator.reset()
     },
 
     initialize() {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.userService
         .index()
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
 
-          this.desserts = r.data.data;
-          this.close();
-          this.loading = false;
+          this.desserts = r.data.data
+          this.close()
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
 
     mapear(item) {
-      this.form.id = item.id;
-      this.form.cui = item.cui;
-      this.form.first_name = item.first_name;
-      this.form.second_name = item.second_name;
-      this.form.surname = item.surname;
-      this.form.second_surname = item.second_surname;
-      this.form.married_name = item.married_name;
-      this.form.email = item.email;
-      this.form.observation = item.observation;
-      this.form.ubication = item.ubication;
-      this.form.phone = item.phone;
-      this.form.municipality_id = item.municipality;
-      this.imagen_upload = item.picture;
+      this.form.id = item.id
+      this.form.cui = item.cui
+      this.form.first_name = item.first_name
+      this.form.second_name = item.second_name
+      this.form.surname = item.surname
+      this.form.second_surname = item.second_surname
+      this.form.married_name = item.married_name
+      this.form.email = item.email
+      this.form.observation = item.observation
+      this.form.ubication = item.ubication
+      this.form.phone = item.phone
+      this.form.municipality_id = item.municipality
+      this.imagen_upload = item.picture
 
-      this.number = item.phone;
+      this.number = item.phone
 
-      this.editedIndex = true;
-      this.dialog = true;
+      this.editedIndex = true
+      this.dialog = true
     },
 
     cambiar_password(item) {
-      this.loading = true;
-      this.form.id = item.id;
-      this.dialog_password = true;
-      this.loading = false;
+      this.loading = true
+      this.form.id = item.id
+      this.dialog_password = true
+      this.loading = false
     },
 
     validar_formulario_password(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result) {
           this.$swal({
-            title: "Cambiar contraseña",
-            text: "¿Está seguro de realizar esta acción?",
-            type: "warning",
+            title: 'Cambiar contraseña',
+            text: '¿Está seguro de realizar esta acción?',
+            type: 'warning',
             showCancelButton: true,
           }).then((result) => {
             if (result.value) {
-              this.form.password = window.btoa(this.form.password);
-              this.loading = true;
+              this.form.password = window.btoa(this.form.password)
+              this.loading = true
               this.$store.state.services.userService
                 .reset(this.form)
                 .then((r) => {
-                  this.loading = false;
+                  this.loading = false
 
                   if (r.response) {
                     if (r.response.data.code === 404) {
-                      this.$toastr.warning(
-                        r.response.data.error,
-                        "Advertencia"
-                      );
-                      return;
+                      this.$toastr.warning(r.response.data.error, 'Advertencia')
+                      return
                     } else if (r.response.data.code === 423) {
-                      this.$toastr.warning(
-                        r.response.data.error,
-                        "Advertencia"
-                      );
-                      return;
+                      this.$toastr.warning(r.response.data.error, 'Advertencia')
+                      return
                     } else {
                       for (let value of Object.values(r.response.data)) {
-                        this.$toastr.error(value, "Mensaje");
+                        this.$toastr.error(value, 'Mensaje')
                       }
                     }
-                    return;
+                    return
                   }
 
-                  this.$toastr.success(r.data, "Mensaje");
-                  this.limpiar();
-                  this.dialog_password = false;
+                  this.$toastr.success(r.data, 'Mensaje')
+                  this.limpiar()
+                  this.dialog_password = false
                 })
                 .catch((r) => {
-                  this.loading = false;
-                });
+                  this.loading = false
+                })
             } else {
-              this.close();
+              this.close()
             }
-          });
+          })
         }
-      });
+      })
     },
 
     close() {
-      this.limpiar();
-      this.dialog = false;
-      this.dialog_rol = false;
+      this.limpiar()
+      this.dialog = false
+      this.dialog_rol = false
     },
 
     validar_formulario(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result)
-          this.editedIndex ? this.update(this.form) : this.store(this.form);
-      });
+          this.editedIndex ? this.update(this.form) : this.store(this.form)
+      })
     },
 
     destroy(data) {
-      let title = !data.deleted_at ? "Desactivar" : "Activar";
-      let type = !data.deleted_at ? "error" : "success";
+      let title = !data.deleted_at ? 'Desactivar' : 'Activar'
+      let type = !data.deleted_at ? 'error' : 'success'
       this.$swal({
         title: title,
-        text: "¿Está seguro de realizar esta acción?",
+        text: '¿Está seguro de realizar esta acción?',
         type: type,
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.userService
             .destroy(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     store(data) {
       this.$swal({
-        title: "Agregar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Agregar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.form.password = window.btoa(this.form.password);
-          this.loading = true;
+          this.form.password = window.btoa(this.form.password)
+          this.loading = true
           this.$store.state.services.userService
             .store(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     update(data) {
       this.$swal({
-        title: "Modificar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "warning",
+        title: 'Modificar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'warning',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.userService
             .update(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     //necesarios
     cargarImagen(e) {
-      this.imagen_upload = null;
-      e !== "undefined" ? (this.imagen_upload = URL.createObjectURL(e)) : null;
-      this.form.photo = null;
+      this.imagen_upload = null
+      e !== 'undefined' ? (this.imagen_upload = URL.createObjectURL(e)) : null
+      this.form.photo = null
     },
 
     crop() {
-      this.form.photo = null;
-      const { coordinates, canvas } = this.$refs.cropper.getResult();
-      this.form.photo = canvas.toDataURL();
+      this.form.photo = null
+      const { coordinates, canvas } = this.$refs.cropper.getResult()
+      this.form.photo = canvas.toDataURL()
     },
 
     getRoles() {
       this.$store.state.services.rolService
         .index()
         .then((r) => {
-          this.roles = r.data.data;
+          this.roles = r.data.data
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
 
     getMunicipios() {
       this.$store.state.services.municipalityService
         .index()
         .then((r) => {
-          this.municipios = r.data.data;
+          this.municipios = r.data.data
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
 
     limipiar_form_rol() {
-      this.form_rol.id = 0;
-      this.form_rol.roles = [];
+      this.form_rol.id = 0
+      this.form_rol.roles = []
 
-      this.$validator.reset();
-      this.$validator.reset();
+      this.$validator.reset()
+      this.$validator.reset()
     },
 
     mapear_roles(item) {
-      this.limipiar_form_rol();
-      this.form_rol.id = item.id;
+      this.limipiar_form_rol()
+      this.form_rol.id = item.id
 
       item.rols.forEach((element) => {
-        this.form_rol.roles.push(element.rol);
-      });
+        this.form_rol.roles.push(element.rol)
+      })
 
-      this.dialog_rol = true;
+      this.dialog_rol = true
     },
 
     validar_formulario_rol(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result) {
           this.$swal({
-            title: "Agregar",
-            text: "¿Está seguro de realizar esta acción?",
-            type: "success",
+            title: 'Agregar',
+            text: '¿Está seguro de realizar esta acción?',
+            type: 'success',
             showCancelButton: true,
           }).then((result) => {
             if (result.value) {
-              this.loading = true;
+              this.loading = true
               this.$store.state.services.userRolService
                 .store(this.form_rol)
                 .then((r) => {
-                  this.loading = false;
+                  this.loading = false
 
                   if (r.response) {
                     if (r.response.data.code === 404) {
-                      this.$toastr.warning(
-                        r.response.data.error,
-                        "Advertencia"
-                      );
-                      return;
+                      this.$toastr.warning(r.response.data.error, 'Advertencia')
+                      return
                     } else if (r.response.data.code === 423) {
-                      this.$toastr.warning(
-                        r.response.data.error,
-                        "Advertencia"
-                      );
-                      return;
+                      this.$toastr.warning(r.response.data.error, 'Advertencia')
+                      return
                     } else {
                       for (let value of Object.values(r.response.data)) {
-                        this.$toastr.error(value, "Mensaje");
+                        this.$toastr.error(value, 'Mensaje')
                       }
                     }
-                    return;
+                    return
                   }
 
-                  this.$toastr.success(r.data, "Mensaje");
-                  this.initialize();
+                  this.$toastr.success(r.data, 'Mensaje')
+                  this.initialize()
                 })
                 .catch((r) => {
-                  this.loading = false;
-                });
+                  this.loading = false
+                })
             } else {
-              this.close();
+              this.close()
             }
-          });
+          })
         }
-      });
+      })
     },
   },
-};
+}
 </script>
-

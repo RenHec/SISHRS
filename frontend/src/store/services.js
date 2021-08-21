@@ -24,6 +24,10 @@ import typeRoomService from '../services/catalogo/typeroom/TypeRoomService'
 import typeChargeService from '../services/catalogo/typecharge/TypeChargeService'
 import typeMessageService from '../services/catalogo/typemessage/TypeMessageService'
 import typeServiceService from '../services/catalogo/typeservice/TypeServiceService'
+import categoryService from '../services/catalogo/category/CategoryService'
+import subCategoryService from '../services/catalogo/category/SubCategoryService'
+import kardexStatusService from '../services/catalogo/kardex/KardexStatusService'
+import supplierService from '../services/catalogo/supplier/SupplierService'
 /* :::::::::::::::::::::::::::::::::::: FIN DE LOS IMPORT DE CATALOGO ::::::::::::::::::::::::::::::::::::: */
 
 /* ::::::::::::::::::::::::::::::::::::::::::::: PRINCIPAL :::::::::::::::::::::::::::::::::::::::::::::::: */
@@ -38,12 +42,20 @@ import ofertRoomService from '../services/principal/room/OfertRoomService'
 import reservationService from '../services/principal/reservation/ReservationService'
 import reservationDetailService from '../services/principal/reservation/ReservationDetailService'
 import reservationServiceService from '../services/principal/reservation/ReservationServiceService'
+import advancePriceService from '../services/principal/reservation/AdvancePriceService'
+import incomeService from '../services/principal/kardex/IncomeService'
+import kardexService from '../services/principal/kardex/KardexService'
+import saleService from '../services/principal/kardex/SaleService'
+import changePriceService from '../services/principal/product/ChangePriceService'
+import pictureProductService from '../services/principal/product/PictureProductService'
+import productService from '../services/principal/product/ProductService'
+import reservationProductService from '../services/principal/reservation/ReservationProductService'
 /* :::::::::::::::::::::::::::::::::::: FIN DE LOS IMPORT DE PRINCIPAL ::::::::::::::::::::::::::::::::::::: */
 
 
 // Para desarrollo
 let baseUrl = 'https://api.hotelspa.app/'
-//baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
+baseUrl = 'http://localhost:8001/SISHRS/backend/public/' //base url desarrollo
 let token_data = $cookies.get('token_data')
 
 // Axios Configuration
@@ -80,7 +92,7 @@ function refreshToken() {
       .then(r => {
         resolve(r)
       }).catch(e => {
-        reject(r)
+        reject(e)
       })
   })
 }
@@ -114,6 +126,10 @@ export default {
   typeChargeService: new typeChargeService(Axios, baseUrl),
   typeMessageService: new typeMessageService(Axios, baseUrl),
   typeServiceService: new typeServiceService(Axios, baseUrl),
+  categoryService: new categoryService(Axios, baseUrl),
+  subCategoryService: new subCategoryService(Axios, baseUrl),
+  kardexStatusService: new kardexStatusService(Axios, baseUrl),
+  supplierService: new supplierService(Axios, baseUrl),
   //Principal
   binnacleReservationService: new binnacleReservationService(Axios, baseUrl),
   clientService: new clientService(Axios, baseUrl),
@@ -125,5 +141,13 @@ export default {
   ofertRoomService: new ofertRoomService(Axios, baseUrl),
   reservationService: new reservationService(Axios, baseUrl),
   reservationDetailService: new reservationDetailService(Axios, baseUrl),
-  reservationServiceService: new reservationServiceService(Axios, baseUrl)
+  reservationServiceService: new reservationServiceService(Axios, baseUrl),
+  advancePriceService: new advancePriceService(Axios, baseUrl),
+  incomeService: new incomeService(Axios, baseUrl),
+  kardexService: new kardexService(Axios, baseUrl),
+  saleService: new saleService(Axios, baseUrl),
+  changePriceService: new changePriceService(Axios, baseUrl),
+  pictureProductService: new pictureProductService(Axios, baseUrl),
+  productService: new productService(Axios, baseUrl),
+  reservationProductService: new reservationProductService(Axios, baseUrl)
 }

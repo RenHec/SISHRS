@@ -24,12 +24,13 @@ class CreateReservationsDetailsTable extends Migration
             $table->decimal('price', 11, 2);
             $table->decimal('sub', 11, 2);
             $table->boolean('ofert')->default(false);
+            $table->boolean('asign')->default(false);
             $table->string('guest', 200);
             $table->longText('description')->nullable();
             $table->foreignId('reservation_id')->constrained('reservations');
             $table->foreignId('room_id')->constrained('rooms');
             $table->foreignId('coin_id')->constrained('coins');
-            
+
             $table->foreignId('client_id')->constrained('clients');
             $table->foreignId('type_service_id')->constrained('type_services');
             $table->foreignId('status_id')->constrained('status');

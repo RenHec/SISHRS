@@ -14,6 +14,9 @@ class Movement extends Model
     const CANCELADA = 3;
     const CHECK_IN = 4;
     const CHECK_OUT = 5;
+    const ASIGNADA = 6;
+    const INICIADO = 6;
+    const FINALIZADO = 6;
 
     /**
      * The table associated with the model.

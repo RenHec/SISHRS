@@ -64,8 +64,9 @@
             color="blue darken-1"
             text
             @click="validar_formulario('create')"
-            >Guardar</v-btn
           >
+            Guardar
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -91,6 +92,9 @@
               single-line
               hide-details
             ></v-text-field>
+            <v-btn class="ma-2" color="primary" @click="initialize">
+              Actualizar
+            </v-btn>
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
@@ -126,10 +130,10 @@
 </template>
 
 <script>
-import FormError from "../shared/FormError";
+import FormError from '../shared/FormError'
 
 export default {
-  name: "TypeRoom",
+  name: 'TypeRoom',
   components: {
     FormError,
   },
@@ -138,245 +142,247 @@ export default {
       loading: false,
       dialog: false,
       editedIndex: false,
-      search: "",
+      search: '',
       headers: [
         {
-          text: "Servicio",
-          align: "start",
-          value: "type_service.name",
+          text: 'Servicio',
+          align: 'start',
+          value: 'type_service.name',
         },
         {
-          text: "Nombre",
-          align: "start",
-          value: "name",
+          text: 'Nombre',
+          align: 'start',
+          value: 'name',
         },
-        { text: "Opciones", value: "actions", sortable: false },
+        { text: 'Opciones', value: 'actions', sortable: false },
       ],
       footer: {
         showFirstLastPage: true,
-        firstIcon: "mdi-arrow-collapse-left",
-        lastIcon: "mdi-arrow-collapse-right",
-        prevIcon: "mdi-minus",
-        nextIcon: "mdi-plus",
+        firstIcon: 'mdi-arrow-collapse-left',
+        lastIcon: 'mdi-arrow-collapse-right',
+        prevIcon: 'mdi-minus',
+        nextIcon: 'mdi-plus',
       },
       desserts: [],
       tipo_servicios: [],
       form: {
         id: 0,
         name: null,
-        type_service_id: null
+        type_service_id: null,
       },
-    };
+    }
   },
   computed: {
     formTitle() {
-      return !this.editedIndex ? "Agregar Tipo de Habitación" : "Editar Tipo de Habitación";
+      return !this.editedIndex
+        ? 'Agregar Tipo de Habitación'
+        : 'Editar Tipo de Habitación'
     },
   },
 
   watch: {
     dialog(val) {
-      val || this.close();
+      val || this.close()
     },
   },
 
   created() {
-    this.initialize();
-    this.getTipoServicio();
+    this.initialize()
+    this.getTipoServicio()
   },
 
   methods: {
     limpiar() {
-      this.editedIndex = false;
+      this.editedIndex = false
 
-      this.form.id = 0;
-      this.form.name = null;
+      this.form.id = 0
+      this.form.name = null
 
-      this.$validator.reset();
-      this.$validator.reset();
+      this.$validator.reset()
+      this.$validator.reset()
     },
 
     initialize() {
-      this.loading = true;
+      this.loading = true
 
       this.$store.state.services.typeRoomService
         .index()
         .then((r) => {
           if (r.response) {
             if (r.response.data.code === 423) {
-              this.$toastr.error(r.response.data.error, "Mensaje");
+              this.$toastr.error(r.response.data.error, 'Mensaje')
             } else {
               for (let value of Object.values(r.response.data.error)) {
-                this.$toastr.error(value, "Mensaje");
+                this.$toastr.error(value, 'Mensaje')
               }
             }
-            this.loading = false;
-            return;
+            this.loading = false
+            return
           }
 
-          this.desserts = r.data.data;
-          this.close();
-          this.loading = false;
+          this.desserts = r.data.data
+          this.close()
+          this.loading = false
         })
         .catch((r) => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
 
     mapear(item) {
-      this.form.id = item.id;
-      this.form.name = item.name;
-      this.form.type_service_id = item.type_service;
+      this.form.id = item.id
+      this.form.name = item.name
+      this.form.type_service_id = item.type_service
 
-      this.editedIndex = true;
-      this.dialog = true;
+      this.editedIndex = true
+      this.dialog = true
     },
 
     close() {
-      this.limpiar();
-      this.dialog = false;
+      this.limpiar()
+      this.dialog = false
     },
 
     validar_formulario(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result)
-          this.editedIndex ? this.update(this.form) : this.store(this.form);
-      });
+          this.editedIndex ? this.update(this.form) : this.store(this.form)
+      })
     },
 
     destroy(data) {
-      let title = !data.deleted_at ? "Desactivar" : "Activar";
-      let type = !data.deleted_at ? "error" : "success";
+      let title = !data.deleted_at ? 'Desactivar' : 'Activar'
+      let type = !data.deleted_at ? 'error' : 'success'
       this.$swal({
         title: title,
-        text: "¿Está seguro de realizar esta acción?",
+        text: '¿Está seguro de realizar esta acción?',
         type: type,
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.typeRoomService
             .destroy(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     store(data) {
       this.$swal({
-        title: "Agregar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "success",
+        title: 'Agregar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'success',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.typeRoomService
             .store(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     update(data) {
       this.$swal({
-        title: "Modificar",
-        text: "¿Está seguro de realizar esta acción?",
-        type: "warning",
+        title: 'Modificar',
+        text: '¿Está seguro de realizar esta acción?',
+        type: 'warning',
         showCancelButton: true,
       }).then((result) => {
         if (result.value) {
-          this.loading = true;
+          this.loading = true
           this.$store.state.services.typeRoomService
             .update(data)
             .then((r) => {
-              this.loading = false;
+              this.loading = false
 
               if (r.response) {
                 if (r.response.data.code === 404) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else if (r.response.data.code === 423) {
-                  this.$toastr.warning(r.response.data.error, "Advertencia");
-                  return;
+                  this.$toastr.warning(r.response.data.error, 'Advertencia')
+                  return
                 } else {
                   for (let value of Object.values(r.response.data)) {
-                    this.$toastr.error(value, "Mensaje");
+                    this.$toastr.error(value, 'Mensaje')
                   }
                 }
-                return;
+                return
               }
 
-              this.$toastr.success(r.data, "Mensaje");
-              this.initialize();
+              this.$toastr.success(r.data, 'Mensaje')
+              this.initialize()
             })
             .catch((r) => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          this.close();
+          this.close()
         }
-      });
+      })
     },
 
     getTipoServicio() {
       this.$store.state.services.typeServiceService
         .index()
         .then((r) => {
-          this.tipo_servicios = r.data.data;
+          this.tipo_servicios = r.data.data
         })
-        .catch((r) => {});
+        .catch((r) => {})
     },
   },
-};
+}
 </script>

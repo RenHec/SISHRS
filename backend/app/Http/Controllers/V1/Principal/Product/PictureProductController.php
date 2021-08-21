@@ -130,7 +130,7 @@ class PictureProductController extends ApiController
      *      ),
      *  )
      */
-    public function show(Room $picture_product)
+    public function show(Product $picture_product)
     {
         $picture_product  = PictureProduct::where('product_id', $picture_product->id)->orderBy('position', 'ASC')->get();
         return $this->showAll($picture_product);
@@ -246,7 +246,7 @@ class PictureProductController extends ApiController
             $arriba = $picture_product->position + 1;
 
             $posicion_baja = PictureProduct::where('product_id', $picture_product->product_id)->where('position', $arriba)->first();
-            if(!is_null($posicion_baja)) {
+            if (!is_null($posicion_baja)) {
                 $posicion_baja->position = $picture_product->position;
                 $posicion_baja->save();
             }
@@ -389,9 +389,6 @@ class PictureProductController extends ApiController
 
                     $img = $this->getB64Image($value['photo']);
                     $image = Image::make($img);
-                    $image->fit(870, 620, function ($constraint) {
-                        $constraint->upsize();
-                    });
                     $image->encode('jpg', 70);
                     $path = "{$picture_product->id}/{$picture_name}.jpg";
                     Storage::disk('product')->put($path, $image);
@@ -399,7 +396,7 @@ class PictureProductController extends ApiController
                     PictureProduct::create(
                         [
                             'photo' => $path,
-                            'position' => $key+1,
+                            'position' => $key + 1,
                             'view' => true,
                             'product_id' => $picture_product->id
                         ]

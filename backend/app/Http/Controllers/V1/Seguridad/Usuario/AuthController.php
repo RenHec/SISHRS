@@ -8,6 +8,8 @@ use App\Models\V1\Seguridad\Usuario;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ApiController;
+use App\Models\V1\Seguridad\Rol;
+use App\Models\V1\Seguridad\UsuarioRol;
 
 class AuthController extends ApiController
 {
@@ -125,8 +127,10 @@ class AuthController extends ApiController
     public function me(Request $request)
     {
         $user = $request->user();
+        $ids = UsuarioRol::where('user_id', $user->id)->pluck('rol_id');
+        $roles = Rol::select('name')->whereIn('id', $ids)->get();
 
-        return $this->successResponse($user);
+        return $this->successResponse(['user' => $user, 'roles' => $roles]);
     }
 
     /**

@@ -45,7 +45,8 @@ class ReservationDetail extends Model
         'coin_id',
         'client_id',
         'type_service_id',
-        'status_id'
+        'status_id',
+        'asign'
     ];
 
     /**
@@ -68,7 +69,8 @@ class ReservationDetail extends Model
         'updated_at' => 'datetime:d/m/Y h:i:s a',
         'arrival_date' => 'datetime:d/m/Y h:i:s a',
         'departure_date' => 'datetime:d/m/Y h:i:s a',
-        'ofert' => 'boolean'
+        'ofert' => 'boolean',
+        'asign' => 'boolean'
     ];
 
     /**
@@ -77,17 +79,6 @@ class ReservationDetail extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-
-    /**
-     * Set the reservation_deatils authorization_code.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setAuthorizationCodeAttribute($value)
-    {
-        $this->attributes['authorization_code'] = Crypt::encryptString($value);
-    }
 
     /**
      * The accessors to append to the model's array form.
@@ -136,7 +127,6 @@ class ReservationDetail extends Model
     {
         return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
     }
-
 
     /**
      * Get the ofert associated with the reservations_details.

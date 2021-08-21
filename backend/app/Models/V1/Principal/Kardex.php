@@ -2,10 +2,14 @@
 
 namespace App\Models\V1\Principal;
 
-use App\Models\Models\V1\Catologo\KardexSatus;
 use App\Models\V1\Catalogo\Coin;
+use App\Models\V1\Principal\Sale;
+use App\Models\V1\Principal\Incomes;
+use App\Models\V1\Principal\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\V1\Catalogo\KardexStatus;
+use App\Models\V1\Principal\ReservationProduct;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Kardex extends Model
@@ -91,7 +95,7 @@ class Kardex extends Model
      */
     public function status()
     {
-        return $this->belongsTo(KardexSatus::class, 'kardex_status_id', 'id');
+        return $this->belongsTo(KardexStatus::class, 'kardex_status_id', 'id');
     }
 
     /**

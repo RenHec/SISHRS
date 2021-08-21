@@ -4,14 +4,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-navigation-drawer
-      v-show="isLogin"
-      v-model="drawer"
-      v-if="drawer"
-      app
-      clipped
-      width="300"
-    >
+    <v-navigation-drawer v-model="$store.state.drawer" app clipped width="300">
       <v-img :aspect-ratio="16 / 10" :src="logo"></v-img>
       <v-list dense>
         <v-list-item @click="redirect('/')" link>
@@ -152,7 +145,6 @@ export default {
     return {
       loading: false,
       dialog_password: false,
-      drawer: false,
       menu: false,
       form: {
         id: 0,
@@ -170,20 +162,19 @@ export default {
         .then((r) => {
           self.$store.dispatch('logout')
           self.$router.push('/login')
-          self.drawer = null
+          this.$store.state.drawer = null
           self.$store.state.is_login = false
           self.loading = false
         })
         .catch((e) => {})
     },
 
-    redirect(item) {
-      this.$router.push({ path: item })
+    mostar() {
+      this.$store.state.drawer = !this.$store.state.drawer ? true : false
     },
 
-    mostar() {
-      let self = this
-      self.drawer = self.drawer ? false : true
+    redirect(item) {
+      this.$router.push({ path: item })
     },
 
     cambiar_password() {
@@ -196,63 +187,59 @@ export default {
     validar_formulario_password(scope) {
       this.$validator.validateAll(scope).then((result) => {
         if (result) {
-          /*this.$swal({
-            title: "Cambiar contraseña",
-            text: "¿Está seguro de realizar esta acción?",
-            type: "warning",
+          this.$swal({
+            title: 'Cambiar contraseña',
+            text: '¿Está seguro de realizar esta acción?',
+            type: 'warning',
             showCancelButton: true,
           }).then((result) => {
             if (result.value) {
-              this.form.password = window.btoa(this.form.password);
-              this.loading = true;
-              this.$store.state.services.UsuarioService.changePassword(
-                this.form
-              )
+              this.form.password = window.btoa(this.form.password)
+              this.loading = true
+              this.$store.state.services.userService
+                .reset(this.form)
                 .then((r) => {
                   if (r.response) {
                     if (r.response.data.code === 404) {
-                      this.$toastr.warning(
-                        r.response.data.error,
-                        "Advertencia"
-                      );
+                      this.$toastr.warning(r.response.data.error, 'Advertencia')
                     } else if (r.response.data.code === 423) {
-                      this.$toastr.warning(
-                        r.response.data.error,
-                        "Advertencia"
-                      );
+                      this.$toastr.warning(r.response.data.error, 'Advertencia')
                     } else {
                       for (let value of Object.values(r.response.data)) {
-                        this.$toastr.error(value, "Mensaje");
+                        this.$toastr.error(value, 'Mensaje')
                       }
                     }
-                    
-                   this.loading = false;
-                    return;
+
+                    this.loading = false
+                    return
                   }
 
-                  this.$toastr.success(r.data, "Mensaje");
+                  this.$toastr.success(r.data, 'Mensaje')
                   this.form.id = 0
                   this.form.password = null
-                  this.dialog_password = false      
+                  this.dialog_password = false
                   this.logout()
                 })
                 .catch((r) => {
-                  this.loading = false;
-                });
+                  this.loading = false
+                })
             } else {
-              this.close();
+              this.close()
             }
-          });*/
+          })
         }
       })
     },
   },
   computed: {
+    drawer() {
+      return this.$store.state.drawer
+    },
+
     isLogin() {
       let self = this
-
       if (self.$store.state.is_login) {
-        this.drawer = true
+        this.$store.state.drawer = true
         this.$vuetify.theme.dark = true
       } else {
         this.$vuetify.theme.dark = false
@@ -263,15 +250,7 @@ export default {
 
     userName() {
       let self = this
-      /*var user = self.$store.state.usuario;
-      if (!_.isEmpty(user)) {
-        return (
-          self.$store.state.usuario.people.names +
-          " " +
-          self.$store.state.usuario.people.surnames
-        );
-      }*/
-      return ''
+      return self.$store.state.usuario.full_name
     },
 
     getMenu() {
@@ -281,11 +260,11 @@ export default {
 
     getImage() {
       let self = this
-      return ''
+      return self.$store.state.picture
     },
 
     logo() {
-      return ''
+      return `${this.$store.state.base_url}img/logo.png`
     },
 
     logo_peque() {

@@ -4,14 +4,16 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
     <v-col cols="12" md="4">
-      <v-list-item style="background: #444140;">
-        <v-list-item-content class="text-center" style="color: white;">
-          <img :src="logo" />
-          <v-list-item-title class="headline">Inicio de Sesión</v-list-item-title>
-          <v-list-item-subtitle style="color: white;">Sistema</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-card class="elevation-12">
+      <v-card class="elevation-12 text-center">
+        <v-img
+          :aspect-ratio="14 / 10"
+          class="img img-fluid img-thumbnail rounded"
+          :src="logo"
+        ></v-img>
+        <v-card-subtitle class="display-2 text-bold">
+          Inicio de Sesión
+        </v-card-subtitle>
+        <v-card-subtitle class="display-1">Sistema</v-card-subtitle>
         <v-card-text>
           <v-form>
             <v-text-field
@@ -21,9 +23,15 @@
               prepend-icon="mdi-account"
               placeholder="número de dpi"
               v-validate="'required|numeric'"
-              :class="{'input':true,'has-errors': errors.has('número de dpi')}"
+              :class="{
+                input: true,
+                'has-errors': errors.has('número de dpi'),
+              }"
             ></v-text-field>
-            <FormError :attribute_name="'número de dpi'" :errors_form="errors"></FormError>
+            <FormError
+              :attribute_name="'número de dpi'"
+              :errors_form="errors"
+            ></FormError>
 
             <v-text-field
               @keypress.enter="beforeLogin"
@@ -33,9 +41,12 @@
               v-model="credentials.password"
               placeholder="Password"
               v-validate="'required'"
-              :class="{'input':true,'has-errors': errors.has('contraseña')}"
+              :class="{ input: true, 'has-errors': errors.has('contraseña') }"
             ></v-text-field>
-            <FormError :attribute_name="'contraseña'" :errors_form="errors"></FormError>
+            <FormError
+              :attribute_name="'contraseña'"
+              :errors_form="errors"
+            ></FormError>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -49,10 +60,10 @@
 </template>
 
 <script>
-import FormError from "../shared/FormError";
-import auth from "../../auth";
+import FormError from '../shared/FormError'
+import auth from '../../auth'
 export default {
-  name: "Login",
+  name: 'Login',
   components: {
     FormError,
   },
@@ -61,48 +72,48 @@ export default {
     return {
       loading: false,
       credentials: {
-        cui: "",
-        password: "",
+        cui: '',
+        password: '',
       },
-    };
+    }
   },
 
   created() {
-    let self = this;
+    let self = this
   },
   methods: {
     login() {
-      let self = this;
-      self.loading = true;
+      let self = this
+      self.loading = true
       self.$store.state.services.loginService
         .login(self.credentials)
         .then((r) => {
-          self.loading = false;
+          self.loading = false
           if (self.$store.state.global.captureError(r)) {
-            self.loading = false;
-            return;
+            self.loading = false
+            return
           }
-          self.$store.dispatch("guardarToken", r.data);
-          auth.getUser();
-          self.$router.push("/");
+          self.$store.dispatch('guardarToken', r.data)
+          auth.getUser()
+          self.$router.push('/')
         })
-        .catch((e) => {});
+        .catch((e) => {})
     },
 
     beforeLogin() {
-      let self = this;
+      let self = this
       self.$validator.validateAll().then((result) => {
         if (result) {
-          self.login();
+          self.login()
         }
-      });
+      })
     },
   },
 
   computed: {
     logo() {
-      return ""
+      return `${this.$store.state.base_url}img/logo.png`
     },
   },
-};
+}
 </script>

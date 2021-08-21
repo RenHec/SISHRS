@@ -37,8 +37,7 @@ class paymentMethodEmail extends Mailable
         <br> El link de pago para cancelar tu reservación con código <strong>{$this->reservation->code}</strong>, 
         es: {$boton}.";
 
-        return $this->from($this->reservation->client->email)
-            ->subject("Link de Pago - Reservación No. {$this->reservation->code}")
+        return $this->subject("Link de Pago - Reservación No. {$this->reservation->code}")
             ->view('email.link')
             ->with([
                 'saludo' => $saludo,

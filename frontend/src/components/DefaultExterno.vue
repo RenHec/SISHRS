@@ -24,40 +24,32 @@
             v-if="data.contract.answer == 'PENDIENTE'"
             class="text-md-center"
           >
-            Actualmente usted tiene una reservación de hospedaje registrada con
-            nosotros,
+            <strong>POLÍTICA DE CANCELACIÓN:</strong>
+            Debido al alto nivel de ocupación,
             <br />
-            es necesario confirmar los terminos y condiciones para poder serguir
-            con el proceso de reservación.
+            no se aceptan cancelaciones y/o modificaciones en las fechas de
+            ingreso/salidas confirmadas.
+            <br />
+            No se harán devoluciones, en ningún de nuestros paquetes previamente
+            cancelados,
+            <br />
+            solamente se hará modificación en traslado de fechas según nuestra
+            disponibilidad.
+            <br />
+            Si una reservación garantizada no se registra en la fecha confirmada
+            o se retira antes,
+            <br />
+            se cobrará el valor total de la estadía de acuerdo a la reservación
+            original.
           </v-card-text>
           <v-card-subtitle
             class="text-center display-2"
-            v-else-if="data.contract.answer == 'ACEPTO'"
+            v-else-if="data.contract.answer == 'ACEPTO' && data.advance == null"
           >
             Términos y condiciones aceptados
             <br />
-            <strong>CANCELAR ANTICIPO</strong>
+            <strong>CANCELAR</strong>
           </v-card-subtitle>
-          <v-card-subtitle
-            class="text-center display-2"
-            v-else-if="data.contract.answer == 'NO ACEPTO'"
-          >
-            Términos y condiciones no aceptados, reservación cancelada.
-          </v-card-subtitle>
-
-          <v-card-text
-            class="text-center display-2 text-success"
-            v-if="data.contract.answer == 'ACEPTO' && data.advance != null"
-          >
-            <template v-if="data.advance.link != null">
-              Hemos enviado el link de pago al correo electrónico:
-              {{ data.reservation.client.email }}
-            </template>
-            <template v-else-if="data.advance.document != null">
-              Si no adjuntaste el comprobante de pago no te preocupes, puedes
-              enviarlo por whatsapp o correo eletrónico.
-            </template>
-          </v-card-text>
 
           <v-card-text
             v-if="data.contract.answer == 'ACEPTO' && data.advance == null"
@@ -100,13 +92,9 @@
                     <div class="font-weight-normal">
                       <strong>{{ item.description }}</strong>
                     </div>
-                    <div v-if="item.accommodation != 0">
+                    <div>
                       {{ item.accommodation }} X {{ item.precio }} =
                       {{ item.sub }}
-                    </div>
-                    <div v-else>
-                      {{ item.quote }} X {{ item.precio }} =
-                      {{ item.sub_formato }}
                     </div>
                   </div>
                 </v-timeline-item>
@@ -119,17 +107,21 @@
                 <v-col class="text-h2 text-right" cols="8">
                   {{ data.reservation.monto_reservacion }}
                 </v-col>
-                <v-col class="text-h4 text-right" cols="4">
+                <v-col class="text-h4 text-right" cols="4" v-if="false">
                   Anticipo
                 </v-col>
-                <v-col class="text-h1 text-right text-success" cols="8">
-                  {{ data.reservation.monto_anticipo }}
+                <v-col
+                  class="text-h1 text-right text-success"
+                  cols="8"
+                  v-if="false"
+                >
+                  {{ data.reservation.monto_anticipo_calculo }}
                 </v-col>
               </v-row>
               <hr />
               <br />
               <v-row>
-                <v-col cols="12" md="12">
+                <v-col cols="12" md="12" v-if="false">
                   <v-radio-group
                     v-model="form.pay"
                     v-validate="'required'"
@@ -212,36 +204,40 @@
             </v-container>
           </v-card-text>
 
-          <v-card-actions
-            v-if="data.contract.answer == 'ACEPTO' && data.advance == null"
+          <v-card-text
+            class="text-center display-2 text-success"
+            v-if="view_forma"
           >
-            <v-spacer></v-spacer>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <div class="text-center">
-                  <v-btn
-                    class="ma-2 btn-block"
-                    elevation="24"
-                    x-large
-                    color="primary"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="metodo_pago('advance')"
-                    outlined
-                    rounded
-                  >
-                    CREAR METODO DE PAGO
-                  </v-btn>
-                </div>
-              </template>
-              <span>Realizar el proceso para pagar el anticipo</span>
-            </v-tooltip>
-            <v-spacer></v-spacer>
-          </v-card-actions>
+            <template v-if="data.advance.way_to_pay_id == 4">
+              Si no adjuntaste el comprobante de pago no te preocupes, puedes
+              enviarlo por whatsapp al número
+              <a
+                href="https://api.whatsapp.com/send/?phone=50241281625&text=Adjunto+mi+boleta+de+pago&app_absent=0"
+                class="link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                41281625
+              </a>
+              o correo eletrónico
+              <a
+                href="mailto:info@lesuissespa.com"
+                class="link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                info@lesuissespa.com
+              </a>
+              .
+            </template>
+            <template v-else>
+              Hemos enviado el link de pago al correo electrónico:
+              {{ data.reservation.client.email }}
+            </template>
+          </v-card-text>
 
           <v-card-actions v-if="data.contract.answer == 'PENDIENTE'">
-            <v-tooltip bottom>
+            <v-tooltip bottom v-if="false">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   elevation="24"
@@ -276,6 +272,32 @@
             </v-tooltip>
           </v-card-actions>
         </template>
+
+        <v-card-actions v-if="view">
+          <v-spacer></v-spacer>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <div class="text-center">
+                <v-btn
+                  class="ma-2 btn-block"
+                  elevation="24"
+                  x-large
+                  color="primary"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="metodo_pago('advance')"
+                  outlined
+                  rounded
+                >
+                  CREAR METODO DE PAGO
+                </v-btn>
+              </div>
+            </template>
+            <span>Realizar el proceso para pagar el anticipo</span>
+          </v-tooltip>
+          <v-spacer></v-spacer>
+        </v-card-actions>
       </v-card>
 
       <v-dialog
@@ -398,13 +420,15 @@ export default {
       data: null,
       way_to_pays_r: [],
       masiva_image: null,
+      view: false,
+      view_forma: false,
     }
   },
 
   computed: {
     logo() {
       return `${this.$store.state.base_url}img/logo.png`
-    }
+    },
   },
 
   created() {
@@ -438,6 +462,17 @@ export default {
           this.form.id = r.data.contract.id
           this.data = r.data
           this.way_to_pays_r = r.data.way
+
+          this.view_forma = false
+          if (r.data.advance != null) {
+            this.view_forma = true
+          }
+
+          if (r.data.contract.answer == 'ACEPTO' && r.data.advance == null) {
+            this.view = true
+          } else {
+            this.view = false
+          }
         })
         .catch((r) => {
           this.$toastr.error('Ocurrio un error', 'Mensaje')
@@ -555,7 +590,6 @@ export default {
     },
 
     recibir() {
-      console.log('sadas')
       this.form.firm = null
       this.canvas = this.$refs.canvas_img
       this.ctx = this.canvas.getContext('2d')

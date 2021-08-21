@@ -46,14 +46,12 @@ class BacPaymentController extends Controller
     public function amexPay(Request $request)
     {
         try {
-            $token = base64_decode($request->hash); //token_contract
-
-            $contract = Contract::where('url', $token)->where('answer', Contract::ACEPTO)->first();
+            $contract = Contract::where('url', $request->hash)->where('answer', Contract::ACEPTO)->first();
             $advance = AdvancePrice::where('contract_id', $contract->id)->first();
 
             $client = new SoapClient($this->wsdlurl, $this->options);
 
-            $signature = $this->Sign($this->password, $this->facId, $this->acquirerId, $contract->reservation->code, $advance->amount, $this->currency);
+            $signature = $this->Sign($this->password, $this->facId, $this->acquirerId, $contract->reservation->id, str_pad('' . ($advance->amount * 100), 12, "0", STR_PAD_LEFT), $this->currency);
 
             $CardDetails = array(
                 'CardCVV2' => $request->cvv,
@@ -65,12 +63,12 @@ class BacPaymentController extends Controller
 
             $TransactionDetails = array(
                 'AcquirerId' => $this->acquirerId,
-                'Amount' => $advance->amount,
+                'Amount' => str_pad('' . ($advance->amount * 100), 12, "0", STR_PAD_LEFT),
                 'Currency' => $this->currency,
                 'CurrencyExponent' => 2,
                 'IPAddress' => '',
                 'MerchantId' => $this->facId,
-                'OrderNumber' => $contract->reservation->code,
+                'OrderNumber' => $contract->reservation->id,
                 'Signature' => $signature,
                 'SignatureMethod' => 'SHA1',
                 'TransactionCode' => '8'
@@ -125,12 +123,11 @@ class BacPaymentController extends Controller
             $advance = AdvancePrice::where('contract_id', $contract->id)->first();
 
             $amountFormatted = number_format($advance->amount, 2, '.', ',');
-
             return view("pay.form_pay", [
                 "hash" => $paymentData,
                 "totalNormal" => "Q {$amountFormatted}",
                 "comercio_name" => 'Eco Le Suisse',
-                "no_orden" => $contract->reservation->code,
+                "no_orden" => $contract->reservation->id,
                 "first_name" => $contract->reservation->client->name,
                 "last_name" => $contract->reservation->client->name,
                 "address_l1" => mb_strtolower("{$contract->reservation->client->municipality->getFullNameAttribute()}, {$contract->reservation->client->ubication}"),
@@ -140,14 +137,14 @@ class BacPaymentController extends Controller
                 "codigo_postal" => '0101',
                 "email" => $contract->reservation->client->email,
                 "phone" => '',
-                "total" => $advance->amount,
+                "total" => str_pad('' . ($advance->amount * 100), 12, "0", STR_PAD_LEFT),
                 "ip" => $this->get_the_user_ip(),
                 "statusPago " => 1,
                 "display" => "none",
                 "status" => $advance->pay,
                 "facId" => $this->facId,
                 "acquiredId" => $this->acquirerId,
-                "signature" => $this->Sign($this->password, $this->facId, $this->acquirerId, $contract->reservation->code, $advance->amount, $this->currency),
+                "signature" => $this->Sign($this->password, $this->facId, $this->acquirerId, $contract->reservation->id, str_pad('' . ($advance->amount * 100), 12, "0", STR_PAD_LEFT), $this->currency),
                 "merRespURL" => route("bac_payment.completeData", $paymentData) //"https://app.centraldepago.com/f/{{$hash}}/completado"
             ]);
         } catch (\Throwable $th) {
@@ -155,18 +152,17 @@ class BacPaymentController extends Controller
         }
     }
 
-    public function getCompletedScreen(Request $request, $paymentData)
+    public function getCompletedScreen(Request $request)
     {
-        dd($request->all(), $paymentData);
-        $token = base64_decode($request->hash); //token_contract
+        $token = $request->hash; //token_contract
         $contract = Contract::where('url', $token)->where('answer', Contract::ACEPTO)->first();
         $advance = AdvancePrice::where('contract_id', $contract->id)->first();
 
         $f = [];
 
-        if ($request->ReasonCode == 3) {
+        /*if ($request->ReasonCode == 3) {
             return ["responseCode" => 515, "msg" => isset($request->ReasonCodeDesc) ? $request->ReasonCodeDesc : "No hay mensaje de error"];
-        }
+        }*/
         if ($request->ReasonCode == 1) {
             $f["ResponseCode"] = $request->ReasonCode;
             $f["ReasonCodeDescription"] = $request->ReasonCodeDesc;
@@ -182,7 +178,7 @@ class BacPaymentController extends Controller
                 "hash" => $request->hash,
                 "totalNormal" => "Q {$amountFormatted}",
                 "comercio_name" => 'Eco Le Suisse',
-                "no_orden" => $contract->reservation->code,
+                "no_orden" => $contract->reservation->id,
                 "first_name" => $contract->reservation->client->name,
                 "last_name" => $contract->reservation->client->name,
                 "address_l1" => mb_strtolower("{$contract->reservation->client->municipality->getFullNameAttribute()}, {$contract->reservation->client->ubication}"),
@@ -192,14 +188,14 @@ class BacPaymentController extends Controller
                 "codigo_postal" => '0101',
                 "email" => $contract->reservation->client->email,
                 "phone" => '',
-                "total" => $advance->amount,
+                "total" => str_pad('' . ($advance->amount * 100), 12, "0", STR_PAD_LEFT),
                 "ip" => $this->get_the_user_ip(),
                 "statusPago " => 2,
                 "display" => "yes",
                 "status" => $advance->pay,
                 "facId" => $this->facId,
                 "acquiredId" => $this->acquirerId,
-                "signature" => $this->Sign($this->password, $this->facId, $this->acquirerId, $contract->reservation->code, $advance->amount, $this->currency),
+                "signature" => $this->Sign($this->password, $this->facId, $this->acquirerId, $contract->reservation->id, str_pad('' . ($advance->amount * 100), 12, "0", STR_PAD_LEFT), $this->currency),
                 "merRespURL" => route("bac_payment.completeData", $request->hash) //"https://app.centraldepago.com/f/{{$hash}}/completado"
             ]);
         }

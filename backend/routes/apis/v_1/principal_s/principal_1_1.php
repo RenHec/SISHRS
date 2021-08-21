@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 //rutas para BinnacleReservationController
-Route::resource('binnacle_reservation', 'BinnacleReservation\BinnacleReservationController')->except('index', 'store', 'create', 'edit');
+Route::resource('binnacle_reservation', 'BinnacleReservation\BinnacleReservationController')->except('store', 'create', 'edit', 'update', 'destroy');
 
 //rutas para ClientController
 Route::resource('client', 'Client\ClientController')->except('create', 'edit');
@@ -54,7 +54,10 @@ Route::name('reservation.buscar_habitaciones')->post('reservation_buscar_habitac
 Route::resource('reservation_detail', 'Reservation\ReservationDetailController')->only('show', 'update', 'destroy');
 
 //rutas para ReservationServiceController
-Route::resource('reservation_service', 'Reservation\ReservationServiceController')->only('show', 'update', 'destroy');
+Route::resource('reservation_service', 'Reservation\ReservationServiceController')->only('index', 'store');
+Route::name('reservation_service.call_services')->get('reservation_service/call_services/{type_service}', 'Reservation\ReservationServiceController@call_services');
+Route::name('reservation_service.start')->get('reservation_service/start/{reservation_service}', 'Reservation\ReservationServiceController@start');
+Route::name('reservation_service.end')->get('reservation_service/end/{reservation_service}', 'Reservation\ReservationServiceController@end');
 
 //rutas para IncomesController
 Route::resource('income', 'Kardex\IncomesController')->only('index', 'store');
@@ -65,8 +68,8 @@ Route::resource('sale', 'Kardex\SaleController')->only('index');
 //rutas para KardexController
 Route::resource('kardex', 'Kardex\KardexController')->only('index');
 
-//rutas para KardexController
-//Route::resource('change_price', 'ChangePriceController\ChangePriceController')->only('index');
+//rutas para ChangePriceController
+Route::resource('change_price', 'ChangePriceController\ChangePriceController')->only('update');
 
 //rutas para ProductController
 Route::resource('product', 'Product\ProductController')->except('create', 'show', 'edit');
@@ -78,11 +81,13 @@ Route::name('picture_product.up')->get('picture_product/up/{picture_product}', '
 Route::name('picture_product.down')->get('picture_product/down/{picture_product}', 'Product\PictureProductController@down');
 
 //rutas para ReservationProductController
-Route::resource('reservation_product', 'Reservation\ReservationProductController')->only('show', 'update', 'destroy');
+Route::resource('reservation_product', 'Reservation\ReservationProductController')->only('index', 'store', 'destroy');
+Route::name('reservation_product.authorization_code')->get('reservation_product/authorization_code/{authorization_code}', 'Reservation\ReservationProductController@authorization_code');
 
 //rutas para ContractController
 Route::get('contract/{link}', 'Reservation\ContractController@validarLink')->name('contract.validarLink');
 Route::put('anticipo/contract/{contract}/reservation/{reservation}', 'Reservation\ContractController@firmaContrato')->name('contract.firmaContrato');
 Route::put('metodo/pago/{contract}/reservation/{reservation}', 'Reservation\ContractController@metodoPago')->name('contract.metodoPago');
-Route::get('metodo/pago/{link}', 'Reservation\ContractController@verficiarLinkBoleta')->name('metodo_pago.verficiarLinkBoleta');
-Route::put('metodo/pago/adjuntar/boleta/{contract}/advance/{advance}', 'Reservation\ContractController@adjuntarBoleta')->name('metodo_pago.adjuntarBoleta');
+
+//rutas para AdvancePriceController
+Route::resource('advance_price', 'Reservation\AdvancePriceController')->only('index', 'update', 'show');

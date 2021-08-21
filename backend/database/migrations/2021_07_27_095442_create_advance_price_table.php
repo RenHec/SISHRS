@@ -25,7 +25,7 @@ class CreateAdvancePriceTable extends Migration
             $table->foreignId('reservation_id')->constrained('reservations');
             $table->foreignId('way_to_pay_id')->constrained('way_to_pay');
             $table->foreignId('coin_id')->constrained('coins');
-            $table->unique('contract_id');
+            //$table->unique('contract_id');
             $table->boolean('pay')->default(false);
             $table->timestamps();
         });

@@ -39,8 +39,7 @@ class contactEmail extends Mailable
         <br> El número de reservación es <strong>{$this->reservation->code}</strong>, 
         el detalle de la reservación te lo damos a conocer a continuación.";
 
-        return $this->from($this->email)
-            ->subject("Terminos y Condiciones - Reservación No. {$this->reservation->code}")
+        return $this->subject("Terminos y Condiciones - Reservación No. {$this->reservation->code}")
             ->view('email.contract')
             /*->attachData($this->pdf, 'constancia.pdf', [
                 'mime' => 'application/pdf',

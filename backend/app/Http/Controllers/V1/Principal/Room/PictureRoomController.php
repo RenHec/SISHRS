@@ -389,9 +389,6 @@ class PictureRoomController extends ApiController
 
                     $img = $this->getB64Image($value['photo']);
                     $image = Image::make($img);
-                    $image->fit(870, 620, function ($constraint) {
-                        $constraint->upsize();
-                    });
                     $image->encode('jpg', 70);
                     $path = "{$picture_room->id}/{$picture_name}.jpg";
                     Storage::disk('room')->put($path, $image);

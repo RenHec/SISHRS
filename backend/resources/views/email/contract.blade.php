@@ -664,7 +664,7 @@
                                                       "
                                                       >
                                                       <multiline>
-                                                        <h1># {{ $item->room->number }}</h1>
+                                                        <h1># {{ $item->room->number }} - Código {{ base64_decode($item->authorization_code) }}</h1>
                                                       </multiline>
                                                       </td>
                                                   </tr>
@@ -1050,7 +1050,7 @@
                                       "
                                     >
                                       <multiline>
-                                        La información de las habitaciones corresponde a las reservadas.
+                                        La información de las habitaciones o servicios corresponden a los reservados.
                                       </multiline>
                                     </td>
                                   </tr>

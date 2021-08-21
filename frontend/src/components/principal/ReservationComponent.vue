@@ -24,7 +24,7 @@
                   :items="listar_servicios"
                   @input="reiniciar"
                   chips
-                  label="Seleccionar servicios"
+                  label="Seleccionar servicio"
                   outlined
                   :clearable="true"
                   :deletable-chips="true"
@@ -286,10 +286,10 @@
           </v-container>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions v-if="habitaciones.length > 0">
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="limpiar">Cancelar</v-btn>
-          <v-btn color="blue darken-1" text @click="agregar">Guardar</v-btn>
+          <v-btn color="red darken-1" @click="limpiar">Cancelar</v-btn>
+          <v-btn color="blue darken-1" @click="agregar">Guardar</v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -644,9 +644,13 @@ export default {
 
     filteredList() {
       if (this.form.nit) {
-        return this.clientes.filter((element) => {
-          return element.nit.toUpperCase().includes(this.form.nit.toUpperCase())
-        })
+        if (this.form.nit.length > 2) {
+          return this.clientes.filter((element) => {
+            return element.nit
+              .toUpperCase()
+              .includes(this.form.nit.toUpperCase())
+          })
+        }
       } else {
         return []
       }
@@ -707,7 +711,7 @@ export default {
       this.todos_precios = []
       this.todos_masajes = []
       this.seleccionados = []
-      this.servicios = []
+      this.servicios = null
 
       this.form.nit = null
       this.form.email = null

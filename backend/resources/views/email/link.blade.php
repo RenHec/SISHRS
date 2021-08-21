@@ -294,7 +294,7 @@
                                 "
                               >
                                 <img
-                                  src="{{ asset('img/logo_sf.svg') }}"
+                                  src="{{ asset('img/logo_sf.png') }}"
                                   width="750"
                                   height="366"
                                   editable="true"
